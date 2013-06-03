@@ -1,0 +1,1 @@
+../../CUtil/include/CAutoPtr.h
