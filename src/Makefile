@@ -28,10 +28,23 @@ CXTimer.cpp \
 CXtTimer.cpp \
 CXUtil.cpp \
 CXWindow.cpp \
+CXrtFont.cpp \
+CWindow.cpp \
+CFont.cpp \
+CFontMgr.cpp \
 
 OBJS = $(patsubst %.cpp,$(OBJ_DIR)/%.o,$(SRC))
 
-CPPFLAGS = -I$(INC_DIR) -I.
+CPPFLAGS = \
+-I$(INC_DIR) \
+-I../../CImageLib/include \
+-I../../CConfig/include \
+-I../../COS/include \
+-I../../CFile/include \
+-I../../CStrUtil/include \
+-I../../CMath/include \
+-I../../CUtil/include \
+-I.
 
 clean:
 	$(RM) -f $(OBJ_DIR)/*.o

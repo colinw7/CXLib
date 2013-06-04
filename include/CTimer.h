@@ -9,6 +9,8 @@
 #include <set>
 #include <list>
 
+typedef unsigned long ulong;
+
 enum CTimerFlags {
   CTIMER_FLAGS_NONE      = 0,
   CTIMER_FLAGS_REPEAT    = (1<<0),

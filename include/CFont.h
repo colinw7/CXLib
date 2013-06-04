@@ -3,6 +3,7 @@
 
 #include <CRefPtr.h>
 #include <CFontStyle.h>
+#include <sys/types.h>
 #include <map>
 
 #define CFONT_DEF_SIZE 14
