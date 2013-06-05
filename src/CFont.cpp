@@ -2,16 +2,8 @@
 #include <CFontMgr.h>
 
 #include <CStrUtil.h>
+#include <CMathGen.h>
 #include <cmath>
-
-#define DEG_TO_RAD(d) (M_PI*(d)/180.0)
-
-namespace {
-  int Round(double x) {
-    if (x >= 0.0) return int(x + 0.5);
-                  return int(x - 0.5);
-  }
-}
 
 CFontFamily::
 CFontFamily(const std::string &name) :
@@ -193,8 +185,8 @@ getIStringBBox(const std::string &str, int x[4], int y[4]) const
   getStringBBox(str, rx, ry);
 
   for (uint i = 0; i < 4; ++i) {
-    x[i] = Round(rx[i]);
-    y[i] = Round(ry[i]);
+    x[i] = CMathGen::Round(rx[i]);
+    y[i] = CMathGen::Round(ry[i]);
   }
 }
 
