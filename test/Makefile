@@ -34,7 +34,14 @@ CPPFLAGS = \
 
 LFLAGS = \
 -L$(LIB_DIR) \
--L.
+-L../../CXLib/lib \
+-L../../CImageLib/lib \
+-L../../CArgs/lib \
+-L../../CFile/lib \
+-L../../COS/lib \
+-L../../CStrUtil/lib \
+-L../../CConfig/lib \
+-L../../CTimer/lib \
 
 clean:
 	$(RM) -f $(OBJ_DIR)/*.o
