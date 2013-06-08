@@ -18,7 +18,7 @@ OBJS = $(patsubst %.cpp,$(OBJ_DIR)/%.o,$(SRC))
 
 LIBS = \
 -lCXLib -lCConfig -lCImageLib -lCTimer -lCArgs \
--lCFile -lCOS -lCStrUtil -lXt -lX11 -lpng
+-lCFile -lCOS -lCStrUtil -lXt -lX11 -lpng -ljpeg
 
 CPPFLAGS = \
 -I$(INC_DIR) \
