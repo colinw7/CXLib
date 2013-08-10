@@ -17,13 +17,14 @@ CXRootImage.cpp \
 OBJS = $(patsubst %.cpp,$(OBJ_DIR)/%.o,$(SRC))
 
 LIBS = \
--lCXLib -lCConfig -lCImageLib -lCTimer -lCArgs \
+-lCXLib -lCConfig -lCImageLib -lCFont -lCTimer -lCArgs \
 -lCFile -lCOS -lCStrUtil -lXt -lX11 -lpng -ljpeg
 
 CPPFLAGS = \
 -I$(INC_DIR) \
 -I../../CXLib/include \
 -I../../CImageLib/include \
+-I../../CFont/include \
 -I../../CArgs/include \
 -I../../CFile/include \
 -I../../COS/include \
@@ -36,6 +37,7 @@ LFLAGS = \
 -L$(LIB_DIR) \
 -L../../CXLib/lib \
 -L../../CImageLib/lib \
+-L../../CFont/lib \
 -L../../CArgs/lib \
 -L../../CFile/lib \
 -L../../COS/lib \

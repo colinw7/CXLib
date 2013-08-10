@@ -30,14 +30,13 @@ CXUtil.cpp \
 CXWindow.cpp \
 CXrtFont.cpp \
 CWindow.cpp \
-CFont.cpp \
-CFontMgr.cpp \
 
 OBJS = $(patsubst %.cpp,$(OBJ_DIR)/%.o,$(SRC))
 
 CPPFLAGS = \
 -I$(INC_DIR) \
 -I../../CImageLib/include \
+-I../../CFont/include \
 -I../../CConfig/include \
 -I../../COS/include \
 -I../../CFile/include \
