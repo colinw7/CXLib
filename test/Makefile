@@ -31,6 +31,7 @@ CPPFLAGS = \
 -I../../CStrUtil/include \
 -I../../CMath/include \
 -I../../CUtil/include \
+-I../../CTimer/include \
 -I.
 
 LFLAGS = \

@@ -42,6 +42,7 @@ CPPFLAGS = \
 -I../../CFile/include \
 -I../../CStrUtil/include \
 -I../../CMath/include \
+-I../../CTimer/include \
 -I../../CUtil/include \
 -I.
 
