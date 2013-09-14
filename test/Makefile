@@ -18,7 +18,7 @@ OBJS = $(patsubst %.cpp,$(OBJ_DIR)/%.o,$(SRC))
 
 LIBS = \
 -lCXLib -lCConfig -lCImageLib -lCFont -lCTimer -lCArgs \
--lCFile -lCOS -lCStrUtil -lXt -lX11 -lpng -ljpeg
+-lCFile -lCUtil -lCOS -lCStrUtil -lXt -lX11 -lpng -ljpeg
 
 CPPFLAGS = \
 -I$(INC_DIR) \
@@ -44,6 +44,7 @@ LFLAGS = \
 -L../../COS/lib \
 -L../../CStrUtil/lib \
 -L../../CConfig/lib \
+-L../../CUtil/lib \
 -L../../CTimer/lib \
 
 clean:

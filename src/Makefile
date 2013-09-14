@@ -29,7 +29,6 @@ CXtTimer.cpp \
 CXUtil.cpp \
 CXWindow.cpp \
 CXrtFont.cpp \
-CWindow.cpp \
 
 OBJS = $(patsubst %.cpp,$(OBJ_DIR)/%.o,$(SRC))
 
