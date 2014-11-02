@@ -2,11 +2,11 @@
 
 #include <X11/XKBlib.h>
 #include <X11/extensions/shape.h>
-#include <cstdlib>
 
 #include <COSSignal.h>
 #include <COSTimer.h>
 #include <COSTime.h>
+#include <CEnv.h>
 #include <CConfig.h>
 #include <CTimer.h>
 
@@ -105,7 +105,7 @@ openDisplay(const string &display_name)
 
   num_screens_ = ScreenCount(display_);
 
-  if (getenv("CX_LIB_DEBUG"))
+  if (CEnvInst.exists("CX_LIB_DEBUG"))
     enterDebugMode();
 
   display_name_ = display_name;
@@ -151,7 +151,7 @@ openXtDisplay(const string &display_name, const string &app_name, int *argc, cha
 
   setDisplay(display);
 
-  if (getenv("CX_LIB_DEBUG"))
+  if (CEnvInst.exists("CX_LIB_DEBUG"))
     enterDebugMode();
 
   display_name_ = display_name;
@@ -3573,6 +3573,8 @@ selectRootRegion(int *xmin, int *ymin, int *xmax, int *ymax) const
   if (! grabPointer(root, event_mask, cursor.getXCursor()))
     return false;
 
+  bool pressed = false;
+
   int x1 = 0, y1 = 0, x2 = 0, y2 = 0;
 
   while (TRUE) {
@@ -3586,20 +3588,26 @@ selectRootRegion(int *xmin, int *ymin, int *xmax, int *ymax) const
 
       drawRectangle(root, gc, std::min(x1, x2), std::min(y1, y2),
                     abs(x2 - x1) + 1, abs(y2 - y1) + 1);
+
+      pressed = true;
     }
     else if (event_.type == MotionNotify) {
-      drawRectangle(root, gc, std::min(x1, x2), std::min(y1, y2),
-                    abs(x2 - x1) + 1, abs(y2 - y1) + 1);
+      if (pressed) {
+        drawRectangle(root, gc, std::min(x1, x2), std::min(y1, y2),
+                      abs(x2 - x1) + 1, abs(y2 - y1) + 1);
 
-      x2 = event_.xmotion.x_root;
-      y2 = event_.xmotion.y_root;
+        x2 = event_.xmotion.x_root;
+        y2 = event_.xmotion.y_root;
 
-      drawRectangle(root, gc, std::min(x1, x2), std::min(y1, y2),
-                    abs(x2 - x1) + 1, abs(y2 - y1) + 1);
+        drawRectangle(root, gc, std::min(x1, x2), std::min(y1, y2),
+                      abs(x2 - x1) + 1, abs(y2 - y1) + 1);
+      }
     }
     else {
       drawRectangle(root, gc, std::min(x1, x2), std::min(y1, y2),
                     abs(x2 - x1) + 1, abs(y2 - y1) + 1);
+
+      pressed = false;
 
       break;
     }

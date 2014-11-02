@@ -1,7 +1,6 @@
 #ifndef CX_GRAPHICS_H
 #define CX_GRAPHICS_H
 
-#include <CRGB.h>
 #include <CRGBA.h>
 #include <CILineDash.h>
 #include <CFont.h>

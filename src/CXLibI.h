@@ -1,4 +1,5 @@
 #include <CStrUtil.h>
+#include <CThrow.h>
 #include <CFontMgr.h>
 #include <CXLib.h>
 
@@ -9,6 +10,3 @@ using std::list;
 using std::cout;
 using std::cerr;
 using std::endl;
-
-#define CTHROW(m) \
-{ std::cerr << m << std::endl; assert(false); }

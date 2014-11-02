@@ -1,4 +1,4 @@
-#include "CXLibI.h"
+#include <CXLibI.h>
 
 CXNamedEvent::
 CXNamedEvent(const string &name) :

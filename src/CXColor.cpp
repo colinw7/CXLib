@@ -1,4 +1,4 @@
-#include "CXLibI.h"
+#include <CXLibI.h>
 
 CXColorMgr::
 CXColorMgr() :
@@ -26,7 +26,7 @@ const CXColor &
 CXColorMgr::
 getCXColor(const CRGB &rgb)
 {
-  CRGBA rgba(rgb.getRed(), rgb.getGreen(), rgb.getBlue());
+  CRGBA rgba(rgb);
 
   return getCXColor(rgba);
 }
@@ -76,8 +76,7 @@ CXColor() :
 
 CXColor::
 CXColor(const CRGB &rgb) :
- screen_(*CXMachineInst->getCXScreen(0)),
- rgba_(rgb.getRed(), rgb.getGreen(), rgb.getBlue())
+ screen_(*CXMachineInst->getCXScreen(0)), rgba_(rgb)
 {
   init();
 }
@@ -98,7 +97,7 @@ CXColor(CXScreen &screen) :
 
 CXColor::
 CXColor(CXScreen &screen, const CRGB &rgb) :
- screen_(screen), rgba_(rgb.getRed(), rgb.getGreen(), rgb.getBlue())
+ screen_(screen), rgba_(rgb)
 {
   init();
 }
@@ -126,7 +125,7 @@ CXColor(CXScreen &screen, Pixel pixel) :
 
 CXColor::
 CXColor(CXScreen &screen, const CRGB &rgb, Pixel pixel) :
- screen_(screen), rgba_(rgb.getRed(), rgb.getGreen(), rgb.getBlue()), pixel_(pixel)
+ screen_(screen), rgba_(rgb), pixel_(pixel)
 {
   init();
 
@@ -183,7 +182,7 @@ setRGB(const CRGB &rgb)
 {
   init();
 
-  rgba_.setRGB(rgb.getRed(), rgb.getGreen(), rgb.getBlue());
+  rgba_.setRGB(rgb);
 }
 
 void
