@@ -4,11 +4,6 @@
 #include <string>
 
 class CXNamedEvent {
- private:
-  std::string  name_;
-  XEvent      *event_;
-  std::string  text_;
-
  public:
   CXNamedEvent(const std::string &name);
  ~CXNamedEvent();
@@ -24,6 +19,11 @@ class CXNamedEvent {
 
  private:
   bool parse();
+
+ private:
+  std::string  name_;
+  XEvent      *event_;
+  std::string  text_;
 };
 
 #endif

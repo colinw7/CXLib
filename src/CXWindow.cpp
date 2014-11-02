@@ -876,7 +876,7 @@ void
 CXWindow::
 setBackground(const CRGB &rgb)
 {
-  setBackground(CRGBA(rgb.getRed(), rgb.getGreen(), rgb.getBlue()));
+  setBackground(CRGBA(rgb));
 }
 
 void
@@ -943,7 +943,7 @@ getForeground(CRGBA &rgba) const
 
   getForeground(rgb);
 
-  rgba = CRGBA(rgb.getRed(), rgb.getGreen(), rgb.getBlue());
+  rgba = CRGBA(rgb);
 }
 
 void
@@ -964,7 +964,7 @@ getBackground(CRGBA &rgba) const
 
   getBackground(rgb);
 
-  rgba = CRGBA(rgb.getRed(), rgb.getGreen(), rgb.getBlue());
+  rgba = CRGBA(rgb);
 }
 
 void

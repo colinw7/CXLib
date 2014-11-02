@@ -1,4 +1,4 @@
-#include "CXLibI.h"
+#include <CXLibI.h>
 
 CXDragWindow::
 CXDragWindow(CXScreen &screen, Window window, int width, int height)

@@ -1,13 +1,4 @@
 #include <CXLibI.h>
-#include <stdlib.h>
-
-#if defined(__cplusplus) || defined(c_plusplus)
-#  define GetVisualClass(v) ((v)->c_class)
-#else
-#  define GetVisualClass(v) ((v)->class)
-#endif
-
-#define IsVisualClass(v,c) (GetVisualClass(v) == (c))
 
 CXScreen::
 CXScreen(int screen_num) :
@@ -417,9 +408,7 @@ CRGB
 CXScreen::
 pixelToRGB(Pixel pixel)
 {
-  CRGBA rgba = pixelToRGBA(pixel);
-
-  return CRGB(rgba.getRed(), rgba.getGreen(), rgba.getBlue());
+  return pixelToRGBA(pixel).getRGB();
 }
 
 CRGBA

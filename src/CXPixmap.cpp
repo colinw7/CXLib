@@ -1,4 +1,4 @@
-#include "CXLibI.h"
+#include <CXLibI.h>
 
 CXPixmap::
 CXPixmap(Window xwin, uint width, uint height) :

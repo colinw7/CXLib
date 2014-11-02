@@ -2,7 +2,6 @@
 #define CX_COLOR_H
 
 #include <CRGBA.h>
-#include <CRGB.h>
 #include <CAutoPtr.h>
 
 #include <map>

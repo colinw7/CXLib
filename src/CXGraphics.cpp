@@ -1,4 +1,4 @@
-#include "CXLibI.h"
+#include <CXLibI.h>
 #include <CXrtFont.h>
 
 bool   CXGraphics::error_trapped = false;
@@ -244,9 +244,7 @@ void
 CXGraphics::
 getForeground(CRGB &rgb)
 {
-  CRGBA rgba = fg_.getRGBA();
-
-  rgb = CRGB(rgba.getRed(), rgba.getGreen(), rgba.getBlue());
+  rgb = fg_.getRGBA().getRGB();
 }
 
 void
@@ -267,9 +265,7 @@ void
 CXGraphics::
 getBackground(CRGB &rgb)
 {
-  CRGBA rgba = bg_.getRGBA();
-
-  rgb = CRGB(rgba.getRed(), rgba.getGreen(), rgba.getBlue());
+  rgb = bg_.getRGBA().getRGB();
 }
 
 void
