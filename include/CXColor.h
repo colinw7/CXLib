@@ -3,7 +3,6 @@
 
 #include <CRGBA.h>
 #include <CAutoPtr.h>
-
 #include <map>
 
 class CXScreen;
