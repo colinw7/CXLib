@@ -556,7 +556,7 @@ setColorsUsed()
   for (int i = 0; i < num_colors_; ++i) {
     Pixel pixel;
 
-    if (! XAllocColorCells(display_, cmap_, False, NULL, 0, &pixel, 1) == 1)
+    if (XAllocColorCells(display_, cmap_, False, NULL, 0, &pixel, 1) != 1)
       break;
 
     color_used_     [pixel] = false;

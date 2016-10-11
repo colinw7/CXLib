@@ -105,10 +105,17 @@ init()
   end_char_   = fs_->max_char_or_byte2;
   num_chars_  = end_char_ - start_char_ + 1;
 
-  for (int i = 0; i < num_chars_; i++) {
-    width_   = std::max(width_  , (int) fs_->per_char[i].width  );
-    ascent_  = std::max(ascent_ , (int) fs_->per_char[i].ascent );
-    descent_ = std::max(descent_, (int) fs_->per_char[i].descent);
+  if (fs_->per_char) {
+    for (int i = 0; i < num_chars_; i++) {
+      width_   = std::max(width_  , (int) fs_->per_char[i].width  );
+      ascent_  = std::max(ascent_ , (int) fs_->per_char[i].ascent );
+      descent_ = std::max(descent_, (int) fs_->per_char[i].descent);
+    }
+  }
+  else {
+    width_   = fs_->min_bounds.width;
+    ascent_  = fs_->min_bounds.ascent;
+    descent_ = fs_->min_bounds.descent;
   }
 
   width_ += 4;
@@ -242,7 +249,12 @@ draw(Window window, GC gc, int x, int y, const string &str)
     if (c < 0 || c >= num_chars_)
       continue;
 
-    int wc = fs_->per_char[c].width;
+    int wc;
+
+    if (fs_->per_char)
+      wc = fs_->per_char[c].width;
+    else
+      wc = fs_->min_bounds.width;
 
     if      (angle_ == 90) {
       int ys = (num_chars_ - 1 - c)*width_;
@@ -340,7 +352,12 @@ drawImage(Window window, GC gc, int x, int y, const string &str)
     if (c < 0 || c >= num_chars_)
       continue;
 
-    int wc = fs_->per_char[c].width;
+    int wc;
+
+    if (fs_->per_char)
+      wc = fs_->per_char[c].width;
+    else
+      wc = fs_->min_bounds.width;
 
     if      (angle_ == 90) {
       XFillRectangle(display_, window, gc, x1, y1 - wc, ascent_ + descent_, wc);
@@ -388,13 +405,20 @@ rotateChar(int c)
   else if (angle_ == 180)
     x2 = (num_chars_ - c1)*width_ - 1;
 
-  int xo = width_ - fs_->per_char[c1].width;
+  int wc1;
+
+  if (fs_->per_char)
+    wc1 = fs_->per_char[c1].width;
+  else
+    wc1 = fs_->min_bounds.width;
+
+  int xo = width_ - wc1;
 
   char c2 = c;
 
   XDrawString(display_, pixmap1_, gc_, x1, ascent_, &c2, 1);
 
-  int char_width  = fs_->per_char[c1].width;
+  int char_width  = wc1;
   int char_height = ascent_ + descent_;
 
   if      (angle_ == 90) {
