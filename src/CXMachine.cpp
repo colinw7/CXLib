@@ -18,7 +18,7 @@ getInstance()
 {
   static CXMachine *instance_;
 
-  if (instance_ == NULL)
+  if (! instance_)
     instance_ = new CXMachine();
 
   return instance_;
@@ -34,7 +34,7 @@ CXMachine()
 
   locked = true;
 
-  display_     = NULL;
+  display_     = 0;
   display_num_ = 0;
   screen_num_  = 0;
   num_screens_ = 0;
@@ -49,7 +49,7 @@ CXMachine()
 
   pedantic_        = false;
   atom_mgr_        = new CXAtomMgr(*this);
-  error_proc_      = NULL;
+  error_proc_      = 0;
 
   XSetErrorHandler(CXMachine::XErrorHandler);
 
@@ -80,7 +80,7 @@ Display *
 CXMachine::
 openDisplay(const string &display_name)
 {
-  if (display_ != NULL) {
+  if (! display_) {
     CTHROW("Display already open");
     return display_;
   }
@@ -88,16 +88,16 @@ openDisplay(const string &display_name)
   string display_name1 = display_name;
 
   if (display_name1 == "") {
-    display_ = XOpenDisplay(NULL);
+    display_ = XOpenDisplay(0);
 
-    if (display_ != NULL)
+    if (display_)
       display_name1 = DisplayString(display_);
   }
   else
     display_ = XOpenDisplay((char *) display_name1.c_str());
 
-  if (display_ == NULL)
-    return NULL;
+  if (! display_)
+    return 0;
 
   CXUtil::decodeDisplayName(display_name1, hostname_, &display_num_, &screen_num_);
 
@@ -120,7 +120,7 @@ Display *
 CXMachine::
 openXtDisplay(const string &display_name, const string &app_name, int *argc, char **argv)
 {
-  if (display_ != NULL) {
+  if (display_) {
     CTHROW("Display already open");
     return display_;
   }
@@ -141,8 +141,8 @@ openXtDisplay(const string &display_name, const string &app_name, int *argc, cha
     XtOpenDisplay(app_context_, display_name.c_str(), app_name.c_str(), class_name.c_str(),
                   NULL, 0, argc, argv);
 
-  if (display == NULL)
-    return NULL;
+  if (! display)
+    return 0;
 
   XtDisplayInitialize(app_context_, display, app_name.c_str(),
                       class_name.c_str(), NULL, 0, argc, argv);
@@ -166,16 +166,16 @@ void
 CXMachine::
 closeDisplay()
 {
-  if (display_ == NULL) {
+  if (! display_) {
     CTHROW("Display not open");
     return;
   }
 
   XCloseDisplay(display_);
 
-  displays_[screen_num_] = NULL;
+  displays_[screen_num_] = 0;
 
-  display_      = NULL;
+  display_      = 0;
   display_name_ = "";
   hostname_     = "";
   display_num_  = 0;
@@ -187,7 +187,7 @@ void
 CXMachine::
 setDisplay(Display *display)
 {
-  if (display != NULL) {
+  if (display) {
     display_ = display;
 
     string display_name = DisplayString(display_);
@@ -199,10 +199,10 @@ setDisplay(Display *display)
     num_screens_ = ScreenCount(display_);
   }
   else {
-    if (display_ != NULL)
-      displays_[screen_num_] = NULL;
+    if (display_)
+      displays_[screen_num_] = 0;
 
-    display_      = NULL;
+    display_      = 0;
     display_name_ = "";
     hostname_     = "";
     display_num_  = 0;
@@ -217,10 +217,10 @@ getScreenDisplay(int screen_num) const
 {
   CXMachine *th = const_cast<CXMachine *>(this);
 
-  if (display_ == NULL) {
+  if (! display_) {
     th->openDisplay("");
 
-    if (display_ == NULL) {
+    if (! display_) {
       cerr << "Failed to open display" << endl;
       exit(1);
     }
@@ -228,7 +228,7 @@ getScreenDisplay(int screen_num) const
 
   if (screen_num < 0 || screen_num >= num_screens_) {
     CTHROW("Invalid Screen Num");
-    return NULL;
+    return 0;
   }
 
   if (screen_num_ == screen_num)
@@ -243,8 +243,8 @@ getScreenDisplay(int screen_num) const
 
   Display *display = XOpenDisplay(display_name1);
 
-  if (display == NULL)
-    return NULL;
+  if (! display)
+    return 0;
 
   th->displays_[screen_num] = display;
 
@@ -257,8 +257,8 @@ getCXScreen(int screen_num) const
 {
   Display *display = getScreenDisplay(screen_num);
 
-  if (display == NULL)
-    return NULL;
+  if (! display)
+    return 0;
 
   CXMachine *th = const_cast<CXMachine *>(this);
 
@@ -345,7 +345,7 @@ CXMachine::
 getRoot(int screen_num) const
 {
   if (screen_num < 0) {
-    if (display_ != NULL)
+    if (display_)
       return DefaultRootWindow(display_);
     else
       return 0;
@@ -379,7 +379,7 @@ getWindowRoot(Window xwin) const
   if (! XQueryTree(display_, xwin, &root, &parent, &children, &num_children))
     return None;
 
-  if (children != NULL)
+  if (children)
     XFree(children);
 
   return root;
@@ -412,7 +412,7 @@ getWindowParent(Window xwin) const
   if (! XQueryTree(display_, xwin, &root, &parent, &children, &num_children))
     return None;
 
-  if (children != NULL)
+  if (children)
     XFree(children);
 
   if (parent == root)
@@ -484,7 +484,7 @@ mainLoop(CXMachineEventProc proc)
     while (eventPending()) {
       nextEvent();
 
-      if (proc != NULL)
+      if (proc)
         (*proc)(this, &event_);
     }
 
@@ -505,9 +505,9 @@ mainLoop(uint twait, CXEventAdapter *adapter)
 
     CTimerMgrInst->tick();
 
-    if      (adapter != NULL)
+    if      (adapter)
       adapter->idleEvent();
-    else if (event_adapter_ != NULL)
+    else if (event_adapter_)
       event_adapter_->idleEvent();
 
     COSTimer::msleep(twait);
@@ -531,9 +531,9 @@ tickLoop(uint nframes, CXEventAdapter *adapter)
       processEvent();
     }
 
-    if      (adapter != NULL)
+    if      (adapter)
       adapter->tickEvent();
-    else if (event_adapter_ != NULL)
+    else if (event_adapter_)
       event_adapter_->tickEvent();
 
     COSTime::getHRTime(&secs2, &usecs2);
@@ -549,20 +549,20 @@ bool
 CXMachine::
 processEvent()
 {
-  CEventAdapter *event_adapter = NULL;
+  CEventAdapter *event_adapter = 0;
 
   event_win_ = getEventWindow(&event_);
 
   CXWindow *window = lookupWindow(event_win_);
 
-  if (window != NULL)
+  if (window)
     event_adapter = window->getEventAdapter();
 
-  if (event_adapter == NULL)
+  if (! event_adapter)
     event_adapter = event_adapter_;
 
 /*
-  if (event_adapter != NULL) {
+  if (event_adapter) {
     if (! (event_.type & event_adapter->event_mask))
       return false;
   }
@@ -585,7 +585,7 @@ processEvent()
         event_button_count_ = 1;
       }
 
-      if (event_adapter != NULL) {
+      if (event_adapter) {
         CMouseEvent bevent(event_pos_, event_button_num_, event_button_count_,
                            CEventModifier(event_modifier_));
 
@@ -601,7 +601,7 @@ processEvent()
 
       event_button_pressed_ = false;
 
-      if (event_adapter != NULL) {
+      if (event_adapter) {
         CMouseEvent bevent(event_pos_, event_button_num_, event_button_count_,
                            CEventModifier(event_modifier_));
 
@@ -613,7 +613,7 @@ processEvent()
     case MotionNotify: {
       event_pos_ = CIPoint2D(event_.xmotion.x, event_.xmotion.y);
 
-      if (event_adapter != NULL) {
+      if (event_adapter) {
         CMouseEvent bevent(event_pos_, event_button_num_, event_button_count_,
                            CEventModifier(event_modifier_));
 
@@ -649,7 +649,7 @@ processEvent()
         }
       }
 
-      if (event_adapter != NULL) {
+      if (event_adapter) {
         string text;
 
         if (event_keysym_ != XK_Shift_L   && event_keysym_ != XK_Shift_R &&
@@ -679,7 +679,7 @@ processEvent()
        else if (event_keysym_ == XK_Alt_L     || event_keysym_ == XK_Alt_R)
          setIsAlt  (false);
 
-      if (event_adapter != NULL) {
+      if (event_adapter) {
         string text;
 
         if (event_keysym_ != XK_Shift_L   && event_keysym_ != XK_Shift_R &&
@@ -703,7 +703,7 @@ processEvent()
       XEvent event1;
 
       if (! checkWindowTypedEvent(event_win_, LeaveNotify, &event1)) {
-        if (event_adapter != NULL)
+        if (event_adapter)
           event_adapter->enterEvent();
       }
 
@@ -713,7 +713,7 @@ processEvent()
       XEvent event1;
 
       if (! checkWindowTypedEvent(event_win_, EnterNotify, &event1)) {
-        if (event_adapter != NULL)
+        if (event_adapter)
           event_adapter->leaveEvent();
       }
 
@@ -721,14 +721,14 @@ processEvent()
     }
     case Expose: {
       if (event_.xexpose.count == 0) {
-        if (event_adapter != NULL)
+        if (event_adapter)
           event_adapter->exposeEvent();
       }
 
       break;
     }
     case ConfigureNotify: {
-      if (event_adapter != NULL) {
+      if (event_adapter) {
         if (window) {
           uint w = event_.xconfigure.width;
           uint h = event_.xconfigure.height;
@@ -747,13 +747,13 @@ processEvent()
       break;
     }
     case UnmapNotify: {
-      if (event_adapter != NULL)
+      if (event_adapter)
         event_adapter->visibilityEvent(false);
 
       break;
     }
     case VisibilityNotify: {
-      if (event_adapter != NULL) {
+      if (event_adapter) {
         bool visible = (event_.xvisibility.state != VisibilityFullyObscured);
 
         event_adapter->visibilityEvent(visible);
@@ -788,7 +788,7 @@ processEvent()
         const CXAtom &atom1 = getAtom(event_.xclient.data.l[0]);
 
         if (isWMDeleteWindowAtom(atom1)) {
-          if (event_adapter != NULL)
+          if (event_adapter)
             event_adapter->closeEvent();
         }
       }
@@ -798,7 +798,7 @@ processEvent()
         const CXAtom &clientAtom = getAtom(event_.xclient.data.l[0]);
 
         if (clientAtom == winMsgAtom) {
-          if (event_adapter != NULL) {
+          if (event_adapter) {
             const CXAtom &msgAtom = getAtom(event_.xclient.data.l[1]);
 
             CXWindow *from = lookupWindow(event_.xclient.data.l[2]);
@@ -811,7 +811,7 @@ processEvent()
       break;
     }
     case DestroyNotify: {
-      if (event_adapter != NULL)
+      if (event_adapter)
         event_adapter->closeEvent();
 
       break;
@@ -936,7 +936,7 @@ convertEvent(XEvent *event)
       return &kevent;
     }
     default:
-      return NULL;
+      return 0;
   }
 }
 
@@ -1091,7 +1091,7 @@ bool
 CXMachine::
 waitForClientMessage(Window, XEvent *event)
 {
-  if (event == NULL) {
+  if (! event) {
     XEvent event1;
 
     while (! checkTypedEvent(ClientMessage, &event1))
@@ -1183,35 +1183,35 @@ getWindowGeometry(Window xwin, int *x, int *y, int *width, int *height, int *bor
   XWindowAttributes attr;
 
   if (XGetWindowAttributes(display_, xwin, &attr)) {
-    if (x != NULL)
+    if (x)
       *x = attr.x;
 
-    if (y != NULL)
+    if (y)
       *y = attr.y;
 
-    if (width != NULL)
+    if (width)
       *width = attr.width;
 
-    if (height != NULL)
+    if (height)
       *height = attr.height;
 
-    if (border != NULL)
+    if (border)
       *border = attr.border_width;
   }
   else {
-    if (x != NULL)
+    if (x)
       *x = 0;
 
-    if (y != NULL)
+    if (y)
       *y = 0;
 
-    if (width != NULL)
+    if (width)
       *width = 1;
 
-    if (height != NULL)
+    if (height)
       *height = 1;
 
-    if (border != NULL)
+    if (border)
       *border = 0;
   }
 }
@@ -1230,11 +1230,11 @@ lookupWindow(Window xwin) const
 
     CXWindow *window = (*p).second->lookupWindow(xwin);
 
-    if (window != NULL)
+    if (window)
       return window;
   }
 
-  return NULL;
+  return 0;
 }
 
 bool
@@ -1286,9 +1286,9 @@ translateCoords(Window src_w, Window dest_w, int src_x, int src_y,
   if (! XTranslateCoordinates(display_, src_w, dest_w, src_x, src_y, &dest_x1, &dest_y1, &child1))
     return false;
 
-  if (dest_x != NULL) *dest_x = dest_x1;
-  if (dest_y != NULL) *dest_y = dest_y1;
-  if (child  != NULL) *child  = child1;
+  if (dest_x) *dest_x = dest_x1;
+  if (dest_y) *dest_y = dest_y1;
+  if (child ) *child  = child1;
 
   return true;
 }
@@ -1805,14 +1805,14 @@ getIntegerProperty(Window xwin, const CXAtom &name, int *value)
   uchar *data;
   int    format;
 
-  if (display_ == NULL)
+  if (! display_)
     return false;
 
   if (XGetWindowProperty(display_, xwin, name.getXAtom(), 0, 1, False, XA_CARDINAL,
                          &type, &format, &n, &left, &data) != Success)
     return false;
 
-  if (n == 0 || data == NULL)
+  if (n == 0 || ! data)
     return false;
 
   CARD32 val = *((CARD32 *) data);
@@ -1841,14 +1841,14 @@ getStringProperty(Window xwin, const CXAtom &name, string &value)
   uchar *data;
   int    format;
 
-  if (display_ == NULL)
+  if (! display_)
     return false;
 
   if (XGetWindowProperty(display_, xwin, name.getXAtom(), 0, 1024, False, XA_STRING,
                          &type, &format, &n, &left, &data) != Success)
     return false;
 
-  if (n == 0 || data == NULL)
+  if (n == 0 || ! data)
     return false;
 
   value = string((char *) data);
@@ -1875,7 +1875,7 @@ getPixmapProperty(Window xwin, const CXAtom &name, Pixmap *value)
   uchar *data;
   int    format;
 
-  if (display_ == NULL)
+  if (! display_)
     return false;
 
   if (XGetWindowProperty(display_, xwin, name.getXAtom(), 0, 1, False, XA_PIXMAP,
@@ -1909,7 +1909,7 @@ getWindowProperty(Window xwin, const CXAtom &name, Window *value)
   uchar *data;
   int    format;
 
-  if (display_ == NULL)
+  if (! display_)
     return false;
 
   if (XGetWindowProperty(display_, xwin, name.getXAtom(), 0, 1, False, XA_CARDINAL,
@@ -2001,7 +2001,7 @@ getWMState(Window xwin)
   uchar *data;
   int    format;
 
-  if (display_ == NULL)
+  if (! display_)
     return false;
 
   if (XGetWindowProperty(display_, xwin, getWMStateAtom().getXAtom(),
@@ -2009,7 +2009,7 @@ getWMState(Window xwin)
                          &type, &format, &n, &left, &data) != Success)
     return false;
 
-  if (n == 0 || data == NULL)
+  if (n == 0 || ! data)
     return false;
 
   int state = ((int *) data)[0];
@@ -2023,14 +2023,14 @@ void
 CXMachine::
 getWMName(Window xwin, string &name)
 {
-  char *cname = NULL;
+  char *cname = 0;
 
   XTextProperty text_prop;
 
   if (XGetWMName(display_, xwin, &text_prop))
     cname = (char *) text_prop.value;
 
-  if (cname != NULL && cname[0] != '\0')
+  if (cname && cname[0] != '\0')
     name = cname;
   else
     name = "";
@@ -2040,14 +2040,14 @@ void
 CXMachine::
 getWMIconName(Window xwin, string &name)
 {
-  char *cname = NULL;
+  char *cname = 0;
 
   XTextProperty text_prop;
 
   if (XGetWMIconName(display_, xwin, &text_prop))
     cname = (char *) text_prop.value;
 
-  if (cname != NULL && cname[0] != '\0')
+  if (cname && cname[0] != '\0')
     name = cname;
 }
 
@@ -2083,7 +2083,7 @@ getWMIconWindowHint(Window xwin)
 
   getWMHints(xwin, &wm_hints);
 
-  if (wm_hints == NULL)
+  if (! wm_hints)
     return None;
 
   if (wm_hints->flags & IconWindowHint) {
@@ -2123,8 +2123,8 @@ getWMClassHint(Window xwin, XClassHint **class_hint)
   static XClassHint class_hint1;
 
   if (! XGetClassHint(display_, xwin, &class_hint1)) {
-    class_hint1.res_name  = NULL;
-    class_hint1.res_class = NULL;
+    class_hint1.res_name  = 0;
+    class_hint1.res_class = 0;
   }
 
   *class_hint = &class_hint1;
@@ -2147,14 +2147,14 @@ void
 CXMachine::
 getWMClientMachine(Window xwin, string &client_machine)
 {
-  char *client_machine1 = NULL;
+  char *client_machine1 = 0;
 
   XTextProperty text_prop;
 
   if (XGetWMClientMachine(display_, xwin, &text_prop))
     client_machine1 = (char *) text_prop.value;
 
-  if (client_machine1 == NULL)
+  if (client_machine1 == 0)
     client_machine1 = (char *) "localhost";
 
   client_machine = client_machine1;
@@ -2202,7 +2202,7 @@ getWMProtocols(Window xwin, const CXAtom ***protocols, int *num_protocols)
 
 bool
 CXMachine::
-getWMMwmHints(Window xwin, MotifWmHints **mwm_hints)
+getWMMwmHints(Window xwin, MotifWmHints &mwm_hints)
 {
   ulong  n;
   Atom   type;
@@ -2210,7 +2210,7 @@ getWMMwmHints(Window xwin, MotifWmHints **mwm_hints)
   uchar *data;
   int    format;
 
-  if (display_ == NULL)
+  if (! display_)
     return false;
 
   if (XGetWindowProperty(display_, xwin, getMwmHintsAtom().getXAtom(),
@@ -2218,10 +2218,16 @@ getWMMwmHints(Window xwin, MotifWmHints **mwm_hints)
                          &type, &format, &n, &left, &data) != Success)
     return false;
 
-  if (data == NULL || n != PROP_MOTIF_WM_HINTS_ELEMENTS)
+  if (! data || n != PROP_MOTIF_WM_HINTS_ELEMENTS)
     return false;
 
-  *mwm_hints = (MotifWmHints *) data;
+  long *ldata = (long *) data;
+
+  mwm_hints.flags       = ldata[0];
+  mwm_hints.functions   = ldata[1];
+  mwm_hints.decorations = ldata[2];
+  mwm_hints.input_mode  = ldata[3];
+  mwm_hints.status      = ldata[4];
 
   return true;
 }
@@ -2951,12 +2957,12 @@ drawImage(Window xwin, GC gc, const CImagePtr &image, int x, int y)
 {
   CXImage *ximage = image.cast<CXImage>();
 
-  if (ximage == NULL)
+  if (! ximage)
     return;
 
   XImage *ximg = ximage->getXImage();
 
-  if (ximg == NULL)
+  if (! ximg)
     return;
 
   putImage(xwin, gc, ximg, 0, 0, x, y, image->getWidth(), image->getHeight());
@@ -2969,12 +2975,12 @@ drawImage(Window xwin, GC gc, const CImagePtr &image, int src_x, int src_y,
 {
   CXImage *ximage = image.cast<CXImage>();
 
-  if (ximage == NULL)
+  if (! ximage)
     return;
 
   XImage *ximg = ximage->getXImage();
 
-  if (ximg == NULL)
+  if (! ximg)
     return;
 
   putImage(xwin, gc, ximg, src_x, src_y, dst_x, dst_y, width, height);
@@ -2986,12 +2992,12 @@ drawAlphaImage(Window xwin, GC gc, const CImagePtr &image, int x, int y)
 {
   CXImage *ximage = image.cast<CXImage>();
 
-  if (ximage == NULL)
+  if (! ximage)
     return;
 
   XImage *ximg = ximage->getXImage();
 
-  if (ximg == NULL)
+  if (! ximg)
     return;
 
   XSetClipOrigin(display_, gc, x, y);
@@ -3467,7 +3473,7 @@ XErrorHandler(Display *, XErrorEvent *event)
   const char *routine = "????";
   const char *message = "????";
 
-  if (event != NULL) {
+  if (event) {
     CXMachineInst->trap_request_code_ = event->request_code;
     CXMachineInst->trap_error_code_   = event->error_code;
 
@@ -3475,7 +3481,7 @@ XErrorHandler(Display *, XErrorEvent *event)
     message = CXMachineInst->getXErrorMessage(event->error_code);
   }
 
-  if (CXMachineInst->error_proc_ != NULL) {
+  if (CXMachineInst->error_proc_) {
     string msg =
       CStrUtil::strprintf("X Error - %s (%d) : %s (%d)",
                           routine, event->request_code, message, event->error_code);
@@ -3534,7 +3540,7 @@ selectWindow() const
   Window root = getRoot();
 
   if (! grabPointer(root, ButtonPressMask, cursor.getXCursor()))
-    return NULL;
+    return 0;
 
   allowEvents(SyncPointer);
 
@@ -3553,7 +3559,7 @@ selectWindow() const
   ungrabPointer();
 
   if (window == None)
-    return NULL;
+    return 0;
 
   return new CXWindow(window);
 }
@@ -3618,10 +3624,10 @@ selectRootRegion(int *xmin, int *ymin, int *xmax, int *ymax) const
   if (x1 == x2 && y1 == y2)
     return false;
 
-  if (xmin != NULL) *xmin = std::min(x1, x2);
-  if (ymin != NULL) *ymin = std::min(y1, y2);
-  if (xmax != NULL) *xmax = std::max(x1, x2);
-  if (ymax != NULL) *ymax = std::max(y1, y2);
+  if (xmin) *xmin = std::min(x1, x2);
+  if (ymin) *ymin = std::min(y1, y2);
+  if (xmax) *xmax = std::max(x1, x2);
+  if (ymax) *ymax = std::max(y1, y2);
 
   return true;
 }
@@ -3671,19 +3677,19 @@ void
 CXMachine::
 selectionClearEvent()
 {
-  CXEventAdapter *event_adapter = NULL;
+  CXEventAdapter *event_adapter = 0;
 
   if (selection_xwin_ != None) {
     CXWindow *window = lookupWindow(selection_xwin_);
 
-    if (window != NULL)
+    if (window)
       event_adapter = window->getXEventAdapter();
   }
 
-  if (event_adapter == NULL)
+  if (! event_adapter)
     event_adapter = event_adapter_;
 
-  if (event_adapter != NULL)
+  if (event_adapter)
     event_adapter->selectionClearEvent();
 
   selection_xwin_ = None;
@@ -3742,7 +3748,7 @@ selectionNotifyEvent(XSelectionEvent *event)
                          &type, &format, &n, &left, &data) != Success)
     return;
 
-  if (data == NULL)
+  if (! data)
     return;
 
   if (type != XA_STRING)
