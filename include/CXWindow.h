@@ -10,6 +10,7 @@
 #include <CXColor.h>
 #include <CEvent.h>
 #include <CAutoPtr.h>
+//#include <CXLibPixelRenderer.h>
 
 class CXEventAdapter;
 
@@ -21,22 +22,6 @@ class CXWindowFactory : public CWindowFactory {
 };
 
 class CXWindow : public CWindow {
- protected:
-  CXScreen                &screen_;
-  CXWindow                *parent_window_;
-  Window                   parent_xwindow_;
-  int                      x_, y_;
-  int                      width_, height_;
-  uint                     last_width_, last_height_;
-  CWindowType              type_;
-  bool                     mapped_;
-  Window                   window_;
-  Display                 *display_;
-  CAutoPtr<CXGraphics>     graphics_;
-  CAutoPtr<CXGraphics>     xor_graphics_;
-  CAutoPtr<CXCursor>       cursor_;
-  CAutoPtr<CEventAdapter>  event_adapter_;
-
  public:
   explicit CXWindow(CWindowType type=CWINDOW_TYPE_NORMAL);
 
@@ -56,6 +41,10 @@ class CXWindow : public CWindow {
   virtual ~CXWindow();
 
   void destroy();
+
+#ifdef CXLIB_PIXEL_RENDERER_H
+  virtual CXLibPixelRenderer *getPixelRenderer() const;
+#endif
 
   CXScreen &getCXScreen() const;
 
@@ -293,7 +282,29 @@ class CXWindow : public CWindow {
   double flipY(double y);
 
   void createXorGraphics() const;
+
+ protected:
+  CXScreen                &screen_;
+  CXWindow                *parent_window_ { nullptr };
+  Window                   parent_xwindow_ { 0 };
+  int                      x_ { 0 }, y_ { 0 };
+  int                      width_ { 0 }, height_ { 0 };
+  uint                     last_width_ { 0 }, last_height_ { 0 };
+  CWindowType              type_;
+  bool                     mapped_ { false };
+  Window                   window_ { 0 };
+  Display                 *display_ { nullptr };
+  CAutoPtr<CXGraphics>     graphics_;
+  CAutoPtr<CXGraphics>     xor_graphics_;
+  CAutoPtr<CXCursor>       cursor_;
+#ifdef CXLIB_PIXEL_RENDERER_H
+  CXLibPixelRenderer      *renderer_ { nullptr };
+#endif
+  bool                     renderer_alloc_ { false };
+  CAutoPtr<CEventAdapter>  event_adapter_;
 };
+
+//------
 
 #include <CXEventAdapter.h>
 
@@ -410,7 +421,7 @@ class CXWindowEventAdapter : public CXEventAdapter {
   }
 
  protected:
-  CXWindow *window_;
+  CXWindow *window_ { nullptr };
 };
 
 #endif

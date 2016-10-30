@@ -9,12 +9,6 @@ class CXScreen;
 class CXColor;
 
 class CXColorMgr {
-  typedef std::map<Pixel, CXColor *> CXColorMap;
-
- private:
-  CXScreen   &screen_;
-  CXColorMap  colormap_;
-
  public:
   CXColorMgr();
   CXColorMgr(CXScreen &screen);
@@ -23,19 +17,17 @@ class CXColorMgr {
   const CXColor &getCXColor(const CRGB &rgb);
   const CXColor &getCXColor(const CRGBA &rgba);
   const CXColor &getCXColor(Pixel pixel);
+
+ private:
+  typedef std::map<Pixel, CXColor *> CXColorMap;
+
+  CXScreen   &screen_;
+  CXColorMap  colormap_;
 };
 
+//------
+
 class CXColor {
- private:
-  CXScreen &screen_;
-  CRGBA     rgba_;
-  Pixel     pixel_;
-  bool      pixel_set_;
-
-  CAutoPtr<CXColor> dark_color_;
-  CAutoPtr<CXColor> light_color_;
-  CAutoPtr<CXColor> inverse_color_;
-
  public:
   CXColor();
 
@@ -100,6 +92,16 @@ class CXColor {
 
  private:
   void init();
+
+ private:
+  CXScreen &screen_;
+  CRGBA     rgba_;
+  Pixel     pixel_;
+  bool      pixel_set_ { false };
+
+  CAutoPtr<CXColor> dark_color_;
+  CAutoPtr<CXColor> light_color_;
+  CAutoPtr<CXColor> inverse_color_;
 };
 
 #endif

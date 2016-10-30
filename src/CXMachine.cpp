@@ -34,22 +34,9 @@ CXMachine()
 
   locked = true;
 
-  display_     = 0;
-  display_num_ = 0;
-  screen_num_  = 0;
-  num_screens_ = 0;
-  app_context_ = 0;
+  event_adapter_  = new CXEventAdapter;
 
-  event_adapter_        = new CXEventAdapter;
-  event_last_time_      = 0;
-  event_modifier_       = CMODIFIER_NONE;
-  event_button_pressed_ = false;
-  event_button_count_   = 0;
-  event_button_time_    = 0;
-
-  pedantic_        = false;
-  atom_mgr_        = new CXAtomMgr(*this);
-  error_proc_      = 0;
+  atomMgr_ = new CXAtomMgr(*this);
 
   XSetErrorHandler(CXMachine::XErrorHandler);
 
@@ -80,7 +67,7 @@ Display *
 CXMachine::
 openDisplay(const string &display_name)
 {
-  if (! display_) {
+  if (display_) {
     CTHROW("Display already open");
     return display_;
   }
@@ -1176,7 +1163,48 @@ getWindowViewable(Window xwin) const
   return (attr.map_state == IsViewable);
 }
 
-void
+bool
+CXMachine::
+getWindowPosition(Window xwin, int *x, int *y) const
+{
+  int x1, y1;
+
+  if (! getWindowGeometry(xwin, &x1, &y1))
+    return false;
+
+  Window parent = getWindowParent(xwin);
+
+  while (parent != None) {
+    int x2, y2;
+
+    if (! getWindowGeometry(parent, &x2, &y2))
+      return false;
+
+    x1 += x2;
+    y1 += y2;
+
+    parent = getWindowParent(parent);
+  }
+
+  *x = x1;
+  *y = y1;
+
+  return true;
+}
+
+bool
+CXMachine::
+getWindowSize(Window xwin, int *w, int *h) const
+{
+  int x1, y1;
+
+  if (! getWindowGeometry(xwin, &x1, &y1, w, h))
+    return false;
+
+  return true;
+}
+
+bool
 CXMachine::
 getWindowGeometry(Window xwin, int *x, int *y, int *width, int *height, int *border) const
 {
@@ -1197,6 +1225,8 @@ getWindowGeometry(Window xwin, int *x, int *y, int *width, int *height, int *bor
 
     if (border)
       *border = attr.border_width;
+
+    return true;
   }
   else {
     if (x)
@@ -1213,6 +1243,8 @@ getWindowGeometry(Window xwin, int *x, int *y, int *width, int *height, int *bor
 
     if (border)
       *border = 0;
+
+    return false;
   }
 }
 
@@ -1665,10 +1697,14 @@ void
 CXMachine::
 getWindowTitle(Window xwin, string &title)
 {
-  const CXAtom &atom = getAtom(XA_WM_NAME);
+  const CXAtom &atom1 = getAtom("_NET_WM_NAME");
 
-  if (! getStringProperty(xwin, atom, title))
-    title = "window";
+  if (! getStringProperty(xwin, atom1, title)) {
+    const CXAtom &atom2 = getAtom(XA_WM_NAME);
+
+    if (! getStringProperty(xwin, atom2, title))
+      title = "window";
+  }
 }
 
 void
@@ -1684,10 +1720,14 @@ void
 CXMachine::
 getIconTitle(Window xwin, string &title)
 {
-  const CXAtom &atom = getAtom(XA_WM_ICON_NAME);
+  const CXAtom &atom1 = getAtom("_NET_WM_ICON_NAME");
 
-  if (! getStringProperty(xwin, atom, title))
-    title = "icon";
+  if (! getStringProperty(xwin, atom1, title)) {
+    const CXAtom &atom2 = getAtom(XA_WM_ICON_NAME);
+
+    if (! getStringProperty(xwin, atom2, title))
+      title = "icon";
+  }
 }
 
 bool
@@ -1698,6 +1738,23 @@ setIntegerProperty(Window xwin, const CXAtom &name, int value)
 
   XChangeProperty(display_, xwin, name.getXAtom(), XA_CARDINAL,
                   32, PropModeReplace, (uchar *) &val, 1);
+
+  return true;
+}
+
+bool
+CXMachine::
+setIntegerArrayProperty(Window xwin, const CXAtom &name, int *values, int num_values)
+{
+  std::vector<long> vals;
+
+  vals.resize(num_values);
+
+  for (int i = 0; i < num_values; ++i)
+    vals[i] = values[i];
+
+  XChangeProperty(display_, xwin, name.getXAtom(), XA_CARDINAL,
+                  32, PropModeReplace, (uchar *) &vals[0], num_values);
 
   return true;
 }
@@ -1727,7 +1784,7 @@ setWindowProperty(Window xwin, const CXAtom &name, Window value)
 {
   CARD32 val = value;
 
-  XChangeProperty(display_, xwin, name.getXAtom(), XA_CARDINAL,
+  XChangeProperty(display_, xwin, name.getXAtom(), XA_WINDOW,
                   32, PropModeReplace, (uchar *) &val, 1);
 
   return true;
@@ -1735,10 +1792,9 @@ setWindowProperty(Window xwin, const CXAtom &name, Window value)
 
 bool
 CXMachine::
-setWindowArrayProperty(Window xwin, const CXAtom &name,
-                       Window *xwins, int num_xwins)
+setWindowArrayProperty(Window xwin, const CXAtom &name, Window *xwins, int num_xwins)
 {
-  XChangeProperty(display_, xwin, name.getXAtom(), XA_CARDINAL,
+  XChangeProperty(display_, xwin, name.getXAtom(), XA_WINDOW,
                   32, PropModeReplace, (uchar *) xwins, num_xwins);
 
   return true;
@@ -1787,6 +1843,8 @@ setStringListProperty(Window xwin, const CXAtom &name, char **strs, int num_strs
 
   return true;
 }
+
+//------
 
 bool
 CXMachine::
@@ -1894,14 +1952,14 @@ getPixmapProperty(Window xwin, const CXAtom &name, Pixmap *value)
 
 bool
 CXMachine::
-getWindowProperty(const CXAtom &name, Window *value)
+getWindowProperty(const CXAtom &name, Window *value) const
 {
   return getWindowProperty(getRoot(), name, value);
 }
 
 bool
 CXMachine::
-getWindowProperty(Window xwin, const CXAtom &name, Window *value)
+getWindowProperty(Window xwin, const CXAtom &name, Window *value) const
 {
   ulong  n;
   Atom   type;
@@ -1912,7 +1970,7 @@ getWindowProperty(Window xwin, const CXAtom &name, Window *value)
   if (! display_)
     return false;
 
-  if (XGetWindowProperty(display_, xwin, name.getXAtom(), 0, 1, False, XA_CARDINAL,
+  if (XGetWindowProperty(display_, xwin, name.getXAtom(), 0, 1, False, XA_WINDOW,
                          &type, &format, &n, &left, &data) != Success)
     return false;
 
@@ -1926,11 +1984,110 @@ getWindowProperty(Window xwin, const CXAtom &name, Window *value)
   return true;
 }
 
+bool
+CXMachine::
+getWindowArrayProperty(Window xwin, const CXAtom &name, std::vector<Window> &windows) const
+{
+  ulong  n;
+  Atom   type;
+  ulong  left;
+  uchar *data;
+  int    format;
+
+  if (! display_)
+    return false;
+
+  if (XGetWindowProperty(display_, xwin, name.getXAtom(), 0, 65535, False, XA_WINDOW,
+                         &type, &format, &n, &left, &data) != Success)
+    return false;
+
+  if (format != 32 || left != 0)
+    return false;
+
+  for (ulong i = 0; i < n; ++i)
+    windows.push_back(((Window *) data)[i]);
+
+  XFree(data);
+
+  return true;
+}
+
+bool
+CXMachine::
+getAtomProperty(Window xwin, const CXAtom &name, CXAtom &atom)
+{
+  ulong  n;
+  Atom   type;
+  ulong  left;
+  uchar *data;
+  int    format;
+
+  if (! display_)
+    return false;
+
+  if (XGetWindowProperty(display_, xwin, name.getXAtom(), 0, 1, False, XA_ATOM,
+                         &type, &format, &n, &left, &data) != Success)
+    return false;
+
+  if (format != 32 || n != 1 || left != 0)
+    return false;
+
+  atom = getAtom(*((Atom *) data));
+
+  XFree(data);
+
+  return true;
+}
+
+bool
+CXMachine::
+getAtomArrayProperty(Window xwin, const CXAtom &name, std::vector<CXAtom> &atoms)
+{
+  ulong  n;
+  Atom   type;
+  ulong  left;
+  uchar *data;
+  int    format;
+
+  if (! display_)
+    return false;
+
+  if (XGetWindowProperty(display_, xwin, name.getXAtom(), 0, 65535, False, XA_ATOM,
+                         &type, &format, &n, &left, &data) != Success)
+    return false;
+
+  if (format != 32 || left != 0)
+    return false;
+
+  for (ulong i = 0; i < n; ++i)
+    atoms.push_back(getAtom(((Atom *) data)[i]));
+
+  XFree(data);
+
+  return true;
+}
+
+//------
+
 void
 CXMachine::
 deleteProperty(Window xwin, const CXAtom &name)
 {
   XDeleteProperty(display_, xwin, name.getXAtom());
+}
+
+//------
+
+bool
+CXMachine::
+isExtendedWM() const
+{
+  Window xwin;
+
+  if (! getWindowProperty(getRoot(), getAtom("_NET_SUPPORTING_WM_CHECK"), &xwin))
+    return false;
+
+  return isValidWindow(xwin);
 }
 
 bool
@@ -2002,15 +2159,15 @@ getWMState(Window xwin)
   int    format;
 
   if (! display_)
-    return false;
+    return -1;
 
   if (XGetWindowProperty(display_, xwin, getWMStateAtom().getXAtom(),
                          0, 3, False, getWMStateAtom().getXAtom(),
                          &type, &format, &n, &left, &data) != Success)
-    return false;
+    return -1;
 
   if (n == 0 || ! data)
-    return false;
+    return -1;
 
   int state = ((int *) data)[0];
 
@@ -2019,36 +2176,42 @@ getWMState(Window xwin)
   return state;
 }
 
-void
+bool
 CXMachine::
 getWMName(Window xwin, string &name)
 {
-  char *cname = 0;
+  name = "";
 
   XTextProperty text_prop;
 
-  if (XGetWMName(display_, xwin, &text_prop))
-    cname = (char *) text_prop.value;
+  if (! XGetWMName(display_, xwin, &text_prop))
+    return false;
+
+  const char *cname = (const char *) text_prop.value;
 
   if (cname && cname[0] != '\0')
     name = cname;
-  else
-    name = "";
+
+  return true;
 }
 
-void
+bool
 CXMachine::
 getWMIconName(Window xwin, string &name)
 {
-  char *cname = 0;
+  name = "";
 
   XTextProperty text_prop;
 
-  if (XGetWMIconName(display_, xwin, &text_prop))
-    cname = (char *) text_prop.value;
+  if (! XGetWMIconName(display_, xwin, &text_prop))
+    return false;
+
+  const char *cname = (const char *) text_prop.value;
 
   if (cname && cname[0] != '\0')
     name = cname;
+
+  return true;
 }
 
 void
@@ -2236,154 +2399,154 @@ const CXAtom &
 CXMachine::
 getWMStateAtom()
 {
-  return atom_mgr_->getWMState();
+  return atomMgr_->getWMState();
 }
 
 const CXAtom &
 CXMachine::
 getMwmHintsAtom()
 {
-  return atom_mgr_->getMwmHints();
+  return atomMgr_->getMwmHints();
 }
 
 const CXAtom &
 CXMachine::
 getWMProtocolsAtom()
 {
-  return atom_mgr_->getWMProtocols();
+  return atomMgr_->getWMProtocols();
 }
 
 const CXAtom &
 CXMachine::
 getWMDeleteWindowAtom()
 {
-  return atom_mgr_->getWMDeleteWindow();
+  return atomMgr_->getWMDeleteWindow();
 }
 
 const CXAtom &
 CXMachine::
 getXSetRootIdAtom()
 {
-  return atom_mgr_->getXSetRootId();
+  return atomMgr_->getXSetRootId();
 }
 
 const CXAtom &
 CXMachine::
 getCwmDesktopAtom()
 {
-  return atom_mgr_->getCwmDesktop();
+  return atomMgr_->getCwmDesktop();
 }
 
 bool
 CXMachine::
 isWMChangeStateAtom(const CXAtom &atom)
 {
-  return atom_mgr_->isWMChangeState(atom);
+  return atomMgr_->isWMChangeState(atom);
 }
 
 bool
 CXMachine::
 isWMClassAtom(const CXAtom &atom)
 {
-  return atom_mgr_->isWMClass(atom);
+  return atomMgr_->isWMClass(atom);
 }
 
 bool
 CXMachine::
 isWMClientMachineAtom(const CXAtom &atom)
 {
-  return atom_mgr_->isWMClientMachine(atom);
+  return atomMgr_->isWMClientMachine(atom);
 }
 
 bool
 CXMachine::
 isWMCommandAtom(const CXAtom &atom)
 {
-  return atom_mgr_->isWMCommand(atom);
+  return atomMgr_->isWMCommand(atom);
 }
 
 bool
 CXMachine::
 isWMDeleteWindowAtom(const CXAtom &atom)
 {
-  return atom_mgr_->isWMDeleteWindow(atom);
+  return atomMgr_->isWMDeleteWindow(atom);
 }
 
 bool
 CXMachine::
 isWMHintsAtom(const CXAtom &atom)
 {
-  return atom_mgr_->isWMHints(atom);
+  return atomMgr_->isWMHints(atom);
 }
 
 bool
 CXMachine::
 isWMIconNameAtom(const CXAtom &atom)
 {
-  return atom_mgr_->isWMIconName(atom);
+  return atomMgr_->isWMIconName(atom);
 }
 
 bool
 CXMachine::
 isWMNameAtom(const CXAtom &atom)
 {
-  return atom_mgr_->isWMName(atom);
+  return atomMgr_->isWMName(atom);
 }
 
 bool
 CXMachine::
 isWMNormalHintsAtom(const CXAtom &atom)
 {
-  return atom_mgr_->isWMNormalHints(atom);
+  return atomMgr_->isWMNormalHints(atom);
 }
 
 bool
 CXMachine::
 isWMProtocolsAtom(const CXAtom &atom)
 {
-  return atom_mgr_->isWMProtocols(atom);
+  return atomMgr_->isWMProtocols(atom);
 }
 
 bool
 CXMachine::
 isWMSaveYourselfAtom(const CXAtom &atom)
 {
-  return atom_mgr_->isWMSaveYourself(atom);
+  return atomMgr_->isWMSaveYourself(atom);
 }
 
 bool
 CXMachine::
 isWMSizeHintsAtom(const CXAtom &atom)
 {
-  return atom_mgr_->isWMSizeHints(atom);
+  return atomMgr_->isWMSizeHints(atom);
 }
 
 bool
 CXMachine::
 isWMStateAtom(const CXAtom &atom)
 {
-  return atom_mgr_->isWMState(atom);
+  return atomMgr_->isWMState(atom);
 }
 
 bool
 CXMachine::
 isWMTakeFocusAtom(const CXAtom &atom)
 {
-  return atom_mgr_->isWMTakeFocus(atom);
+  return atomMgr_->isWMTakeFocus(atom);
 }
 
 bool
 CXMachine::
 isWMTransientForAtom(const CXAtom &atom)
 {
-  return atom_mgr_->isWMTransientFor(atom);
+  return atomMgr_->isWMTransientFor(atom);
 }
 
 bool
 CXMachine::
 isWMZoomHintsAtom(const CXAtom &atom)
 {
-  return atom_mgr_->isWMZoomHints(atom);
+  return atomMgr_->isWMZoomHints(atom);
 }
 
 bool
@@ -2528,6 +2691,102 @@ readStringServerMessage(Window client_xwin, Window *server_xwin, string &str)
   getStringProperty(client_xwin, atom2, str);
 
   return true;
+}
+
+bool
+CXMachine::
+sendActivate(Window window)
+{
+  XClientMessageEvent event;
+
+  memset(&event, 0, sizeof(XClientMessageEvent));
+
+  event.type         = ClientMessage;
+  event.serial       = 0;
+  event.send_event   = True;
+  event.display      = display_;
+  event.window       = window;
+  event.message_type = getAtom("_NET_ACTIVE_WINDOW").getXAtom();
+  event.format       = 32;
+  event.data.l[0]    = 2;
+  event.data.l[1]    = CurrentTime;
+  event.data.l[2]    = 0;
+
+  Window root = getRoot();
+
+  if (! XSendEvent(display_, root, False, (SubstructureNotifyMask|SubstructureRedirectMask),
+                   (XEvent *) &event))
+    return true;
+
+  return false;
+}
+
+bool
+CXMachine::
+sendMoveWindowBy(Window window, int dx, int dy)
+{
+  int x, y;
+
+  if (! CXMachineInst->getWindowPosition(window, &x, &y))
+    return false;
+
+  int w, h;
+
+  if (! CXMachineInst->getWindowSize(window, &w, &h))
+    return false;
+
+  XClientMessageEvent event;
+
+  memset(&event, 0, sizeof(XClientMessageEvent));
+
+  event.type         = ClientMessage;
+  event.serial       = 0;
+  event.send_event   = True;
+  event.display      = display_;
+  event.window       = window;
+  event.message_type = getAtom("_NET_MOVERESIZE_WINDOW").getXAtom();
+  event.format       = 32;
+  event.data.l[0]    = StaticGravity | (0xF << 8) | (0x2 << 12);
+  event.data.l[1]    = x + dx;
+  event.data.l[2]    = y + dy;
+  event.data.l[3]    = w;
+  event.data.l[4]    = h;
+
+  Window root = getRoot();
+
+  if (! XSendEvent(display_, root, False, (SubstructureNotifyMask|SubstructureRedirectMask),
+                   (XEvent *) &event))
+    return true;
+
+  return false;
+}
+
+bool
+CXMachine::
+sendRestackWindow(Window window, Window sibling, bool above)
+{
+  XClientMessageEvent event;
+
+  memset(&event, 0, sizeof(XClientMessageEvent));
+
+  event.type         = ClientMessage;
+  event.serial       = 0;
+  event.send_event   = True;
+  event.display      = display_;
+  event.window       = window;
+  event.message_type = getAtom("_NET_RESTACK_WINDOW").getXAtom();
+  event.format       = 32;
+  event.data.l[0]    = 2; // pager
+  event.data.l[1]    = sibling;
+  event.data.l[2]    = (above ? Above : Below);
+
+  Window root = getRoot();
+
+  if (! XSendEvent(display_, root, False, (SubstructureNotifyMask|SubstructureRedirectMask),
+                   (XEvent *) &event))
+    return true;
+
+  return false;
 }
 
 bool
@@ -3030,14 +3289,14 @@ const CXAtom &
 CXMachine::
 getAtom(const string &name) const
 {
-  return atom_mgr_->getCXAtom(name);
+  return atomMgr_->getCXAtom(name);
 }
 
 const CXAtom &
 CXMachine::
 getAtom(Atom atom) const
 {
-  return atom_mgr_->getCXAtom(atom);
+  return atomMgr_->getCXAtom(atom);
 }
 
 KeySym

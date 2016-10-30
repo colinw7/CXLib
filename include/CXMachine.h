@@ -28,10 +28,6 @@ struct CXEventAdapter;
 enum { CXLIB_MAX_FONTS = 1000 };
 
 class CXFontList {
- private:
-  char **fonts_;
-  int    num_fonts_;
-
  public:
   CXFontList(const char *pattern=CXLIB_ALL_FONTS_PATTERN, uint max_fonts=CXLIB_MAX_FONTS);
  ~CXFontList();
@@ -39,59 +35,17 @@ class CXFontList {
   uint getNumFonts() const { return num_fonts_; }
 
   const char *getFont(uint i) const { return fonts_[i]; }
+
+ private:
+  char **fonts_ { nullptr };
+  int    num_fonts_ { 0 };
 };
+
+//------
 
 class CXMachine {
  public:
   typedef void (*XErrorProc)(const std::string &str);
-
- private:
-  struct MaximizeData {
-    int x, y, width, height;
-  };
-
-  typedef std::map<int, Display  *>   DisplayMap;
-  typedef std::map<int, CXScreen *>   CXScreenMap;
-  typedef std::map<int, MaximizeData> MaximizeDataMap;
-
-  Display      *display_;
-  std::string   display_name_;
-  std::string   hostname_;
-  int           display_num_;
-  int           screen_num_;
-  int           num_screens_;
-  XtAppContext  app_context_;
-
-  CAutoPtr<CXEventAdapter> event_adapter_;
-  XEvent                   event_;
-  Time                     event_last_time_;
-  Window                   event_win_;
-  CIPoint2D                event_pos_;
-  CMouseButton             event_button_num_;
-  bool                     event_button_pressed_;
-  Time                     event_button_time_;
-  int                      event_button_count_;
-  KeySym                   event_keysym_;
-  uint                     event_modifier_;
-
-  bool pedantic_;
-
-  bool trap_active_;
-  int  trap_request_code_;
-  int  trap_error_code_;
-
-  DisplayMap  displays_;
-  CXScreenMap screens_;
-
-  MaximizeDataMap max_data_map_;
-
-  CAutoPtr<CXAtomMgr> atom_mgr_;
-
-  XErrorProc  error_proc_;
-
-  Window      selection_xwin_;
-  bool        selection_set_;
-  std::string selection_text_;
 
  public:
   static CXMachine *getInstance();
@@ -235,7 +189,12 @@ class CXMachine {
 
   bool getWindowViewable(Window xwin) const;
 
-  void getWindowGeometry(Window xwin, int *x, int *y, int *width, int *height, int *border) const;
+  bool getWindowPosition(Window xwin, int *x, int *y) const;
+
+  bool getWindowSize(Window xwin, int *w, int *h) const;
+
+  bool getWindowGeometry(Window xwin, int *x, int *y,
+                         int *width=0, int *height=0, int *border=0) const;
 
   CXWindow *lookupWindow(Window xwin) const;
 
@@ -320,25 +279,44 @@ class CXMachine {
   void setIconTitle(Window xwin, const std::string &title);
   void getIconTitle(Window xwin, std::string &title);
 
-  bool setIntegerProperty(Window xwin, const CXAtom &name, int value);
-  bool setStringProperty(Window xwin, const CXAtom &name, const std::string &value);
-  bool setWindowProperty(const CXAtom &name, Window value);
-  bool setWindowProperty(Window xwin, const CXAtom &name, Window value);
-  bool setWindowArrayProperty(Window xwin, const CXAtom &name, Window *xwins, int num_xwins);
-  bool setAtomProperty(Window xwin, const CXAtom &name, const CXAtom *atom);
-  bool setAtomArrayProperty(Window xwin, const CXAtom &name, const CXAtom **atoms, int num_atoms);
+  //---
+
+  bool setIntegerProperty     (Window xwin, const CXAtom &name, int value);
+  bool setIntegerArrayProperty(Window xwin, const CXAtom &name, int *values, int num_values);
+
+  bool setStringProperty    (Window xwin, const CXAtom &name, const std::string &value);
   bool setStringListProperty(Window xwin, const CXAtom &name, char **strs, int num_strs);
+
+  bool setWindowProperty     (const CXAtom &name, Window value);
+  bool setWindowProperty     (Window xwin, const CXAtom &name, Window value);
+  bool setWindowArrayProperty(Window xwin, const CXAtom &name, Window *xwins, int num_xwins);
+
+  bool setAtomProperty     (Window xwin, const CXAtom &name, const CXAtom *atom);
+  bool setAtomArrayProperty(Window xwin, const CXAtom &name, const CXAtom **atoms, int num_atoms);
+
+  //---
 
   bool getIntegerProperty(const CXAtom &name, int *value);
   bool getIntegerProperty(Window xwin, const CXAtom &name, int *value);
+
   bool getStringProperty(const CXAtom &name, std::string &value);
   bool getStringProperty(Window xwin, const CXAtom &name, std::string &value);
+
   bool getPixmapProperty(const CXAtom &name, Pixmap *value);
   bool getPixmapProperty(Window xwin, const CXAtom &name, Pixmap *value);
-  bool getWindowProperty(const CXAtom &name, Window *value);
-  bool getWindowProperty(Window xwin, const CXAtom &name, Window *value);
+
+  bool getWindowProperty     (const CXAtom &name, Window *value) const;
+  bool getWindowProperty     (Window xwin, const CXAtom &name, Window *value) const;
+  bool getWindowArrayProperty(Window xwin, const CXAtom &name, std::vector<Window> &windows) const;
+
+  bool getAtomProperty     (Window xwin, const CXAtom &name, CXAtom &atom);
+  bool getAtomArrayProperty(Window xwin, const CXAtom &name, std::vector<CXAtom> &atoms);
+
+  //---
 
   void deleteProperty(Window xwin, const CXAtom &name);
+
+  bool isExtendedWM() const;
 
   bool isWMWindow(Window xwin);
 
@@ -348,8 +326,8 @@ class CXMachine {
   bool isWMStateIconic(Window xwin);
   int  getWMState(Window xwin);
 
-  void getWMName(Window xwin, std::string &name);
-  void getWMIconName(Window xwin, std::string &name);
+  bool getWMName(Window xwin, std::string &name);
+  bool getWMIconName(Window xwin, std::string &name);
 
   void getWMNormalHints(Window xwin, XSizeHints **size_hints, int *supplied);
   bool setWMNormalHints(Window xwin, XSizeHints *size_hints);
@@ -395,13 +373,17 @@ class CXMachine {
   bool isWMTransientForAtom(const CXAtom &atom);
   bool isWMZoomHintsAtom(const CXAtom &atom);
 
-  bool sendKeyPressedEvent(Window xwin, int x, int y, int keycode);
+  bool sendKeyPressedEvent (Window xwin, int x, int y, int keycode);
   bool sendKeyReleasedEvent(Window xwin, int x, int y, int keycode);
 
   bool sendStringClientMessage(Window server_xwin, Window client_xwin, const std::string &str);
   bool readStringClientMessage(Window server_xwin, Window *client_xwin, std::string &str);
   bool sendStringServerMessage(Window client_xwin, Window server_xwin, const std::string &str);
   bool readStringServerMessage(Window client_xwin, Window *server_xwin, std::string &str);
+
+  bool sendActivate(Window window);
+  bool sendMoveWindowBy(Window window, int dx, int dy);
+  bool sendRestackWindow(Window window, Window sibling, bool above=true);
 
   bool sendWindowMessage(Window from, Window to, const std::string &str);
 
@@ -547,6 +529,54 @@ class CXMachine {
  private:
   bool getMonitorWidthMM(double *width);
   bool getMonitorHeightMM(double *height);
+
+ private:
+  struct MaximizeData {
+    int x, y, width, height;
+  };
+
+  typedef std::map<int, Display  *>   DisplayMap;
+  typedef std::map<int, CXScreen *>   CXScreenMap;
+  typedef std::map<int, MaximizeData> MaximizeDataMap;
+
+  Display*     display_ { nullptr };
+  std::string  display_name_;
+  std::string  hostname_;
+  int          display_num_ { 0 };
+  int          screen_num_  { 0 };
+  int          num_screens_ { 0 };
+  XtAppContext app_context_ { nullptr };
+
+  CAutoPtr<CXEventAdapter> event_adapter_;
+  XEvent                   event_;
+  Time                     event_last_time_ { 0 };
+  Window                   event_win_ { None };
+  CIPoint2D                event_pos_;
+  CMouseButton             event_button_num_ { CBUTTON_NONE };
+  bool                     event_button_pressed_ { false };
+  Time                     event_button_time_ { 0 };
+  int                      event_button_count_ { 0 };
+  KeySym                   event_keysym_ { 0 };
+  uint                     event_modifier_ { CMODIFIER_NONE };
+
+  bool pedantic_ { false };
+
+  bool trap_active_       { false };
+  int  trap_request_code_ { 0 };
+  int  trap_error_code_   { 0 };
+
+  DisplayMap  displays_;
+  CXScreenMap screens_;
+
+  MaximizeDataMap max_data_map_;
+
+  CAutoPtr<CXAtomMgr> atomMgr_;
+
+  XErrorProc error_proc_ { 0 };
+
+  Window      selection_xwin_ { None };
+  bool        selection_set_ { false };
+  std::string selection_text_;
 };
 
 #include <CXEventAdapter.h>

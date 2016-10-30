@@ -490,10 +490,9 @@ createImageData()
       for (int ix = 0; ix < ximage_->width; ++ix) {
         pixel = XGetPixel(ximage_, ix, iy);
 
-        CRGB rgb = screen_.pixelToRGB(pixel);
-
         //pixel |= 0xFF000000;
-        setData(x1 + ix, y1 + iy, CImage::rgbaToPixel(rgb));
+
+        setData(x1 + ix, y1 + iy, pixel);
       }
     }
   }

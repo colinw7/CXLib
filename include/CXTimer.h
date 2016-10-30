@@ -6,9 +6,6 @@
 class CXTimer1;
 
 class CXTimer {
- private:
-  CXTimer1 *timer_;
-
  public:
   CXTimer(uint msecs, CTimerFlags flags);
 
@@ -17,6 +14,9 @@ class CXTimer {
   virtual void timeOut() { }
 
   void restart();
+
+ private:
+  CXTimer1 *timer_ { nullptr };
 };
 
 #endif

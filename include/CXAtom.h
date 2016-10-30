@@ -1,26 +1,12 @@
 #ifndef CX_ATOM_H
 #define CX_ATOM_H
 
+#include <map>
+
 class CXMachine;
 class CXAtom;
 
 class CXAtomMgr {
- private:
-  const CXAtom *XA_WM_PROTOCOLS;
-  const CXAtom *XA_WM_TAKE_FOCUS;
-  const CXAtom *XA_WM_SAVE_YOURSELF;
-  const CXAtom *XA_WM_DELETE_WINDOW;
-  const CXAtom *XA_WM_STATE;
-  const CXAtom *XA_WM_CHANGE_STATE;
-  const CXAtom *XA_MWM_HINTS;
-  const CXAtom *XA_XSETROOT_ID;
-  const CXAtom *XA_CWM_DESKTOP;
-
-  typedef std::map<std::string, CXAtom *> CXAtomMap;
-
-  CXMachine &machine_;
-  CXAtomMap  atom_map_;
-
  public:
   CXAtomMgr();
   CXAtomMgr(CXMachine &machine);
@@ -58,23 +44,39 @@ class CXAtomMgr {
   const CXAtom &getCXAtom(Atom atom);
 
  private:
-  void init();
+  const CXAtom *XA_WM_PROTOCOLS { 0 };
+  const CXAtom *XA_WM_TAKE_FOCUS { 0 };
+  const CXAtom *XA_WM_SAVE_YOURSELF { 0 };
+  const CXAtom *XA_WM_DELETE_WINDOW { 0 };
+  const CXAtom *XA_WM_STATE { 0 };
+  const CXAtom *XA_WM_CHANGE_STATE { 0 };
+  const CXAtom *XA_MWM_HINTS { 0 };
+  const CXAtom *XA_XSETROOT_ID { 0 };
+  const CXAtom *XA_CWM_DESKTOP { 0 };
+
+  typedef std::map<std::string, CXAtom *> CXAtomMap;
+
+  CXMachine &machine_;
+  CXAtomMap  atom_map_;
 };
 
-class CXAtom {
- private:
-  std::string name_;
-  Atom        xatom_;
+//------
 
+class CXAtom {
  public:
-  CXAtom(const std::string &name, Atom xatom);
+  CXAtom(const std::string &name="", Atom xatom=0);
 
   std::string getName () const { return name_ ; }
-  Atom   getXAtom() const { return xatom_; }
+
+  Atom getXAtom() const { return xatom_; }
 
   bool isXAtom(Atom xatom) const { return xatom == xatom_; }
 
   bool operator==(const CXAtom &atom) const { return xatom_ == atom.xatom_; }
+
+ private:
+  std::string name_;
+  Atom        xatom_ { 0 };
 };
 
 #endif

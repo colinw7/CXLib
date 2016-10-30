@@ -7,11 +7,6 @@ class CXScreen;
 #include <CCursor.h>
 
 class CXCursor {
- private:
-  CXScreen    &screen_;
-  CCursorType  type_;
-  Cursor       xcursor_;
-
  public:
   CXCursor(CXScreen &screen, CCursorType type);
   CXCursor(CCursorType type);
@@ -28,6 +23,11 @@ class CXCursor {
   void init();
 
   uint lookupCursorShape(CCursorType type);
+
+ private:
+  CXScreen    &screen_;
+  CCursorType  type_;
+  Cursor       xcursor_;
 };
 
 #endif

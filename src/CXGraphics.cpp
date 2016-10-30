@@ -637,6 +637,7 @@ drawText(int x, int y, const string &str)
     xrt_font->draw(window_, gc_, x, y, str);
 }
 
+#if 0
 void
 CXGraphics::
 drawTextImage(int x, int y, const string &str)
@@ -658,6 +659,7 @@ drawTextImage(int x, int y, const string &str)
   else
     xrt_font->drawImage(window_, gc_, x, y, str);
 }
+#endif
 
 void
 CXGraphics::

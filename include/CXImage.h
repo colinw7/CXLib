@@ -8,14 +8,6 @@ class CXScreen;
 #include <CXColor.h>
 
 class CXImage : public CImage {
- private:
-  CXScreen &screen_;
-  uchar    *xdata_;
-  XImage   *ximage_;
-  bool      ximage_owner_;
-  Pixmap    pixmap_;
-  Pixmap    mask_;
-
   // Create
 
  protected:
@@ -107,6 +99,14 @@ class CXImage : public CImage {
 
   int getDataSize();
   int getRowSize();
+
+ private:
+  CXScreen &screen_;
+  uchar    *xdata_ { nullptr };
+  XImage   *ximage_ { nullptr };
+  bool      ximage_owner_ { false };
+  Pixmap    pixmap_ { 0 };
+  Pixmap    mask_ { 0 };
 };
 
 #endif

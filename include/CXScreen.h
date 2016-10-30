@@ -9,34 +9,6 @@ class CXColorMgr;
 class CXWindow;
 
 class CXScreen {
- private:
-  typedef std::map<Window,CXWindow *> WindowMap;
-
-  Display    *display_;
-  int         screen_num_;
-  Screen     *screen_;
-  Visual     *visual_;
-  Colormap    cmap_;
-  int         x_, y_;
-  int         width_, height_;
-  int         depth_;
-  bool        gray_scale_;
-  bool        has_colormap_;
-  int         num_colors_;
-  CXColor     black_color_, white_color_;
-
-  std::vector<XColor> colors_;
-  int                 num_used_colors_;
-  std::vector<bool>   color_used_;
-  std::vector<bool>   color_allocated_;
-
-  uint red_mask_, green_mask_, blue_mask_, alpha_mask_;
-  int  red_shift_, green_shift_, blue_shift_, alpha_shift_;
-
-  WindowMap   window_map_;
-
-  CXColorMgr *color_mgr_;
-
  public:
   CXScreen(int screen_num);
   CXScreen(const CXScreen &screen);
@@ -114,6 +86,34 @@ class CXScreen {
   void freeAllocatedColors();
 
   void decodeVisualMask(uint full_mask, int *shift, uint *mask);
+
+ private:
+  typedef std::map<Window,CXWindow *> WindowMap;
+
+  Display    *display_ { nullptr };
+  int         screen_num_ { 0 };
+  Screen     *screen_ { nullptr };
+  Visual     *visual_ { nullptr };
+  Colormap    cmap_;
+  int         x_ { 0 }, y_ { 0 };
+  int         width_ { 0 }, height_ { 0 };
+  int         depth_ { 0 };
+  bool        gray_scale_ { false };
+  bool        has_colormap_ { false };
+  int         num_colors_ { 0 };
+  CXColor     black_color_, white_color_;
+
+  std::vector<XColor> colors_;
+  int                 num_used_colors_ { 0 };
+  std::vector<bool>   color_used_;
+  std::vector<bool>   color_allocated_;
+
+  uint red_mask_ { 0 }, green_mask_ { 0 }, blue_mask_ { 0 }, alpha_mask_ { 0 };
+  int  red_shift_ { 0 }, green_shift_ { 0 }, blue_shift_ { 0 }, alpha_shift_ { 0 };
+
+  WindowMap   window_map_;
+
+  CXColorMgr *color_mgr_ { nullptr };
 };
 
 #endif

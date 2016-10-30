@@ -4,6 +4,8 @@
 #include <std_Xt.h>
 #include <string>
 
+//class CPixelRenderer;
+
 class CXrtFont {
  public:
   CXrtFont(Display *display, XFontStruct *fs, double angle);
@@ -26,6 +28,12 @@ class CXrtFont {
 
   void drawImage(Window window, GC gc, int x, int y, const std::string &str);
 
+#ifdef CPIXEL_RENDERER_H
+  void draw(CPixelRenderer *renderer, int x, int y, const std::string &str);
+
+  void drawImage(CPixelRenderer *renderer, int x, int y, const std::string &str);
+#endif
+
   XFontStruct *getFontStruct();
 
  private:
@@ -38,22 +46,22 @@ class CXrtFont {
   static int XErrorHandler(Display *display, XErrorEvent *event);
 
  private:
-  Display     *display_;
-  Window       window_;
-  int          angle_;
+  Display     *display_ { nullptr };
+  Window       window_ { 0 };
+  int          angle_ { 0 };
   std::string  name_;
-  XFontStruct *fs_;
-  Pixmap       pixmap1_;
-  Pixmap       pixmap2_;
-  XImage      *ximage_;
-  GC           gc_;
-  int          width_;
-  int          ascent_;
-  int          descent_;
-  int          start_char_;
-  int          end_char_;
-  int          num_chars_;
-  bool        *rotated_;
+  XFontStruct *fs_ { nullptr };
+  Pixmap       pixmap1_ { 0 };
+  Pixmap       pixmap2_ { 0 };
+  XImage      *ximage_ { nullptr };
+  GC           gc_ { 0 };
+  int          width_ { 8 };
+  int          ascent_ { 8 };
+  int          descent_ { 2 };
+  int          start_char_ { 0 };
+  int          end_char_ { 0 };
+  int          num_chars_ { 0 };
+  bool        *rotated_ { nullptr };
 };
 
 #endif

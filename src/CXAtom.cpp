@@ -4,29 +4,12 @@ CXAtomMgr::
 CXAtomMgr() :
  machine_(*CXMachineInst)
 {
-  init();
 }
 
 CXAtomMgr::
 CXAtomMgr(CXMachine &machine) :
  machine_(machine)
 {
-  init();
-}
-
-void
-CXAtomMgr::
-init()
-{
-  XA_WM_PROTOCOLS     = NULL;
-  XA_WM_TAKE_FOCUS    = NULL;
-  XA_WM_SAVE_YOURSELF = NULL;
-  XA_WM_DELETE_WINDOW = NULL;
-  XA_WM_STATE         = NULL;
-  XA_WM_CHANGE_STATE  = NULL;
-  XA_MWM_HINTS        = NULL;
-  XA_XSETROOT_ID      = NULL;
-  XA_CWM_DESKTOP      = NULL;
 }
 
 bool
@@ -282,6 +265,8 @@ getCXAtom(Atom atom)
 
   return getCXAtom(name);
 }
+
+//---
 
 CXAtom::
 CXAtom(const string &name, Atom xatom) :

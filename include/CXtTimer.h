@@ -6,9 +6,6 @@
 class CXtTimer1;
 
 class CXtTimer {
- private:
-  CXtTimer1 *timer_;
-
  public:
   CXtTimer(uint msecs, CTimerFlags flags);
 
@@ -17,6 +14,9 @@ class CXtTimer {
   virtual void timeOut() = 0;
 
   static void setAppContext(XtAppContext app_context);
+
+ private:
+  CXtTimer1 *timer_ { nullptr };
 };
 
 #endif

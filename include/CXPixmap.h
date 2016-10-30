@@ -4,12 +4,6 @@
 #include <CXDrawable.h>
 
 class CXPixmap : public CXDrawable {
- private:
-  Window xwin_;
-  uint   width_;
-  uint   height_;
-  Pixmap pixmap_;
-
  public:
   CXPixmap(Window xwin, uint width, uint height);
   CXPixmap(uint width, uint height);
@@ -22,6 +16,12 @@ class CXPixmap : public CXDrawable {
   Pixmap getPixmap() const { return pixmap_; }
 
   bool resizePixmap(uint width, uint height);
+
+ private:
+  Window xwin_ { 0 };
+  uint   width_ { 0 };
+  uint   height_ { 0 };
+  Pixmap pixmap_ { 0 };
 };
 
 #endif

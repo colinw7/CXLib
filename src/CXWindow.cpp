@@ -173,6 +173,12 @@ init1(CWindowType type)
 
   cursor_ = NULL;
 
+#ifdef CXLIB_PIXEL_RENDERER_H
+  renderer_ = NULL;
+
+  renderer_alloc_ = false;
+#endif
+
   event_adapter_ = NULL;
 
   setEventAdapter(new CXWindowEventAdapter(this));
@@ -236,8 +242,30 @@ destroy()
 
   CXMachineInst->destroyWindow(window_);
 
+#ifdef CXLIB_PIXEL_RENDERER_H
+  if (renderer_alloc_)
+    delete renderer_;
+
+  renderer_ = NULL;
+#endif
+
   init1(type_);
 }
+
+#ifdef CXLIB_PIXEL_RENDERER_H
+CXLibPixelRenderer *
+CXWindow::
+getPixelRenderer() const
+{
+  if (! renderer_) {
+    CXWindow *th = const_cast<CXWindow *>(this);
+
+    th->renderer_ = new CXLibPixelRenderer(th);
+  }
+
+  return renderer_;
+}
+#endif
 
 CXScreen &
 CXWindow::
@@ -1222,6 +1250,10 @@ void
 CXWindow::
 expose()
 {
+#ifdef CXLIB_PIXEL_RENDERER_H
+  getPixelRenderer()->setContentsChanged();
+#endif
+
   CXMachineInst->sendExposeEvent(window_);
 }
 

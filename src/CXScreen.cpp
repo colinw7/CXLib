@@ -17,8 +17,6 @@ void
 CXScreen::
 init()
 {
-  gray_scale_ = false;
-
   display_ = CXMachineInst->getScreenDisplay(screen_num_);
   screen_  = ScreenOfDisplay(display_, screen_num_);
   visual_  = DefaultVisualOfScreen(screen_);
@@ -30,9 +28,7 @@ init()
   height_ = HeightOfScreen      (screen_);
   depth_  = DefaultDepthOfScreen(screen_);
 
-  if (depth_ == 8 &&
-      (IsVisualClass(visual_, PseudoColor) ||
-       IsVisualClass(visual_, GrayScale  ))) {
+  if (depth_ == 8 && (IsVisualClass(visual_, PseudoColor) || IsVisualClass(visual_, GrayScale))) {
     has_colormap_ = true;
 
     num_colors_ = (1 << depth_);

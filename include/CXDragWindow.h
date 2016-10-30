@@ -4,9 +4,6 @@
 #include <CXWindow.h>
 
 class CXDragWindow {
- private:
-  CXWindow *cxwindow_;
-
  public:
   CXDragWindow(CXScreen &screen, Window window, int width, int height);
  ~CXDragWindow();
@@ -18,6 +15,9 @@ class CXDragWindow {
   void dragEnd(int x, int y);
 
   void setSize(int width, int height);
+
+ private:
+  CXWindow *cxwindow_ { nullptr };
 };
 
 #endif

@@ -22,7 +22,7 @@ class CXNamedEvent {
 
  private:
   std::string  name_;
-  XEvent      *event_;
+  XEvent      *event_ { nullptr };
   std::string  text_;
 };
 

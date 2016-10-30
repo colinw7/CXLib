@@ -1,5 +1,7 @@
 #include <CXrtFont.h>
 
+//#include <CPixelRenderer.h>
+
 #include <std_Xt.h>
 
 #define XRT_CHAR_BORDER_RIGHT 3
@@ -8,7 +10,7 @@ using std::string;
 
 CXrtFont::
 CXrtFont(Display *display, const string &name, double angle) :
- display_(display), window_(None), angle_((int) angle), name_(name), fs_(NULL)
+ display_(display), window_(None), angle_((int) angle), name_(name)
 {
   window_ = DefaultRootWindow(display_);
 
@@ -17,7 +19,7 @@ CXrtFont(Display *display, const string &name, double angle) :
 
 CXrtFont::
 CXrtFont(Display *display, XFontStruct *fs, double angle) :
- display_(display), window_(None), angle_((int) angle), name_(""), fs_(fs)
+ display_(display), window_(None), angle_((int) angle), fs_(fs)
 {
   window_ = DefaultRootWindow(display_);
 
@@ -26,14 +28,14 @@ CXrtFont(Display *display, XFontStruct *fs, double angle) :
 
 CXrtFont::
 CXrtFont(Display *display, Window window, const string &name, double angle) :
- display_(display), window_(window), angle_((int) angle), name_(name), fs_(NULL)
+ display_(display), window_(window), angle_((int) angle), name_(name)
 {
   initFontStruct(name);
 }
 
 CXrtFont::
 CXrtFont(Display *display, Window window, XFontStruct *fs, double angle) :
- display_(display), window_(window), angle_((int) angle), name_(""), fs_(fs)
+ display_(display), window_(window), angle_((int) angle), fs_(fs)
 {
   init();
 }
@@ -49,7 +51,7 @@ CXrtFont(const CXrtFont &xrt_font) :
 CXrtFont::
 ~CXrtFont()
 {
-  if (fs_ != NULL)
+  if (fs_)
     XFreeFont(display_, fs_);
 
   if (pixmap1_ != None)
@@ -58,10 +60,10 @@ CXrtFont::
   if (pixmap2_ != pixmap1_)
     XFreePixmap(display_, pixmap2_);
 
-  if (ximage_ != NULL)
+  if (ximage_)
     XDestroyImage(ximage_);
 
-  if (gc_ != 0)
+  if (gc_)
     XFreeGC(display_, gc_);
 
   delete [] rotated_;
@@ -73,10 +75,10 @@ initFontStruct(const string &name)
 {
   fs_ = XLoadQueryFont(display_, (char *) name.c_str());
 
-  if (fs_ == NULL)
+  if (! fs_)
     fs_ = XLoadQueryFont(display_, "fixed");
 
-  if (fs_ == NULL)
+  if (! fs_)
     throw "Failed to load font";
 
   init();
@@ -331,6 +333,133 @@ draw(Window window, GC gc, int x, int y, const string &str)
   }
 }
 
+#ifdef CPIXEL_RENDERER_H
+void
+CXrtFont::
+draw(CPixelRenderer *renderer, int x, int y, const string &str)
+{
+  bool changed = false;
+
+  int len = str.size();
+
+  for (int i = 0; i < len; i++) {
+    int c = str[i];
+
+    if (c < 0 || c >= num_chars_)
+      continue;
+
+    if (! rotated_[c - start_char_]) {
+      rotateChar(c);
+
+      changed = true;
+    }
+  }
+
+  if (changed || ximage_ == NULL) {
+    if (ximage_ != NULL)
+      XDestroyImage(ximage_);
+
+    if (angle_ == 0 || angle_ == 180)
+      ximage_ = XGetImage(display_, pixmap2_, 0, 0, num_chars_*width_, ascent_ + descent_,
+                          AllPlanes, XYPixmap);
+    else
+      ximage_ = XGetImage(display_, pixmap2_, 0, 0, ascent_ + descent_, num_chars_*width_,
+                          AllPlanes, XYPixmap);
+  }
+
+  if (ximage_ == NULL)
+    return;
+
+  len = str.size();
+
+  for (int i = 0; i < len; i++) {
+    int c = str[i] - start_char_;
+
+    if (c < 0 || c >= num_chars_)
+      continue;
+
+    int wc;
+
+    if (fs_->per_char)
+      wc = fs_->per_char[c].width;
+    else
+      wc = fs_->min_bounds.width;
+
+    if      (angle_ == 90) {
+      int ys = (num_chars_ - 1 - c)*width_;
+      int yd = y - wc - XRT_CHAR_BORDER_RIGHT;
+
+      for (int yy = 0; yy < wc + XRT_CHAR_BORDER_RIGHT; yy++, ys++, yd++) {
+        int xs = 0;
+        int xd = x;
+
+        for (int xx = 0; xx < ascent_ + descent_; xx++, xs++, xd++) {
+          Pixel pixel = XGetPixel(ximage_, xs, ys);
+
+          if (pixel != 0)
+            renderer->drawPoint(CIPoint2D(xd, yd));
+        }
+      }
+
+      y -= wc;
+    }
+    else if (angle_ == 270) {
+      int ys = c*width_;
+      int yd = y;
+
+      for (int yy = 0; yy < wc + XRT_CHAR_BORDER_RIGHT; yy++, ys++, yd++) {
+        int xs = 0;
+        int xd = x - ascent_ - descent_;
+
+        for (int xx = 0; xx < ascent_ + descent_; xx++, xs++, xd++) {
+          Pixel pixel = XGetPixel(ximage_, xs, ys);
+
+          if (pixel != 0)
+            renderer->drawPoint(CIPoint2D(xd, yd));
+        }
+      }
+
+      y += wc;
+    }
+    else if (angle_ == 180) {
+      int ys = 0;
+      int yd = y - ascent_ - descent_;
+
+      for (int yy = 0; yy < ascent_ + descent_; yy++, ys++, yd++) {
+        int xs = (num_chars_ - 1 - c)*width_;
+        int xd = x - wc - XRT_CHAR_BORDER_RIGHT;
+
+        for (int xx = 0; xx < wc + XRT_CHAR_BORDER_RIGHT; xx++, xs++, xd++) {
+          Pixel pixel = XGetPixel(ximage_, xs, ys);
+
+          if (pixel != 0)
+            renderer->drawPoint(CIPoint2D(xd, yd));
+        }
+      }
+
+      x -= wc;
+    }
+    else {
+      int ys = 0;
+      int yd = y;
+
+      for (int yy = 0; yy < ascent_ + descent_; yy++, ys++, yd++) {
+        int xs = c*width_;
+        int xd = x;
+
+        for (int xx = 0; xx < wc + XRT_CHAR_BORDER_RIGHT; xx++, xs++, xd++) {
+          Pixel pixel = XGetPixel(ximage_, xs, ys);
+
+          if (pixel != 0)
+            renderer->drawPoint(CIPoint2D(xd, yd));
+        }
+      }
+
+      x += wc;
+    }
+  }
+}
+
 void
 CXrtFont::
 drawImage(Window window, GC gc, int x, int y, const string &str)
@@ -387,6 +516,63 @@ drawImage(Window window, GC gc, int x, int y, const string &str)
 
   draw(window, gc, x, y, str);
 }
+
+void
+CXrtFont::
+drawImage(CPixelRenderer *renderer, int x, int y, const string &str)
+{
+  CRGBA bg, fg;
+
+  renderer->getBackground(bg);
+  renderer->getForeground(fg);
+
+  renderer->setForeground(bg);
+
+  int x1 = x;
+  int y1 = y;
+
+  int len = str.size();
+
+  for (int i = 0; i < len; i++) {
+    int c = str[i] - start_char_;
+
+    if (c < 0 || c >= num_chars_)
+      continue;
+
+    int wc;
+
+    if (fs_->per_char)
+      wc = fs_->per_char[c].width;
+    else
+      wc = fs_->min_bounds.width;
+
+    if      (angle_ == 90) {
+      renderer->fillRectangle(CIBBox2D(x1, y1 - wc, ascent_ + descent_, wc));
+
+      y1 -= wc;
+    }
+    else if (angle_ == 270) {
+      renderer->fillRectangle(CIBBox2D(x1 - ascent_ - descent_, y1, ascent_ + descent_, wc));
+
+      y1 += wc;
+    }
+    else if (angle_ == 180) {
+      renderer->fillRectangle(CIBBox2D(x1 - wc, y1 - ascent_ - descent_, wc, ascent_ + descent_));
+
+      x1 -= wc;
+    }
+    else {
+      renderer->fillRectangle(CIBBox2D(x1, y1, wc, ascent_ + descent_));
+
+      x1 += wc;
+    }
+  }
+
+  renderer->setForeground(fg);
+
+  draw(renderer, x, y, str);
+}
+#endif
 
 void
 CXrtFont::

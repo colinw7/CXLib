@@ -18,24 +18,6 @@ class CXScreen;
 class CXPixmap;
 
 class CXGraphics {
- private:
-  enum { MAX_POLY_POINTS=100 };
-
-  CXScreen           &screen_;
-  Window              window_;
-  Display            *display_;
-  bool                is_pixmap_;
-  GC                  gc_;
-  CXColor             bg_;
-  CXColor             fg_;
-  CFontPtr            font_;
-  CAutoPtr<CXPixmap>  pixmap_;
-  bool                in_double_buffer_;
-  bool                fill_complex_;
-
-  static bool   error_trapped;
-  static XPoint poly_point[MAX_POLY_POINTS];
-
  public:
   CXGraphics(Window window);
   CXGraphics(CXScreen &screen, Window window);
@@ -119,7 +101,8 @@ class CXGraphics {
   bool getImage(int x, int y, int width, int height, XImage **ximage);
 
   void drawText(int x, int y, const std::string &str);
-  void drawTextImage(int x, int y, const std::string &str);
+
+  //void drawTextImage(int x, int y, const std::string &str);
 
   void startClip(int x, int y, int width, int height);
   void startClip(Pixmap pixmap, int dx, int dy);
@@ -153,6 +136,24 @@ class CXGraphics {
   bool isPixmapWindow() const;
 
   static int newErrorHandler(Display *display, XErrorEvent *event);
+
+ private:
+  enum { MAX_POLY_POINTS=100 };
+
+  CXScreen           &screen_;
+  Window              window_ { 0 };
+  Display            *display_ { nullptr };
+  bool                is_pixmap_ { false };
+  GC                  gc_;
+  CXColor             bg_;
+  CXColor             fg_;
+  CFontPtr            font_;
+  CAutoPtr<CXPixmap>  pixmap_;
+  bool                in_double_buffer_ { false };
+  bool                fill_complex_ { false };
+
+  static bool   error_trapped;
+  static XPoint poly_point[MAX_POLY_POINTS];
 };
 
 #endif

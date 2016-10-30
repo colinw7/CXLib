@@ -5,9 +5,6 @@
 #include <CEvent.h>
 
 class CXEventAdapter : public CEventAdapter {
- private:
-  uint event_mask_;
-
  public:
   CXEventAdapter(uint event_mask=0) :
    event_mask_(event_mask) {
@@ -55,6 +52,9 @@ class CXEventAdapter : public CEventAdapter {
   int getEventRootY() const { return CXMachineInst->getEventRootY(); }
 
   int getEventButtonNum() const { return CXMachineInst->getEventButtonNum(); }
+
+ private:
+  uint event_mask_ { 0 };
 };
 
 #endif

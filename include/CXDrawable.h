@@ -4,12 +4,6 @@
 #include <CXGraphics.h>
 
 class CXDrawable {
- protected:
-  Drawable    drawable_;
-  uint        width_;
-  uint        height_;
-  CXGraphics *graphics_;
-
  public:
   CXDrawable();
   CXDrawable(Drawable drawable, uint width, uint height);
@@ -95,6 +89,12 @@ class CXDrawable {
   CImagePtr getImage();
 
   CImagePtr getImage(int x, int y, uint width, uint height);
+
+ protected:
+  Drawable    drawable_ { 0 };
+  uint        width_ { 0 };
+  uint        height_ { 0 };
+  CXGraphics *graphics_ { nullptr };
 };
 
 #endif

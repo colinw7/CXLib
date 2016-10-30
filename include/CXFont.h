@@ -9,19 +9,6 @@ class CXrtFont;
 class CXFont;
 
 class CXFont : public CFont {
- private:
-  CXScreen    &screen_;
-  CFontFamily &font_family_;
-  CXrtFont    *xrt_font_;
-  uint         font_width_;
-  uint         font_ascent_;
-  uint         font_descent_;
-  bool         proportional_;
-  double       font_aspect_;
-  CImagePtr    image_;
-
-  friend class CXFontMgr;
-
  protected:
   friend class CXMachine;
 
@@ -83,6 +70,19 @@ class CXFont : public CFont {
  private:
   void init();
   void init(XFontStruct *fs);
+
+ private:
+  friend class CXFontMgr;
+
+  CXScreen    &screen_;
+  CFontFamily &font_family_;
+  CXrtFont    *xrt_font_ { nullptr };
+  uint         font_width_ { 0 };
+  uint         font_ascent_ { 0 };
+  uint         font_descent_ { 0 };
+  bool         proportional_ { false };
+  double       font_aspect_ { 1.0 };
+  CImagePtr    image_;
 };
 
 #endif
