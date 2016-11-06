@@ -11,6 +11,23 @@
 #include <CIPoint2D.h>
 #include <MwmUtil.h>
 
+#define _NET_WM_MOVERESIZE_SIZE_TOPLEFT     0
+#define _NET_WM_MOVERESIZE_SIZE_TOP         1
+#define _NET_WM_MOVERESIZE_SIZE_TOPRIGHT    2
+#define _NET_WM_MOVERESIZE_SIZE_RIGHT       3
+#define _NET_WM_MOVERESIZE_SIZE_BOTTOMRIGHT 4
+#define _NET_WM_MOVERESIZE_SIZE_BOTTOM      5
+#define _NET_WM_MOVERESIZE_SIZE_BOTTOMLEFT  6
+#define _NET_WM_MOVERESIZE_SIZE_LEFT        7
+#define _NET_WM_MOVERESIZE_MOVE             8
+#define _NET_WM_MOVERESIZE_SIZE_KEYBOARD    9
+#define _NET_WM_MOVERESIZE_MOVE_KEYBOARD    10
+#define _NET_WM_MOVERESIZE_CANCEL           11
+
+#define _NET_WM_STATE_REMOVE 0
+#define _NET_WM_STATE_ADD    1
+#define _NET_WM_STATE_TOGGLE 2
+
 class CXMachine;
 class CXScreen;
 class CXWindow;
@@ -381,9 +398,14 @@ class CXMachine {
   bool sendStringServerMessage(Window client_xwin, Window server_xwin, const std::string &str);
   bool readStringServerMessage(Window client_xwin, Window *server_xwin, std::string &str);
 
+  bool sendShowDesktop(bool show);
   bool sendActivate(Window window);
+  bool sendClose(Window window);
   bool sendMoveWindowBy(Window window, int dx, int dy);
+  bool sendDragWindowBy(Window window, int x, int y, int button, int action);
   bool sendRestackWindow(Window window, Window sibling, bool above=true);
+  bool sendWmState(Window window, int action, const std::string &atom1,
+                   const std::string &atom2="");
 
   bool sendWindowMessage(Window from, Window to, const std::string &str);
 

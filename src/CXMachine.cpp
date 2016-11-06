@@ -2695,6 +2695,59 @@ readStringServerMessage(Window client_xwin, Window *server_xwin, string &str)
 
 bool
 CXMachine::
+sendShowDesktop(bool show)
+{
+  Window root = getRoot();
+
+  XClientMessageEvent event;
+
+  memset(&event, 0, sizeof(XClientMessageEvent));
+
+  event.type         = ClientMessage;
+  event.serial       = 0;
+  event.send_event   = True;
+  event.display      = display_;
+  event.window       = root;
+  event.message_type = getAtom("_NET_SHOWING_DESKTOP").getXAtom();
+  event.format       = 32;
+  event.data.l[0]    = (show ? 1 : 0);
+
+  if (! XSendEvent(display_, root, False, (SubstructureNotifyMask|SubstructureRedirectMask),
+                   (XEvent *) &event))
+    return true;
+
+  return false;
+}
+
+bool
+CXMachine::
+sendClose(Window window)
+{
+  XClientMessageEvent event;
+
+  memset(&event, 0, sizeof(XClientMessageEvent));
+
+  event.type         = ClientMessage;
+  event.serial       = 0;
+  event.send_event   = True;
+  event.display      = display_;
+  event.window       = window;
+  event.message_type = getAtom("_NET_CLOSE_WINDOW").getXAtom();
+  event.format       = 32;
+  event.data.l[0]    = CurrentTime;
+  event.data.l[1]    = 2;
+
+  Window root = getRoot();
+
+  if (! XSendEvent(display_, root, False, (SubstructureNotifyMask|SubstructureRedirectMask),
+                   (XEvent *) &event))
+    return true;
+
+  return false;
+}
+
+bool
+CXMachine::
 sendActivate(Window window)
 {
   XClientMessageEvent event;
@@ -2763,6 +2816,36 @@ sendMoveWindowBy(Window window, int dx, int dy)
 
 bool
 CXMachine::
+sendDragWindowBy(Window window, int x, int y, int button, int action)
+{
+  XClientMessageEvent event;
+
+  memset(&event, 0, sizeof(XClientMessageEvent));
+
+  event.type         = ClientMessage;
+  event.serial       = 0;
+  event.send_event   = True;
+  event.display      = display_;
+  event.window       = window;
+  event.message_type = getAtom("_NET_WM_MOVERESIZE").getXAtom();
+  event.format       = 32;
+  event.data.l[0]    = x;
+  event.data.l[1]    = y;
+  event.data.l[2]    = action;
+  event.data.l[3]    = button;
+  event.data.l[4]    = 2;
+
+  Window root = getRoot();
+
+  if (! XSendEvent(display_, root, False, (SubstructureNotifyMask|SubstructureRedirectMask),
+                   (XEvent *) &event))
+    return true;
+
+  return false;
+}
+
+bool
+CXMachine::
 sendRestackWindow(Window window, Window sibling, bool above)
 {
   XClientMessageEvent event;
@@ -2779,6 +2862,35 @@ sendRestackWindow(Window window, Window sibling, bool above)
   event.data.l[0]    = 2; // pager
   event.data.l[1]    = sibling;
   event.data.l[2]    = (above ? Above : Below);
+
+  Window root = getRoot();
+
+  if (! XSendEvent(display_, root, False, (SubstructureNotifyMask|SubstructureRedirectMask),
+                   (XEvent *) &event))
+    return true;
+
+  return false;
+}
+
+bool
+CXMachine::
+sendWmState(Window window, int action, const std::string &atom1, const std::string &atom2)
+{
+  XClientMessageEvent event;
+
+  memset(&event, 0, sizeof(XClientMessageEvent));
+
+  event.type         = ClientMessage;
+  event.serial       = 0;
+  event.send_event   = True;
+  event.display      = display_;
+  event.window       = window;
+  event.message_type = getAtom("_NET_WM_STATE").getXAtom();
+  event.format       = 32;
+  event.data.l[0]    = action;
+  event.data.l[1]    = getAtom(atom1).getXAtom();
+  event.data.l[2]    = (atom2 != "" ? getAtom(atom2).getXAtom() : 0);
+  event.data.l[3]    = 2;
 
   Window root = getRoot();
 
