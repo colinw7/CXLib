@@ -1,14 +1,12 @@
 #include <CXLibI.h>
 
 CXDrawable::
-CXDrawable() :
- drawable_(0), width_(0), height_(0), graphics_(NULL)
+CXDrawable()
 {
 }
 
 CXDrawable::
-CXDrawable(Drawable drawable, uint width, uint height) :
- drawable_(0), width_(0), height_(0), graphics_(NULL)
+CXDrawable(Drawable drawable, uint width, uint height)
 {
   setDrawable(drawable, width, height);
 }
@@ -338,7 +336,7 @@ CImagePtr
 CXDrawable::
 getImage(int x, int y, uint width, uint height)
 {
-  if (graphics_ == NULL)
+  if (! graphics_)
     return CImagePtr();
 
   CImagePtr image;

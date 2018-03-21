@@ -162,9 +162,9 @@ init()
 {
   pixel_set_ = false;
 
-  dark_color_    = NULL;
-  light_color_   = NULL;
-  inverse_color_ = NULL;
+  dark_color_    = nullptr;
+  light_color_   = nullptr;
+  inverse_color_ = nullptr;
 }
 
 void
@@ -234,7 +234,7 @@ Pixel
 CXColor::
 getDarkPixel() const
 {
-  if (dark_color_ == NULL) {
+  if (! dark_color_) {
     CXColor *th = const_cast<CXColor *>(this);
 
     th->dark_color_ = new CXColor(screen_, rgba_.getDarkRGBA());
@@ -247,7 +247,7 @@ Pixel
 CXColor::
 getLightPixel() const
 {
-  if (light_color_ == NULL) {
+  if (! light_color_) {
     CXColor *th = const_cast<CXColor *>(this);
 
     th->light_color_ = new CXColor(screen_, rgba_.getLightRGBA());
@@ -260,7 +260,7 @@ Pixel
 CXColor::
 getInversePixel() const
 {
-  if (inverse_color_ == NULL) {
+  if (! inverse_color_) {
     CXColor *th = const_cast<CXColor *>(this);
 
     th->inverse_color_ = new CXColor(screen_, rgba_.getInverseRGBA());

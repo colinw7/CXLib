@@ -25,9 +25,9 @@ class CXCursor {
   uint lookupCursorShape(CCursorType type);
 
  private:
-  CXScreen    &screen_;
-  CCursorType  type_;
-  Cursor       xcursor_;
+  CXScreen&   screen_;
+  CCursorType type_;
+  Cursor      xcursor_;
 };
 
 #endif

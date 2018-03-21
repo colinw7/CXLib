@@ -126,13 +126,13 @@ openXtDisplay(const string &display_name, const string &app_name, int *argc, cha
 
   Display *display =
     XtOpenDisplay(app_context_, display_name.c_str(), app_name.c_str(), class_name.c_str(),
-                  NULL, 0, argc, argv);
+                  nullptr, 0, argc, argv);
 
   if (! display)
     return 0;
 
   XtDisplayInitialize(app_context_, display, app_name.c_str(),
-                      class_name.c_str(), NULL, 0, argc, argv);
+                      class_name.c_str(), nullptr, 0, argc, argv);
 
   CXtTimer::setAppContext(app_context_);
 
@@ -870,7 +870,7 @@ getEventRootX() const
 
   int root_x, root_y;
 
-  translateCoords(event_win_, root, getEventX(), getEventY(), &root_x, &root_y, NULL);
+  translateCoords(event_win_, root, getEventX(), getEventY(), &root_x, &root_y, nullptr);
 
   return root_x;
 }
@@ -883,7 +883,7 @@ getEventRootY() const
 
   int root_x, root_y;
 
-  translateCoords(event_win_, root, getEventX(), getEventY(), &root_x, &root_y, NULL);
+  translateCoords(event_win_, root, getEventX(), getEventY(), &root_x, &root_y, nullptr);
 
   return root_y;
 }
@@ -894,7 +894,7 @@ getWindowRootPos(Window xwin, int *x, int *y) const
 {
   Window root = getRoot();
 
-  translateCoords(xwin, root, 0, 0, x, y, NULL);
+  translateCoords(xwin, root, 0, 0, x, y, nullptr);
 }
 
 CEvent *
@@ -3449,7 +3449,7 @@ keycodeToKeysym(uint keycode, int state) const
     event.state   = state;
     event.keycode = keycode;
 
-    int len = XLookupString(&event, buffer, sizeof(buffer) - 1, &keysym, NULL);
+    int len = XLookupString(&event, buffer, sizeof(buffer) - 1, &keysym, nullptr);
 
     buffer[len] = '\0';
 
@@ -3923,7 +3923,7 @@ selectWindow() const
 
   if (event.type == ButtonPress) {
     if (! translateCoords(root, root, event.xbutton.x_root, event.xbutton.y_root,
-                          NULL, NULL, &window))
+                          nullptr, nullptr, &window))
       window = None;
   }
 

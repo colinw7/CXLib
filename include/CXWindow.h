@@ -10,7 +10,7 @@
 #include <CXColor.h>
 #include <CEvent.h>
 #include <CAutoPtr.h>
-//#include <CXLibPixelRenderer.h>
+#include <CXLibPixelRenderer.h>
 
 class CXEventAdapter;
 
@@ -42,9 +42,7 @@ class CXWindow : public CWindow {
 
   void destroy();
 
-#ifdef CXLIB_PIXEL_RENDERER_H
   virtual CXLibPixelRenderer *getPixelRenderer() const;
-#endif
 
   CXScreen &getCXScreen() const;
 
@@ -190,7 +188,7 @@ class CXWindow : public CWindow {
   void setLineWidth(double line_width);
   void setLineType(CXLineType line_type);
 
-  void setLineDash(int offset=0, char *dashes=NULL, uint num_dashes=0);
+  void setLineDash(int offset=0, char *dashes=nullptr, uint num_dashes=0);
   void setLineDash(int offset, int *dashes, uint num_dashes);
   void setLineDash(const CILineDash &line_dash);
 
@@ -284,24 +282,25 @@ class CXWindow : public CWindow {
   void createXorGraphics() const;
 
  protected:
-  CXScreen                &screen_;
-  CXWindow                *parent_window_ { nullptr };
-  Window                   parent_xwindow_ { 0 };
-  int                      x_ { 0 }, y_ { 0 };
-  int                      width_ { 0 }, height_ { 0 };
-  uint                     last_width_ { 0 }, last_height_ { 0 };
-  CWindowType              type_;
-  bool                     mapped_ { false };
-  Window                   window_ { 0 };
-  Display                 *display_ { nullptr };
-  CAutoPtr<CXGraphics>     graphics_;
-  CAutoPtr<CXGraphics>     xor_graphics_;
-  CAutoPtr<CXCursor>       cursor_;
-#ifdef CXLIB_PIXEL_RENDERER_H
-  CXLibPixelRenderer      *renderer_ { nullptr };
-#endif
-  bool                     renderer_alloc_ { false };
-  CAutoPtr<CEventAdapter>  event_adapter_;
+  CXScreen&               screen_;
+  CXWindow*               parent_window_  { nullptr };
+  Window                  parent_xwindow_ { 0 };
+  int                     x_              { 0 };
+  int                     y_              { 0 };
+  int                     width_          { 100 };
+  int                     height_         { 100 };
+  uint                    last_width_     { 0 };
+  uint                    last_height_    { 0 };
+  CWindowType             type_;
+  bool                    mapped_         { false };
+  Window                  window_         { 0 };
+  Display*                display_        { nullptr };
+  CAutoPtr<CXGraphics>    graphics_;
+  CAutoPtr<CXGraphics>    xor_graphics_;
+  CAutoPtr<CXCursor>      cursor_;
+  CXLibPixelRenderer*     renderer_       { nullptr };
+  bool                    renderer_alloc_ { false };
+  CAutoPtr<CEventAdapter> event_adapter_;
 };
 
 //------

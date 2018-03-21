@@ -45,7 +45,7 @@ CXTimer1(CXTimer *timer, uint msecs, CTimerFlags flags) :
 CXTimer1::
 ~CXTimer1()
 {
-  timer_ = NULL;
+  timer_ = nullptr;
 
   timers_.remove(this);
 }

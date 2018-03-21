@@ -27,25 +27,22 @@ createWindow(CWindow *parent, int x, int y, uint width, uint height)
 
 CXWindow::
 CXWindow(CWindowType type) :
- screen_(*CXMachineInst->getCXScreen(0)), parent_window_(NULL),
- parent_xwindow_(screen_.getRoot()), x_(0), y_(0), width_(100), height_(100)
+ screen_(*CXMachineInst->getCXScreen(0)), parent_xwindow_(screen_.getRoot())
 {
   init(type);
 }
 
 CXWindow::
 CXWindow(CXScreen &screen, Window parent_window, int x, int y, uint width, uint height) :
- screen_(screen), parent_window_(NULL), parent_xwindow_(parent_window),
- x_(x), y_(y), width_(width), height_(height)
+ screen_(screen), parent_xwindow_(parent_window), x_(x), y_(y), width_(width), height_(height)
 {
   init(CWINDOW_TYPE_NORMAL);
 }
 
 CXWindow::
 CXWindow(CXWindow *parent_window, int x, int y, uint width, uint height) :
- screen_        (parent_window ? parent_window->getCXScreen() : *CXMachineInst->getCXScreen(0)),
- parent_window_ (parent_window),
- parent_xwindow_(parent_window != NULL ? parent_window->getXWindow() : 0),
+ screen_(parent_window ? parent_window->getCXScreen() : *CXMachineInst->getCXScreen(0)),
+ parent_window_ (parent_window), parent_xwindow_(parent_window ? parent_window->getXWindow() : 0),
  x_(x), y_(y), width_(width), height_(height)
 {
   init(CWINDOW_TYPE_NORMAL);
@@ -53,54 +50,51 @@ CXWindow(CXWindow *parent_window, int x, int y, uint width, uint height) :
 
 CXWindow::
 CXWindow(CXScreen &screen, int x, int y, uint width, uint height, CWindowType type) :
- screen_(screen), parent_window_(NULL), parent_xwindow_(screen_.getRoot()),
- x_(x), y_(y), width_(width), height_(height)
+ screen_(screen), parent_xwindow_(screen_.getRoot()), x_(x), y_(y), width_(width), height_(height)
 {
   init(type);
 }
 
 CXWindow::
 CXWindow(int x, int y, uint width, uint height, CWindowType type) :
- screen_(*CXMachineInst->getCXScreen(0)), parent_window_(NULL),
- parent_xwindow_(screen_.getRoot()), x_(x), y_(y), width_(width), height_(height)
+ screen_(*CXMachineInst->getCXScreen(0)), parent_xwindow_(screen_.getRoot()),
+ x_(x), y_(y), width_(width), height_(height)
 {
   init(type);
 }
 
 CXWindow::
 CXWindow(uint width, uint height, CWindowType type) :
- screen_(*CXMachineInst->getCXScreen(0)), parent_window_(NULL),
- parent_xwindow_(screen_.getRoot()), x_(0), y_(0), width_(width), height_(height)
+ screen_(*CXMachineInst->getCXScreen(0)), parent_xwindow_(screen_.getRoot()),
+ width_(width), height_(height)
 {
   init(type);
 }
 
 CXWindow::
 CXWindow(CXScreen &screen, Window window) :
- screen_(screen), parent_window_(NULL), parent_xwindow_(screen_.getRoot()), window_(window)
+ screen_(screen), parent_xwindow_(screen_.getRoot()), window_(window)
 {
   init(window_);
 }
 
 CXWindow::
 CXWindow(CXScreen &screen, Window window, uint width, uint height) :
- screen_(screen), parent_window_(NULL), parent_xwindow_(screen_.getRoot()), window_(window)
+ screen_(screen), parent_xwindow_(screen_.getRoot()), window_(window)
 {
   init(window_, width, height);
 }
 
 CXWindow::
 CXWindow(Window window) :
- screen_(*CXMachineInst->getCXScreen(0)), parent_window_(NULL),
- parent_xwindow_(screen_.getRoot()), window_(window)
+ screen_(*CXMachineInst->getCXScreen(0)), parent_xwindow_(screen_.getRoot()), window_(window)
 {
   init(window_);
 }
 
 CXWindow::
 CXWindow(Window window, uint width, uint height) :
- screen_(*CXMachineInst->getCXScreen(0)), parent_window_(NULL),
- parent_xwindow_(screen_.getRoot()), window_(window)
+ screen_(*CXMachineInst->getCXScreen(0)), parent_xwindow_(screen_.getRoot()), window_(window)
 {
   init(window_, width, height);
 }
@@ -132,7 +126,7 @@ init(Window window)
 
   graphics_ = new CXGraphics(screen_, window_);
 
-  CXMachineInst->getWindowGeometry(window_, &x_, &y_, &width_, &height_, NULL);
+  CXMachineInst->getWindowGeometry(window_, &x_, &y_, &width_, &height_, nullptr);
 }
 
 void
@@ -168,18 +162,16 @@ init1(CWindowType type)
 
   window_ = None;
 
-  graphics_     = NULL;
-  xor_graphics_ = NULL;
+  graphics_     = nullptr;
+  xor_graphics_ = nullptr;
 
-  cursor_ = NULL;
+  cursor_ = nullptr;
 
-#ifdef CXLIB_PIXEL_RENDERER_H
-  renderer_ = NULL;
+  renderer_ = nullptr;
 
   renderer_alloc_ = false;
-#endif
 
-  event_adapter_ = NULL;
+  event_adapter_ = nullptr;
 
   setEventAdapter(new CXWindowEventAdapter(this));
 
@@ -242,17 +234,14 @@ destroy()
 
   CXMachineInst->destroyWindow(window_);
 
-#ifdef CXLIB_PIXEL_RENDERER_H
   if (renderer_alloc_)
     delete renderer_;
 
-  renderer_ = NULL;
-#endif
+  renderer_ = nullptr;
 
   init1(type_);
 }
 
-#ifdef CXLIB_PIXEL_RENDERER_H
 CXLibPixelRenderer *
 CXWindow::
 getPixelRenderer() const
@@ -265,7 +254,6 @@ getPixelRenderer() const
 
   return renderer_;
 }
-#endif
 
 CXScreen &
 CXWindow::
@@ -278,7 +266,7 @@ CXWindow *
 CXWindow::
 getTopWindow()
 {
-  if (parent_window_ != NULL)
+  if (parent_window_)
     return parent_window_->getTopWindow();
 
   return this;
@@ -327,10 +315,10 @@ void
 CXWindow::
 setFont(CFontPtr font)
 {
-  if (graphics_ != NULL)
+  if (graphics_)
     graphics_->setFont(font);
 
-  if (xor_graphics_ != NULL)
+  if (xor_graphics_)
     xor_graphics_->setFont(font);
 }
 
@@ -363,7 +351,7 @@ void
 CXWindow::
 unsetCursor()
 {
-  cursor_ = NULL;
+  cursor_ = nullptr;
 
   CXMachineInst->unsetCursor(window_);
 }
@@ -372,7 +360,7 @@ uint
 CXWindow::
 getWidth() const
 {
-  getSize(NULL, NULL);
+  getSize(nullptr, nullptr);
 
   return width_;
 }
@@ -381,7 +369,7 @@ uint
 CXWindow::
 getHeight() const
 {
-  getSize(NULL, NULL);
+  getSize(nullptr, nullptr);
 
   return height_;
 }
@@ -450,7 +438,7 @@ getSize(uint *width, uint *height) const
 {
   CXWindow *th = const_cast<CXWindow *>(this);
 
-  if (th->graphics_ != NULL)
+  if (th->graphics_)
     th->graphics_->getSize(&th->width_, &th->height_);
   else
     th->width_ = 1;
@@ -528,7 +516,7 @@ GC
 CXWindow::
 getXGC() const
 {
-  if (graphics_ != NULL)
+  if (graphics_)
     return graphics_->getXGC();
   else
     return 0;
@@ -615,7 +603,7 @@ void
 CXWindow::
 startDoubleBuffer(bool clear)
 {
-  if (graphics_ != NULL)
+  if (graphics_)
     graphics_->startDoubleBuffer(clear);
 }
 
@@ -623,7 +611,7 @@ void
 CXWindow::
 endDoubleBuffer()
 {
-  if (graphics_ != NULL)
+  if (graphics_)
     graphics_->endDoubleBuffer();
 }
 
@@ -631,7 +619,7 @@ void
 CXWindow::
 copyDoubleBuffer()
 {
-  if (graphics_ != NULL)
+  if (graphics_)
     graphics_->copyDoubleBuffer();
 }
 
@@ -639,7 +627,7 @@ void
 CXWindow::
 clear()
 {
-  if (graphics_ != NULL)
+  if (graphics_)
     graphics_->clear(false);
 }
 
@@ -647,7 +635,7 @@ void
 CXWindow::
 fill()
 {
-  if (graphics_ != NULL)
+  if (graphics_)
     graphics_->fill();
 }
 
@@ -655,7 +643,7 @@ void
 CXWindow::
 redraw()
 {
-  if (graphics_ != NULL)
+  if (graphics_)
     graphics_->clear(true);
 }
 
@@ -663,7 +651,7 @@ void
 CXWindow::
 drawLine(double x1, double y1, double x2, double y2)
 {
-  if (graphics_ != NULL)
+  if (graphics_)
     graphics_->drawLine((int) x1, (int) y1, (int) x2, (int) y2);
 }
 
@@ -673,7 +661,7 @@ drawXorLine(double x1, double y1, double x2, double y2)
 {
   createXorGraphics();
 
-  if (xor_graphics_ != NULL)
+  if (xor_graphics_)
     xor_graphics_->drawLine((int) x1, (int) y1, (int) x2, (int) y2);
 }
 
@@ -681,10 +669,8 @@ void
 CXWindow::
 drawRectangle(double x, double y, double width1, double height1)
 {
-  if (graphics_ != NULL)
-    graphics_->drawRectangle((int) x, (int) y,
-                             (int) (width1  - 1.0),
-                             (int) (height1 - 1.0));
+  if (graphics_)
+    graphics_->drawRectangle((int) x, (int) y, (int) (width1  - 1.0), (int) (height1 - 1.0));
 }
 
 void
@@ -693,17 +679,15 @@ drawXorRectangle(double x, double y, double width1, double height1)
 {
   createXorGraphics();
 
-  if (xor_graphics_ != NULL)
-    xor_graphics_->drawRectangle((int) x, (int) y,
-                                 (int) (width1  - 1.0),
-                                 (int) (height1 - 1.0));
+  if (xor_graphics_)
+    xor_graphics_->drawRectangle((int) x, (int) y, (int) (width1  - 1.0), (int) (height1 - 1.0));
 }
 
 void
 CXWindow::
 fillRectangle(double x, double y, double width1, double height1)
 {
-  if (graphics_ != NULL)
+  if (graphics_)
     graphics_->fillRectangle((int) x, (int) y, (int) width1, (int) height1);
 }
 
@@ -719,7 +703,7 @@ drawPolygon(double *x, double *y, uint num_xy)
     yi[i] = (int) y[i];
   }
 
-  if (graphics_ != NULL)
+  if (graphics_)
     graphics_->drawPolygon(&xi[0], &yi[0], num_xy);
 }
 
@@ -735,7 +719,7 @@ fillPolygon(double *x, double *y, uint num_xy)
     yi[i] = (int) y[i];
   }
 
-  if (graphics_ != NULL)
+  if (graphics_)
     graphics_->fillPolygon(&xi[0], &yi[0], num_xy);
 }
 
@@ -743,7 +727,7 @@ void
 CXWindow::
 drawCircle(double x, double y, double r)
 {
-  if (graphics_ != NULL)
+  if (graphics_)
     graphics_->drawCircle((int) x, (int) y, (int) r);
 }
 
@@ -751,7 +735,7 @@ void
 CXWindow::
 fillCircle(double x, double y, double r)
 {
-  if (graphics_ != NULL)
+  if (graphics_)
     graphics_->fillCircle((int) x, (int) y, (int) r);
 }
 
@@ -759,7 +743,7 @@ void
 CXWindow::
 drawEllipse(double x, double y, double xr, double yr)
 {
-  if (graphics_ != NULL)
+  if (graphics_)
     graphics_->drawEllipse((int) x, (int) y, (int) xr, (int) yr);
 }
 
@@ -767,7 +751,7 @@ void
 CXWindow::
 fillEllipse(double x, double y, double xr, double yr)
 {
-  if (graphics_ != NULL)
+  if (graphics_)
     graphics_->fillEllipse((int) x, (int) y, (int) xr, (int) yr);
 }
 
@@ -775,7 +759,7 @@ void
 CXWindow::
 drawArc(double x, double y, double xr, double yr, double a1, double a2)
 {
-  if (graphics_ != NULL)
+  if (graphics_)
     graphics_->drawArc((int) x, (int) y, (int) xr, (int) yr, a1, a2);
 }
 
@@ -783,7 +767,7 @@ void
 CXWindow::
 fillArc(double x, double y, double xr, double yr, double a1, double a2)
 {
-  if (graphics_ != NULL)
+  if (graphics_)
     graphics_->fillArc((int) x, (int) y, (int) xr, (int) yr, a1, a2);
 }
 
@@ -791,7 +775,7 @@ void
 CXWindow::
 drawPoint(double x, double y)
 {
-  if (graphics_ != NULL)
+  if (graphics_)
     graphics_->drawPoint((int) x, (int) y);
 }
 
@@ -799,7 +783,7 @@ void
 CXWindow::
 drawImage(const CImagePtr &image, double x, double y)
 {
-  if (graphics_ != NULL)
+  if (graphics_)
     graphics_->drawImage(image, (int) x, (int) y);
 }
 
@@ -807,7 +791,7 @@ void
 CXWindow::
 drawAlphaImage(const CImagePtr &image, double x, double y)
 {
-  if (graphics_ != NULL)
+  if (graphics_)
     graphics_->drawAlphaImage(image, (int) x, (int) y);
 }
 
@@ -829,10 +813,8 @@ drawSubImage(const CImagePtr &image, double src_x, double src_y,
   if (src_y + height1 > height2)
     height1 = height2 - src_y;
 
-  if (graphics_ != NULL)
-    graphics_->drawSubImage(ximg,
-                            (int) src_x, (int) src_y,
-                            (int) dst_x, (int) dst_y,
+  if (graphics_)
+    graphics_->drawSubImage(ximg, (int) src_x, (int) src_y, (int) dst_x, (int) dst_y,
                             (int) width1, (int) height1);
 }
 
@@ -840,7 +822,7 @@ void
 CXWindow::
 drawText(double x, double y, const string &str)
 {
-  if (graphics_ != NULL)
+  if (graphics_)
     graphics_->drawText((int) x, (int) y, str);
 }
 
@@ -848,7 +830,7 @@ void
 CXWindow::
 clipRectangle(double x, double y, double width, double height)
 {
-  if (graphics_ != NULL)
+  if (graphics_)
     graphics_->startClip((int) x, (int) y, (int) width, (int) height);
 }
 
@@ -856,7 +838,7 @@ void
 CXWindow::
 clipReset()
 {
-  if (graphics_ != NULL)
+  if (graphics_)
     graphics_->endClip();
 }
 
@@ -864,7 +846,7 @@ void
 CXWindow::
 setForeground(const CRGB &rgb)
 {
-  if (graphics_ != NULL)
+  if (graphics_)
     graphics_->setForeground(rgb);
 }
 
@@ -872,7 +854,7 @@ void
 CXWindow::
 setForeground(const CRGBA &rgba)
 {
-  if (graphics_ != NULL)
+  if (graphics_)
     graphics_->setForeground(rgba);
 }
 
@@ -880,7 +862,7 @@ void
 CXWindow::
 setForeground(CXColor &color)
 {
-  if (graphics_ != NULL)
+  if (graphics_)
     graphics_->setForeground(color);
 }
 
@@ -888,7 +870,7 @@ void
 CXWindow::
 setLightForeground(CXColor &color)
 {
-  if (graphics_ != NULL)
+  if (graphics_)
     graphics_->setForeground(color.getLightPixel());
 }
 
@@ -896,7 +878,7 @@ void
 CXWindow::
 setDarkForeground(CXColor &color)
 {
-  if (graphics_ != NULL)
+  if (graphics_)
     graphics_->setForeground(color.getDarkPixel());
 }
 
@@ -911,7 +893,7 @@ void
 CXWindow::
 setBackground(const CRGBA &rgba)
 {
-  if (graphics_ != NULL) {
+  if (graphics_) {
     graphics_->setBackground(rgba);
 
     Pixel pixel;
@@ -926,7 +908,7 @@ void
 CXWindow::
 setBackground(CXColor &color)
 {
-  if (graphics_ != NULL) {
+  if (graphics_) {
     graphics_->setBackground(color);
 
     Pixel pixel;
@@ -941,7 +923,7 @@ void
 CXWindow::
 setLightBackground(CXColor &color)
 {
-  if (graphics_ != NULL)
+  if (graphics_)
     graphics_->setBackground(color.getLightPixel());
 }
 
@@ -949,7 +931,7 @@ void
 CXWindow::
 setDarkBackground(CXColor &color)
 {
-  if (graphics_ != NULL)
+  if (graphics_)
     graphics_->setBackground(color.getDarkPixel());
 }
 
@@ -957,7 +939,7 @@ void
 CXWindow::
 getForeground(CRGB &rgb) const
 {
-  if (graphics_ != NULL)
+  if (graphics_)
     graphics_->getForeground(rgb);
   else
     rgb = CRGB(0,0,0);
@@ -978,7 +960,7 @@ void
 CXWindow::
 getBackground(CRGB &rgb) const
 {
-  if (graphics_ != NULL)
+  if (graphics_)
     graphics_->getBackground(rgb);
   else
     rgb = CRGB(1,1,1);
@@ -999,7 +981,7 @@ void
 CXWindow::
 setLineWidth(double line_width)
 {
-  if (graphics_ != NULL)
+  if (graphics_)
     graphics_->setLineWidth((int) line_width);
 }
 
@@ -1007,7 +989,7 @@ void
 CXWindow::
 setLineDash(int offset, char *dashes, uint num_dashes)
 {
-  if (graphics_ != NULL)
+  if (graphics_)
     graphics_->setLineDash(offset, dashes, num_dashes);
 }
 
@@ -1015,7 +997,7 @@ void
 CXWindow::
 setLineDash(int offset, int *dashes, uint num_dashes)
 {
-  if (graphics_ != NULL)
+  if (graphics_)
     graphics_->setLineDash(offset, dashes, num_dashes);
 }
 
@@ -1023,7 +1005,7 @@ void
 CXWindow::
 setLineDash(const CILineDash &line_dash)
 {
-  if (graphics_ != NULL)
+  if (graphics_)
     graphics_->setLineDash(line_dash);
 }
 
@@ -1031,7 +1013,7 @@ void
 CXWindow::
 setLineType(CXLineType line_type)
 {
-  if (graphics_ != NULL)
+  if (graphics_)
     graphics_->setLineType(line_type);
 }
 
@@ -1039,7 +1021,7 @@ void
 CXWindow::
 setFillComplex(bool comp)
 {
-  if (graphics_ != NULL)
+  if (graphics_)
     graphics_->setFillComplex(comp);
 }
 
@@ -1047,7 +1029,7 @@ uint
 CXWindow::
 getStringWidth(const string &str) const
 {
-  if (graphics_ != NULL)
+  if (graphics_)
     return graphics_->getStringWidth(str);
   else
     return 1;
@@ -1057,9 +1039,8 @@ void
 CXWindow::
 copyArea(const CXWindow &src_window)
 {
-  if (graphics_ != NULL)
-    graphics_->copyArea(*src_window.getCXGraphics(), 0, 0, 0, 0,
-                        getWidth(), getHeight());
+  if (graphics_)
+    graphics_->copyArea(*src_window.getCXGraphics(), 0, 0, 0, 0, getWidth(), getHeight());
 }
 
 CImagePtr
@@ -1073,7 +1054,7 @@ CImagePtr
 CXWindow::
 getImage(int x, int y, uint width, uint height) const
 {
-  if (graphics_ == NULL)
+  if (! graphics_)
     return CImagePtr();
 
   CImagePtr image;
@@ -1094,7 +1075,7 @@ void
 CXWindow::
 createXorGraphics() const
 {
-  if (xor_graphics_ == NULL) {
+  if (! xor_graphics_) {
     CXWindow *th = const_cast<CXWindow *>(this);
 
     th->xor_graphics_ = new CXGraphics(screen_, window_);
@@ -1250,9 +1231,7 @@ void
 CXWindow::
 expose()
 {
-#ifdef CXLIB_PIXEL_RENDERER_H
   getPixelRenderer()->setContentsChanged();
-#endif
 
   CXMachineInst->sendExposeEvent(window_);
 }
@@ -1287,7 +1266,7 @@ translateFromRootCoords(int rx, int ry, int *wx, int *wy) const
 {
   Window root = CXMachineInst->getRoot();
 
-  CXMachineInst->translateCoords(root, window_, rx, ry, wx, wy, NULL);
+  CXMachineInst->translateCoords(root, window_, rx, ry, wx, wy, nullptr);
 }
 
 void
@@ -1296,7 +1275,7 @@ translateToRootCoords(int wx, int wy, int *rx, int *ry) const
 {
   Window root = CXMachineInst->getRoot();
 
-  CXMachineInst->translateCoords(window_, root, wx, wy, rx, ry, NULL);
+  CXMachineInst->translateCoords(window_, root, wx, wy, rx, ry, nullptr);
 }
 
 void

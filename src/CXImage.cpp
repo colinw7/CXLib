@@ -144,8 +144,8 @@ void
 CXImage::
 init()
 {
-  xdata_        = NULL;
-  ximage_       = NULL;
+  xdata_        = nullptr;
+  ximage_       = nullptr;
   ximage_owner_ = false;
   pixmap_       = None;
   mask_         = None;
@@ -157,9 +157,9 @@ reset()
 {
   delete [] xdata_;
 
-  if (ximage_ != NULL) {
+  if (ximage_) {
     if (ximage_owner_) {
-      ximage_->data = NULL;
+      ximage_->data = nullptr;
 
       XDestroyImage(ximage_);
     }
@@ -217,7 +217,7 @@ createXImage()
   ximage_ = XCreateImage(display, visual, screen_.getDepth(), format, xoffset,
                          (char *) xdata_, width, height, pad, bytes_per_line);
 
-  if (ximage_ == NULL)
+  if (! ximage_)
     cerr << "Failed to create ximage" << endl;
 
   ximage_owner_ = true;
@@ -231,7 +231,7 @@ void
 CXImage::
 initXImage()
 {
-  if (ximage_ == NULL)
+  if (! ximage_)
     return;
 
   CRGBA rgba;
@@ -322,7 +322,7 @@ XImage *
 CXImage::
 getXImage() const
 {
-  if (ximage_ == NULL) {
+  if (! ximage_) {
     CXImage *th = const_cast<CXImage *>(this);
 
     th->createXImage();
@@ -356,7 +356,7 @@ getXPixmap() const
 
     GC gc = CXMachineInst->createGC(pixmap_, 0, 0);
 
-    if (ximage_ != NULL) {
+    if (ximage_) {
       Pixel pixel;
 
       for (uint y = 0; y < height; ++y) {
@@ -456,7 +456,7 @@ createImageData()
 
   //------
 
-  if (ximage_ == NULL)
+  if (! ximage_)
     return;
 
   setDataSize(ximage_->width, ximage_->height);
@@ -502,15 +502,15 @@ void
 CXImage::
 getImageColors(CRGB **colors, int *num_colors)
 {
-  if (ximage_ == NULL) {
-    *colors     = NULL;
+  if (! ximage_) {
+    *colors     = nullptr;
     *num_colors = 0;
 
     return;
   }
 
   if (ximage_->depth > 8) {
-    *colors     = NULL;
+    *colors     = nullptr;
     *num_colors = 0;
 
     return;
@@ -596,7 +596,7 @@ bool
 CXImage::
 setPixel(int pos, const CXColor &color)
 {
-  if (ximage_ != NULL) {
+  if (ximage_) {
     int x1, y1, x2, y2;
 
     getWindow(&x1, &y1, &x2, &y2);
@@ -613,7 +613,7 @@ bool
 CXImage::
 setPixel(int x, int y, const CXColor &color)
 {
-  if (ximage_ != NULL)
+  if (ximage_)
     XPutPixel(ximage_, x, y, color.getPixel());
 
   return CImage::setRGBAPixel(x, y, color.getRGBA());
@@ -623,7 +623,7 @@ bool
 CXImage::
 setColorIndexPixel(int pos, Pixel pixel)
 {
-  if (ximage_ != NULL) {
+  if (ximage_) {
     int x1, y1, x2, y2;
 
     getWindow(&x1, &y1, &x2, &y2);
@@ -640,7 +640,7 @@ bool
 CXImage::
 setColorIndexPixel(int x, int y, Pixel pixel)
 {
-  if (ximage_ != NULL)
+  if (ximage_)
     XPutPixel(ximage_, x, y, pixel);
 
   return CImage::setColorIndexPixel(x, y, pixel);
@@ -652,10 +652,10 @@ setRGBAData(uint *data)
 {
   CImage::setRGBAData(data);
 
-  if (ximage_ != NULL) {
+  if (ximage_) {
     delete ximage_;
 
-    ximage_ = NULL;
+    ximage_ = nullptr;
   }
 }
 
@@ -672,10 +672,10 @@ setRGBAData(const CRGBA &rgba, int left, int bottom, int right, int top)
 {
   CImage::setRGBAData(rgba, left, bottom, right, top);
 
-  if (ximage_ != NULL) {
+  if (ximage_) {
     delete ximage_;
 
-    ximage_ = NULL;
+    ximage_ = nullptr;
   }
 }
 
@@ -683,7 +683,7 @@ bool
 CXImage::
 setRGBAPixel(int pos, const CRGBA &rgba)
 {
-  if (ximage_ != NULL) {
+  if (ximage_) {
     Pixel pixel = screen_.rgbaToPixel(rgba);
 
     int x1, y1, x2, y2;
@@ -702,7 +702,7 @@ bool
 CXImage::
 setRGBAPixel(int x, int y, const CRGBA &rgba)
 {
-  if (ximage_ != NULL) {
+  if (ximage_) {
     Pixel pixel = screen_.rgbaToPixel(rgba);
 
     XPutPixel(ximage_, x, y, pixel);
@@ -798,7 +798,7 @@ draw(Display *, Drawable drawable, GC gc, int src_x, int src_y,
 
   XImage *ximage = getXImage();
 
-  if (ximage != NULL)
+  if (ximage)
     CXMachineInst->putImage(drawable, gc, ximage, src_x, src_y, dst_x, dst_y, width, height);
 }
 

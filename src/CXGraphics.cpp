@@ -45,7 +45,7 @@ init()
 
   font_ = CFontMgrInst->lookupFont("courier", CFONT_STYLE_NORMAL, 13);
 
-  pixmap_ = NULL;
+  pixmap_ = nullptr;
 
   in_double_buffer_ = false;
   fill_complex_     = false;
@@ -79,8 +79,7 @@ startDoubleBuffer(bool clear)
   }
 
   if (clear)
-    CXMachineInst->fillRectangle(pixmap_->getPixmap(), gc_,
-                                 0, 0, width, height);
+    CXMachineInst->fillRectangle(pixmap_->getPixmap(), gc_, 0, 0, width, height);
 
   in_double_buffer_ = true;
 }
@@ -126,7 +125,7 @@ clear(bool redraw)
   CXMachineInst->setForeground(gc_, bg_);
 
   if (! is_pixmap_) {
-    if (pixmap_ != NULL) {
+    if (pixmap_) {
       CXMachineInst->fillRectangle(pixmap_->getPixmap(), gc_, 0, 0,
                                    pixmap_->getWidth(), pixmap_->getHeight());
 
@@ -166,9 +165,8 @@ fill()
 
   getSize(&width, &height);
 
-  if (pixmap_ != NULL)
-    CXMachineInst->fillRectangle(pixmap_->getPixmap(), gc_,
-                                 0, 0, width, height);
+  if (pixmap_)
+    CXMachineInst->fillRectangle(pixmap_->getPixmap(), gc_, 0, 0, width, height);
   else
     CXMachineInst->fillRectangle(window_, gc_, 0, 0, width, height);
 }
@@ -293,7 +291,7 @@ void
 CXGraphics::
 drawLine(int x1, int y1, int x2, int y2)
 {
-  if (pixmap_ != NULL)
+  if (pixmap_)
     CXMachineInst->drawLine(pixmap_->getPixmap(), gc_, x1, y1, x2, y2);
   else
     CXMachineInst->drawLine(window_, gc_, x1, y1, x2, y2);
@@ -303,21 +301,18 @@ void
 CXGraphics::
 drawRectangle(int x, int y, int width, int height)
 {
-  if (pixmap_ != NULL)
-    CXMachineInst->drawRectangle(pixmap_->getPixmap(), gc_,
-                                 x, y, (uint) width, (uint) height);
+  if (pixmap_)
+    CXMachineInst->drawRectangle(pixmap_->getPixmap(), gc_, x, y, (uint) width, (uint) height);
   else
-    CXMachineInst->drawRectangle(window_, gc_,
-                                 x, y, (uint) width, (uint) height);
+    CXMachineInst->drawRectangle(window_, gc_, x, y, (uint) width, (uint) height);
 }
 
 void
 CXGraphics::
 fillRectangle(int x, int y, int width, int height)
 {
-  if (pixmap_ != NULL)
-    CXMachineInst->fillRectangle(pixmap_->getPixmap(), gc_,
-                                 x, y, width, height);
+  if (pixmap_)
+    CXMachineInst->fillRectangle(pixmap_->getPixmap(), gc_, x, y, width, height);
   else
     CXMachineInst->fillRectangle(window_, gc_, x, y, width, height);
 }
@@ -339,12 +334,10 @@ drawPolygon(int *x, int *y, int num_xy)
     poly_point[i].y = y[i];
   }
 
-  if (pixmap_ != NULL)
-    XDrawLines(display_, pixmap_->getPixmap(), gc_,
-               poly_point, num_xy, CoordModeOrigin);
+  if (pixmap_)
+    XDrawLines(display_, pixmap_->getPixmap(), gc_, poly_point, num_xy, CoordModeOrigin);
   else
-    XDrawLines(display_, window_, gc_,
-               poly_point, num_xy, CoordModeOrigin);
+    XDrawLines(display_, window_, gc_, poly_point, num_xy, CoordModeOrigin);
 }
 
 void
@@ -364,25 +357,20 @@ fillPolygon(int *x, int *y, int num_xy)
     poly_point[i].y = y[i];
   }
 
-  if (pixmap_ != NULL)
-    XFillPolygon(display_, pixmap_->getPixmap(), gc_,
-                 poly_point, num_xy,
-                 fill_complex_ ? Complex : Convex,
-                 CoordModeOrigin);
+  if (pixmap_)
+    XFillPolygon(display_, pixmap_->getPixmap(), gc_, poly_point, num_xy,
+                 fill_complex_ ? Complex : Convex, CoordModeOrigin);
   else
-    XFillPolygon(display_, window_, gc_,
-                 poly_point, num_xy,
-                 fill_complex_ ? Complex : Convex,
-                 CoordModeOrigin);
+    XFillPolygon(display_, window_, gc_, poly_point, num_xy,
+                 fill_complex_ ? Complex : Convex, CoordModeOrigin);
 }
 
 void
 CXGraphics::
 drawCircle(int x, int y, int r)
 {
-  if (pixmap_ != NULL)
-    XDrawArc(display_, pixmap_->getPixmap(), gc_,
-             x - r, y - r, 2*r, 2*r, 0, 360*64);
+  if (pixmap_)
+    XDrawArc(display_, pixmap_->getPixmap(), gc_, x - r, y - r, 2*r, 2*r, 0, 360*64);
   else
     XDrawArc(display_, window_, gc_, x - r, y - r, 2*r, 2*r, 0, 360*64);
 }
@@ -391,9 +379,8 @@ void
 CXGraphics::
 fillCircle(int x, int y, int r)
 {
-  if (pixmap_ != NULL)
-    XFillArc(display_, pixmap_->getPixmap(), gc_,
-             x - r, y - r, 2*r, 2*r, 0, 360*64);
+  if (pixmap_)
+    XFillArc(display_, pixmap_->getPixmap(), gc_, x - r, y - r, 2*r, 2*r, 0, 360*64);
   else
     XFillArc(display_, window_, gc_, x - r, y - r, 2*r, 2*r, 0, 360*64);
 }
@@ -402,9 +389,8 @@ void
 CXGraphics::
 drawEllipse(int x, int y, int xr, int yr)
 {
-  if (pixmap_ != NULL)
-    XDrawArc(display_, pixmap_->getPixmap(), gc_,
-             x - xr, y - yr, 2*xr, 2*yr, 0, 360*64);
+  if (pixmap_)
+    XDrawArc(display_, pixmap_->getPixmap(), gc_, x - xr, y - yr, 2*xr, 2*yr, 0, 360*64);
   else
     XDrawArc(display_, window_, gc_, x - xr, y - yr, 2*xr, 2*yr, 0, 360*64);
 }
@@ -413,9 +399,8 @@ void
 CXGraphics::
 fillEllipse(int x, int y, int xr, int yr)
 {
-  if (pixmap_ != NULL)
-    XFillArc(display_, pixmap_->getPixmap(), gc_,
-             x - xr, y - yr, 2*xr, 2*yr, 0, 360*64);
+  if (pixmap_)
+    XFillArc(display_, pixmap_->getPixmap(), gc_, x - xr, y - yr, 2*xr, 2*yr, 0, 360*64);
   else
     XFillArc(display_, window_, gc_, x - xr, y - yr, 2*xr, 2*yr, 0, 360*64);
 }
@@ -424,9 +409,8 @@ void
 CXGraphics::
 drawArc(int x, int y, int xr, int yr, double angle1, double angle2)
 {
-  if (pixmap_ != NULL)
-    XDrawArc(display_, pixmap_->getPixmap(), gc_,
-             x - xr, y - yr, 2*xr, 2*yr,
+  if (pixmap_)
+    XDrawArc(display_, pixmap_->getPixmap(), gc_, x - xr, y - yr, 2*xr, 2*yr,
              (int) (angle1*64), (int) (-angle2*64));
   else
     XDrawArc(display_, window_, gc_, x - xr, y - yr, 2*xr, 2*yr,
@@ -437,9 +421,8 @@ void
 CXGraphics::
 fillArc(int x, int y, int xr, int yr, double angle1, double angle2)
 {
-  if (pixmap_ != NULL)
-    XFillArc(display_, pixmap_->getPixmap(), gc_,
-             x - xr, y - yr, 2*xr, 2*yr,
+  if (pixmap_)
+    XFillArc(display_, pixmap_->getPixmap(), gc_, x - xr, y - yr, 2*xr, 2*yr,
              (int) (angle1*64), (int) (-angle2*64));
   else
     XFillArc(display_, window_, gc_, x - xr, y - yr, 2*xr, 2*yr,
@@ -450,7 +433,7 @@ void
 CXGraphics::
 drawPoint(int x, int y)
 {
-  if (pixmap_ != NULL)
+  if (pixmap_)
     CXMachineInst->drawPoint(pixmap_->getPixmap(), gc_, x, y);
   else
     CXMachineInst->drawPoint(window_, gc_, x, y);
@@ -460,7 +443,7 @@ void
 CXGraphics::
 drawImage(const CImagePtr &image, int x, int y)
 {
-  if (pixmap_ != NULL)
+  if (pixmap_)
     CXMachineInst->drawImage(pixmap_->getPixmap(), gc_, image, x, y);
   else
     CXMachineInst->drawImage(window_, gc_, image, x, y);
@@ -471,7 +454,7 @@ CXGraphics::
 drawSubImage(const CImagePtr &image, int src_x, int src_y,
              int dst_x, int dst_y, int width, int height)
 {
-  if (pixmap_ != NULL)
+  if (pixmap_)
     CXMachineInst->drawImage(pixmap_->getPixmap(), gc_, image,
                              src_x, src_y, dst_x, dst_y, width, height);
   else
@@ -481,10 +464,9 @@ drawSubImage(const CImagePtr &image, int src_x, int src_y,
 
 void
 CXGraphics::
-drawSubImage(XImage *ximage, int src_x, int src_y, int dst_x, int dst_y,
-             int width, int height)
+drawSubImage(XImage *ximage, int src_x, int src_y, int dst_x, int dst_y, int width, int height)
 {
-  if (pixmap_ != NULL)
+  if (pixmap_)
     CXMachineInst->putImage(pixmap_->getPixmap(), gc_, ximage, src_x, src_y,
                             dst_x, dst_y, width, height);
   else
@@ -496,7 +478,7 @@ void
 CXGraphics::
 drawAlphaImage(const CImagePtr &image, int x, int y)
 {
-  if (pixmap_ != NULL) {
+  if (pixmap_) {
     //CXMachineInst->drawImage(pixmap_->getPixmap(), gc_, image, x, y);
 
     uint width  = image->getWidth ();
@@ -589,7 +571,7 @@ getImage(int x, int y, int width, int height, CImagePtr &image)
   if (! getImage(x, y, width, height, &ximage))
     return false;
 
-  if (ximage == NULL)
+  if (! ximage)
     return false;
 
   CXImage *cimage = new CXImage(ximage);
@@ -603,14 +585,12 @@ bool
 CXGraphics::
 getImage(int x, int y, int width, int height, XImage **ximage)
 {
-  *ximage = NULL;
+  *ximage = nullptr;
 
-  if (pixmap_ != NULL)
-    *ximage = XGetImage(display_, pixmap_->getPixmap(), x, y, width, height,
-                        AllPlanes, ZPixmap);
+  if (pixmap_)
+    *ximage = XGetImage(display_, pixmap_->getPixmap(), x, y, width, height, AllPlanes, ZPixmap);
   else
-    *ximage = XGetImage(display_, window_, x, y, width, height,
-                        AllPlanes, ZPixmap);
+    *ximage = XGetImage(display_, window_, x, y, width, height, AllPlanes, ZPixmap);
 
   return true;
 }
@@ -620,46 +600,44 @@ CXGraphics::
 drawText(int x, int y, const string &str)
 {
   if (! font_.isValid()) {
-    cerr << "Bad Font" << endl;
+    std::cerr << "Bad Font" << endl;
     return;
   }
 
   CXFont *xfont = font_.cast<CXFont>();
 
-  if (xfont == NULL)
+  if (! xfont)
     return;
 
   CXrtFont *xrt_font = xfont->getXrtFont();
 
-  if (pixmap_ != NULL)
+  if (pixmap_)
     xrt_font->draw(pixmap_->getPixmap(), gc_, x, y, str);
   else
     xrt_font->draw(window_, gc_, x, y, str);
 }
 
-#if 0
 void
 CXGraphics::
 drawTextImage(int x, int y, const string &str)
 {
   if (! font_.isValid()) {
-    cerr << "Bad Font" << endl;
+    std::cerr << "Bad Font" << endl;
     return;
   }
 
   CXFont *xfont = font_.cast<CXFont>();
 
-  if (xfont == NULL)
+  if (! xfont)
     return;
 
   CXrtFont *xrt_font = xfont->getXrtFont();
 
-  if (pixmap_ != NULL)
+  if (pixmap_)
     xrt_font->drawImage(pixmap_->getPixmap(), gc_, x, y, str);
   else
     xrt_font->drawImage(window_, gc_, x, y, str);
 }
-#endif
 
 void
 CXGraphics::
@@ -702,10 +680,9 @@ endClip()
 
 void
 CXGraphics::
-copyArea(const CXGraphics &src, int src_x, int src_y,
-         int dst_x, int dst_y, int width, int height)
+copyArea(const CXGraphics &src, int src_x, int src_y, int dst_x, int dst_y, int width, int height)
 {
-  if (pixmap_ != NULL)
+  if (pixmap_)
     CXMachineInst->copyArea(src.getXWindow(), pixmap_->getPixmap(), gc_,
                             src_x, src_y, width, height, dst_x, dst_y);
   else
@@ -773,8 +750,7 @@ void
 CXGraphics::
 setLineDash(const CILineDash &line_dash)
 {
-  setLineDash(line_dash.getOffset(), line_dash.getLengths(),
-              line_dash.getNumLengths());
+  setLineDash(line_dash.getOffset(), line_dash.getLengths(), line_dash.getNumLengths());
 }
 
 void
@@ -829,8 +805,7 @@ getSize(int *width, int *height) const
     uint   height1;
     uint   border_width;
 
-    XGetGeometry(display_, window_, &root, &x, &y, &width1, &height1,
-                 &border_width, &depth);
+    XGetGeometry(display_, window_, &root, &x, &y, &width1, &height1, &border_width, &depth);
 
     *width  = width1;
     *height = height1;

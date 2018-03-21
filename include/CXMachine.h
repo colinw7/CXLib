@@ -145,8 +145,8 @@ class CXMachine {
   void setEventAdapter(CXEventAdapter *adapter);
 
   void mainLoop(CXMachineEventProc proc);
-  void mainLoop(uint twait=10, CXEventAdapter *adapter=NULL);
-  void tickLoop(uint nframes=30, CXEventAdapter *adapter=NULL);
+  void mainLoop(uint twait=10, CXEventAdapter *adapter=nullptr);
+  void tickLoop(uint nframes=30, CXEventAdapter *adapter=nullptr);
 
   bool processEvent();
 
@@ -191,7 +191,7 @@ class CXMachine {
 
   bool compareEvents(XEvent *event1, XEvent *event2);
 
-  bool waitForClientMessage(Window xwin, XEvent *event=NULL);
+  bool waitForClientMessage(Window xwin, XEvent *event=nullptr);
 
   bool checkWindowEvent(Window xwin, uint event_mask, XEvent *event) const;
   bool checkTypedEvent(int event_type, XEvent *event) const;
@@ -267,12 +267,12 @@ class CXMachine {
   void ungrabButton(Window xwin, int button, int modifiers);
 
   Window createOverrideWindow(int x, int y, int width, int height, int border = 0,
-                              uint attr_mask = 0, XSetWindowAttributes *attr = NULL);
+                              uint attr_mask = 0, XSetWindowAttributes *attr=nullptr);
 
   Window createWindow(Window parent_xwin, int x, int y, int width, int height,
-                      int border = 0, uint attr_mask = 0, XSetWindowAttributes *attr = NULL);
+                      int border = 0, uint attr_mask = 0, XSetWindowAttributes *attr=nullptr);
   Window createWindow(int x, int y, int width, int height,
-                      int border = 0, uint attr_mask = 0, XSetWindowAttributes *attr = NULL);
+                      int border = 0, uint attr_mask = 0, XSetWindowAttributes *attr=nullptr);
 
   CXPixmap *createPixmap(Window xwin, uint width, uint height);
   CXPixmap *createPixmap(uint width, uint height);

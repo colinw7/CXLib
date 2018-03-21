@@ -4,7 +4,7 @@
 #include <std_Xt.h>
 #include <string>
 
-//class CPixelRenderer;
+class CPixelRenderer;
 
 class CXrtFont {
  public:
@@ -28,11 +28,9 @@ class CXrtFont {
 
   void drawImage(Window window, GC gc, int x, int y, const std::string &str);
 
-#ifdef CPIXEL_RENDERER_H
   void draw(CPixelRenderer *renderer, int x, int y, const std::string &str);
 
   void drawImage(CPixelRenderer *renderer, int x, int y, const std::string &str);
-#endif
 
   XFontStruct *getFontStruct();
 

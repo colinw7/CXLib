@@ -11,8 +11,8 @@ setPrototype()
 }
 
 CXFont::
-CXFont(const string &family, CFontStyle style, double size,
-       double angle, double char_angle, int x_res, int y_res) :
+CXFont(const string &family, CFontStyle style, double size, double angle,
+       double char_angle, int x_res, int y_res) :
  CFont(family, style, size, angle, char_angle, x_res, y_res),
  screen_(*CXMachineInst->getCXScreen(0)),
  font_family_(CFontFamily::lookup(family))
@@ -21,10 +21,10 @@ CXFont(const string &family, CFontStyle style, double size,
 }
 
 CXFont::
-CXFont(CXScreen &screen, const string &family, CFontStyle style,
-       double size, double angle, double char_angle, int x_res, int y_res) :
- CFont(family, style, size, angle, char_angle, x_res, y_res),
- screen_(screen), font_family_(CFontFamily::lookup(family))
+CXFont(CXScreen &screen, const string &family, CFontStyle style, double size, double angle,
+       double char_angle, int x_res, int y_res) :
+ CFont(family, style, size, angle, char_angle, x_res, y_res), screen_(screen),
+ font_family_(CFontFamily::lookup(family))
 {
   init();
 }
@@ -39,8 +39,7 @@ CXFont(const string &full_name) :
 
 CXFont::
 CXFont(CXScreen &screen, const string &full_name) :
- CFont(full_name), screen_(screen),
- font_family_(CFontFamily::lookup(getFamily()))
+ CFont(full_name), screen_(screen), font_family_(CFontFamily::lookup(getFamily()))
 {
   init();
 }
@@ -48,8 +47,7 @@ CXFont(CXScreen &screen, const string &full_name) :
 CXFont::
 CXFont(XFontStruct *fs, uint angle) :
  CFont("", CFONT_STYLE_NORMAL, CFONT_DEF_SIZE, angle),
- screen_(*CXMachineInst->getCXScreen(0)),
- font_family_(CFontFamily::lookup(""))
+ screen_(*CXMachineInst->getCXScreen(0)), font_family_(CFontFamily::lookup(""))
 {
   init(fs);
 }
@@ -57,8 +55,7 @@ CXFont(XFontStruct *fs, uint angle) :
 CXFont::
 CXFont(CXScreen &screen, XFontStruct *fs, uint angle) :
  CFont("", CFONT_STYLE_NORMAL, CFONT_DEF_SIZE, angle),
- screen_(screen),
- font_family_(CFontFamily::lookup(""))
+ screen_(screen), font_family_(CFontFamily::lookup(""))
 {
   init(fs);
 }
@@ -66,8 +63,7 @@ CXFont(CXScreen &screen, XFontStruct *fs, uint angle) :
 CXFont::
 CXFont(const CXFont &font) :
  CFont(font), screen_(font.screen_), font_family_(font.font_family_),
- xrt_font_(NULL), font_width_(font.font_width_),
- font_ascent_(font.font_ascent_), font_descent_(font.font_descent_),
+ font_width_(font.font_width_), font_ascent_(font.font_ascent_), font_descent_(font.font_descent_),
  proportional_(font.proportional_), font_aspect_(font.font_aspect_)
 {
   xrt_font_ = new CXrtFont(*font.xrt_font_);
@@ -169,7 +165,7 @@ getIStringWidth(const string &str) const
 {
   int width;
 
-  xrt_font_->textExtents(str, &width, NULL, NULL);
+  xrt_font_->textExtents(str, &width, nullptr, nullptr);
 
   return width;
 }

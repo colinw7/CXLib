@@ -75,7 +75,7 @@ class CXDrawable {
 
   void setLineWidth(int line_width);
 
-  void setLineDash(int offset=0, char *dashes=NULL, uint num_dashes=0);
+  void setLineDash(int offset=0, char *dashes=nullptr, uint num_dashes=0);
   void setLineDash(int offset, int *dashes, uint num_dashes);
   void setLineDash(const CILineDash &line_dash);
 
@@ -92,8 +92,8 @@ class CXDrawable {
 
  protected:
   Drawable    drawable_ { 0 };
-  uint        width_ { 0 };
-  uint        height_ { 0 };
+  uint        width_    { 0 };
+  uint        height_   { 0 };
   CXGraphics *graphics_ { nullptr };
 };
 

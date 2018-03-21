@@ -44,19 +44,19 @@ class CXAtomMgr {
   const CXAtom &getCXAtom(Atom atom);
 
  private:
-  const CXAtom *XA_WM_PROTOCOLS { 0 };
-  const CXAtom *XA_WM_TAKE_FOCUS { 0 };
-  const CXAtom *XA_WM_SAVE_YOURSELF { 0 };
-  const CXAtom *XA_WM_DELETE_WINDOW { 0 };
-  const CXAtom *XA_WM_STATE { 0 };
-  const CXAtom *XA_WM_CHANGE_STATE { 0 };
-  const CXAtom *XA_MWM_HINTS { 0 };
-  const CXAtom *XA_XSETROOT_ID { 0 };
-  const CXAtom *XA_CWM_DESKTOP { 0 };
+  const CXAtom *XA_WM_PROTOCOLS     { nullptr };
+  const CXAtom *XA_WM_TAKE_FOCUS    { nullptr };
+  const CXAtom *XA_WM_SAVE_YOURSELF { nullptr };
+  const CXAtom *XA_WM_DELETE_WINDOW { nullptr };
+  const CXAtom *XA_WM_STATE         { nullptr };
+  const CXAtom *XA_WM_CHANGE_STATE  { nullptr };
+  const CXAtom *XA_MWM_HINTS        { nullptr };
+  const CXAtom *XA_XSETROOT_ID      { nullptr };
+  const CXAtom *XA_CWM_DESKTOP      { nullptr };
 
   typedef std::map<std::string, CXAtom *> CXAtomMap;
 
-  CXMachine &machine_;
+  CXMachine& machine_;
   CXAtomMap  atom_map_;
 };
 

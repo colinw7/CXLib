@@ -2,7 +2,7 @@
 
 CXNamedEvent::
 CXNamedEvent(const string &name) :
- name_(name), event_(NULL)
+ name_(name)
 {
   parse();
 }
@@ -171,8 +171,8 @@ parse()
   flag = true;
 
  done:
-  if (event_ == NULL)
-    cerr << "Invalid Event Name '" << name_ << "'" << endl;
+  if (! event_)
+    std::cerr << "Invalid Event Name '" << name_ << "'" << endl;
 
   return flag;
 }
@@ -181,7 +181,7 @@ bool
 CXNamedEvent::
 matchEvent(CXNamedEvent *event)
 {
-  if (event->event_ == NULL)
+  if (! event->event_)
     return false;
 
   return matchEvent(event->event_);
@@ -191,8 +191,8 @@ bool
 CXNamedEvent::
 matchEvent(XEvent *event)
 {
-  if (event_ == NULL)
-    return FALSE;
+  if (! event_)
+    return false;
 
   return CXMachineInst->compareEvents(event_, event);
 }
@@ -201,11 +201,11 @@ XKeyPressedEvent *
 CXNamedEvent::
 getKeyPressedEvent()
 {
-  if (event_ == NULL)
-    return NULL;
+  if (! event_)
+    return nullptr;
 
   if (event_->type != KeyPress)
-    return NULL;
+    return nullptr;
 
   return &event_->xkey;
 }

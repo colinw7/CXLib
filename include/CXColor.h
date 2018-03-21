@@ -21,8 +21,8 @@ class CXColorMgr {
  private:
   typedef std::map<Pixel, CXColor *> CXColorMap;
 
-  CXScreen   &screen_;
-  CXColorMap  colormap_;
+  CXScreen&  screen_;
+  CXColorMap colormap_;
 };
 
 //------
@@ -94,7 +94,7 @@ class CXColor {
   void init();
 
  private:
-  CXScreen &screen_;
+  CXScreen& screen_;
   CRGBA     rgba_;
   Pixel     pixel_;
   bool      pixel_set_ { false };

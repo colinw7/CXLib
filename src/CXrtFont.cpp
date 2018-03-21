@@ -1,6 +1,5 @@
 #include <CXrtFont.h>
-
-//#include <CPixelRenderer.h>
+#include <CPixelRenderer.h>
 
 #include <std_Xt.h>
 
@@ -333,7 +332,6 @@ draw(Window window, GC gc, int x, int y, const string &str)
   }
 }
 
-#ifdef CPIXEL_RENDERER_H
 void
 CXrtFont::
 draw(CPixelRenderer *renderer, int x, int y, const string &str)
@@ -572,7 +570,6 @@ drawImage(CPixelRenderer *renderer, int x, int y, const string &str)
 
   draw(renderer, x, y, str);
 }
-#endif
 
 void
 CXrtFont::

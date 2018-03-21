@@ -76,12 +76,12 @@ class CXFont : public CFont {
 
   CXScreen    &screen_;
   CFontFamily &font_family_;
-  CXrtFont    *xrt_font_ { nullptr };
-  uint         font_width_ { 0 };
-  uint         font_ascent_ { 0 };
+  CXrtFont    *xrt_font_     { nullptr };
+  uint         font_width_   { 0 };
+  uint         font_ascent_  { 0 };
   uint         font_descent_ { 0 };
   bool         proportional_ { false };
-  double       font_aspect_ { 1.0 };
+  double       font_aspect_  { 1.0 };
   CImagePtr    image_;
 };
 

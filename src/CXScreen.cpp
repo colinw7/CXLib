@@ -208,7 +208,7 @@ void
 CXScreen::
 removeWindow(CXWindow *window)
 {
-  window_map_[window->getXWindow()] = NULL;
+  window_map_[window->getXWindow()] = nullptr;
 }
 
 CXWindow *
@@ -220,7 +220,7 @@ lookupWindow(Window xwin)
   if (p != window_map_.end())
     return (*p).second;
 
-  return NULL;
+  return nullptr;
 }
 
 Pixel
@@ -463,7 +463,7 @@ allocateOwnGrayColormap()
 
   Colormap new_cmap = XCreateColormap(display_, root, visual_, AllocNone);
 
-  if (XAllocColorCells(display_, new_cmap, False, NULL, 0, pixels, 256) == 0) {
+  if (XAllocColorCells(display_, new_cmap, False, nullptr, 0, pixels, 256) == 0) {
     fprintf(stderr, "Failed to allocated colormap colors_\n");
     return false;
   }
@@ -552,7 +552,7 @@ setColorsUsed()
   for (int i = 0; i < num_colors_; ++i) {
     Pixel pixel;
 
-    if (XAllocColorCells(display_, cmap_, False, NULL, 0, &pixel, 1) != 1)
+    if (XAllocColorCells(display_, cmap_, False, nullptr, 0, &pixel, 1) != 1)
       break;
 
     color_used_     [pixel] = false;

@@ -101,8 +101,7 @@ class CXGraphics {
   bool getImage(int x, int y, int width, int height, XImage **ximage);
 
   void drawText(int x, int y, const std::string &str);
-
-  //void drawTextImage(int x, int y, const std::string &str);
+  void drawTextImage(int x, int y, const std::string &str);
 
   void startClip(int x, int y, int width, int height);
   void startClip(Pixmap pixmap, int dx, int dy);
@@ -115,7 +114,7 @@ class CXGraphics {
 
   void setLineWidth(int line_width);
 
-  void setLineDash(int offset=0, char *dashes=NULL, int num_dashes=0);
+  void setLineDash(int offset=0, char *dashes=nullptr, int num_dashes=0);
   void setLineDash(int offset, int *dashes, int num_dashes);
   void setLineDash(const CILineDash &line_dash);
 
@@ -140,17 +139,17 @@ class CXGraphics {
  private:
   enum { MAX_POLY_POINTS=100 };
 
-  CXScreen           &screen_;
-  Window              window_ { 0 };
-  Display            *display_ { nullptr };
-  bool                is_pixmap_ { false };
+  CXScreen&           screen_;
+  Window              window_           { 0 };
+  Display*            display_          { nullptr };
+  bool                is_pixmap_        { false };
   GC                  gc_;
   CXColor             bg_;
   CXColor             fg_;
   CFontPtr            font_;
   CAutoPtr<CXPixmap>  pixmap_;
   bool                in_double_buffer_ { false };
-  bool                fill_complex_ { false };
+  bool                fill_complex_     { false };
 
   static bool   error_trapped;
   static XPoint poly_point[MAX_POLY_POINTS];

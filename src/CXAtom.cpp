@@ -142,7 +142,7 @@ const CXAtom &
 CXAtomMgr::
 getWMProtocols()
 {
-  if (XA_WM_PROTOCOLS == NULL)
+  if (! XA_WM_PROTOCOLS)
     XA_WM_PROTOCOLS = &getCXAtom("WM_PROTOCOLS");
 
   return *XA_WM_PROTOCOLS;
@@ -152,7 +152,7 @@ const CXAtom &
 CXAtomMgr::
 getWMTakeFocus()
 {
-  if (XA_WM_TAKE_FOCUS == NULL)
+  if (! XA_WM_TAKE_FOCUS)
     XA_WM_TAKE_FOCUS = &getCXAtom("WM_TAKE_FOCUS");
 
   return *XA_WM_TAKE_FOCUS;
@@ -162,7 +162,7 @@ const CXAtom &
 CXAtomMgr::
 getWMSaveYourself()
 {
-  if (XA_WM_SAVE_YOURSELF == NULL)
+  if (! XA_WM_SAVE_YOURSELF)
     XA_WM_SAVE_YOURSELF = &getCXAtom("WM_SAVE_YOURSELF");
 
   return *XA_WM_SAVE_YOURSELF;
@@ -172,7 +172,7 @@ const CXAtom &
 CXAtomMgr::
 getWMDeleteWindow()
 {
-  if (XA_WM_DELETE_WINDOW == NULL)
+  if (! XA_WM_DELETE_WINDOW)
     XA_WM_DELETE_WINDOW = &getCXAtom("WM_DELETE_WINDOW");
 
   return *XA_WM_DELETE_WINDOW;
@@ -182,7 +182,7 @@ const CXAtom &
 CXAtomMgr::
 getWMState()
 {
-  if (XA_WM_STATE == NULL)
+  if (! XA_WM_STATE)
     XA_WM_STATE = &getCXAtom("WM_STATE");
 
   return *XA_WM_STATE;
@@ -192,7 +192,7 @@ const CXAtom &
 CXAtomMgr::
 getWMChangeState()
 {
-  if (XA_WM_CHANGE_STATE == NULL)
+  if (! XA_WM_CHANGE_STATE)
     XA_WM_CHANGE_STATE = &getCXAtom("WM_CHANGE_STATE");
 
   return *XA_WM_CHANGE_STATE;
@@ -202,7 +202,7 @@ const CXAtom &
 CXAtomMgr::
 getMwmHints()
 {
-  if (XA_MWM_HINTS == NULL)
+  if (! XA_MWM_HINTS)
     XA_MWM_HINTS = &getCXAtom("_MOTIF_WM_HINTS");
 
   return *XA_MWM_HINTS;
@@ -212,7 +212,7 @@ const CXAtom &
 CXAtomMgr::
 getXSetRootId()
 {
-  if (XA_XSETROOT_ID == NULL)
+  if (! XA_XSETROOT_ID)
     XA_XSETROOT_ID = &getCXAtom("_XSETROOT_ID");
 
   return *XA_XSETROOT_ID;
@@ -222,7 +222,7 @@ const CXAtom &
 CXAtomMgr::
 getCwmDesktop()
 {
-  if (XA_CWM_DESKTOP == NULL)
+  if (! XA_CWM_DESKTOP)
     XA_CWM_DESKTOP = &getCXAtom("CWM_DESKTOP");
 
   return *XA_CWM_DESKTOP;
@@ -240,7 +240,7 @@ getCXAtom(const string &name)
 
   Display *display = machine_.getDisplay();
 
-  if (display == NULL) {
+  if (! display) {
     static CXAtom atom("", 0);
     CTHROW("No display");
     return atom;

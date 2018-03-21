@@ -10,9 +10,9 @@ class CXDragWindow {
 
   CXWindow *getCXWindow() const { return cxwindow_; }
 
-  void dragStart(int x, int y);
+  void dragStart (int x, int y);
   void dragMotion(int x, int y);
-  void dragEnd(int x, int y);
+  void dragEnd   (int x, int y);
 
   void setSize(int width, int height);
 
