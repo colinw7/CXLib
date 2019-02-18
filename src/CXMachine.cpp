@@ -34,7 +34,7 @@ CXMachine()
 
   locked = true;
 
-  event_adapter_  = new CXEventAdapter;
+  event_adapter_ = new CXEventAdapter;
 
   atomMgr_ = new CXAtomMgr(*this);
 
@@ -65,14 +65,14 @@ init()
 
 Display *
 CXMachine::
-openDisplay(const string &display_name)
+openDisplay(const std::string &display_name)
 {
   if (display_) {
     CTHROW("Display already open");
     return display_;
   }
 
-  string display_name1 = display_name;
+  std::string display_name1 = display_name;
 
   if (display_name1 == "") {
     display_ = XOpenDisplay(0);
@@ -105,7 +105,7 @@ openDisplay(const string &display_name)
 
 Display *
 CXMachine::
-openXtDisplay(const string &display_name, const string &app_name, int *argc, char **argv)
+openXtDisplay(const std::string &display_name, const std::string &app_name, int *argc, char **argv)
 {
   if (display_) {
     CTHROW("Display already open");
@@ -114,7 +114,7 @@ openXtDisplay(const string &display_name, const string &app_name, int *argc, cha
 
   app_context_ = XtCreateApplicationContext();
 
-  string class_name = app_name;
+  std::string class_name = app_name;
 
   int len = class_name.size();
 
@@ -177,7 +177,7 @@ setDisplay(Display *display)
   if (display) {
     display_ = display;
 
-    string display_name = DisplayString(display_);
+    std::string display_name = DisplayString(display_);
 
     CXUtil::decodeDisplayName(display_name, hostname_, &display_num_, &screen_num_);
 
@@ -208,7 +208,7 @@ getScreenDisplay(int screen_num) const
     th->openDisplay("");
 
     if (! display_) {
-      cerr << "Failed to open display" << endl;
+      std::cerr << "Failed to open display\n";
       exit(1);
     }
   }
@@ -505,7 +505,7 @@ void
 CXMachine::
 tickLoop(uint nframes, CXEventAdapter *adapter)
 {
-  int secs1, usecs1, secs2, usecs2, dsecs, dusecs;
+  long secs1, usecs1, secs2, usecs2, dsecs, dusecs;
 
   int usecs = 1000000/nframes;
 
@@ -628,7 +628,7 @@ processEvent()
       if (event_keysym_ == XK_Print ||
           (event_keysym_ == XK_p && getIsAlt())) {
         if (window) {
-          cerr << "Print Window" << endl;
+          std::cerr << "Print Window\n";
 
           CImagePtr image = window->getImage();
 
@@ -637,7 +637,7 @@ processEvent()
       }
 
       if (event_adapter) {
-        string text;
+        std::string text;
 
         if (event_keysym_ != XK_Shift_L   && event_keysym_ != XK_Shift_R &&
             event_keysym_ != XK_Control_L && event_keysym_ != XK_Control_R &&
@@ -667,7 +667,7 @@ processEvent()
          setIsAlt  (false);
 
       if (event_adapter) {
-        string text;
+        std::string text;
 
         if (event_keysym_ != XK_Shift_L   && event_keysym_ != XK_Shift_R &&
             event_keysym_ != XK_Control_L && event_keysym_ != XK_Control_R &&
@@ -817,14 +817,14 @@ getEventKeysym() const
   return keycodeToKeysym(event_.xkey.keycode, event_.xkey.state);
 }
 
-string
+std::string
 CXMachine::
 getEventString() const
 {
   return getEventString(&event_);
 }
 
-string
+std::string
 CXMachine::
 getEventString(const XEvent *event) const
 {
@@ -962,11 +962,11 @@ convertEventKeyCodeToType(uint keycode, uint state)
   return (CKeyType) keysym;
 }
 
-string
+std::string
 CXMachine::
 convertEventKeyCodeToString(uint keycode, uint state)
 {
-  string str = keycodeToString(keycode, state);
+  std::string str = keycodeToString(keycode, state);
 
   return str;
 }
@@ -1686,7 +1686,7 @@ killClient(Window xwin)
 
 void
 CXMachine::
-setWindowTitle(Window xwin, const string &title)
+setWindowTitle(Window xwin, const std::string &title)
 {
   const CXAtom &atom = getAtom(XA_WM_NAME);
 
@@ -1695,7 +1695,7 @@ setWindowTitle(Window xwin, const string &title)
 
 void
 CXMachine::
-getWindowTitle(Window xwin, string &title)
+getWindowTitle(Window xwin, std::string &title)
 {
   const CXAtom &atom1 = getAtom("_NET_WM_NAME");
 
@@ -1709,7 +1709,7 @@ getWindowTitle(Window xwin, string &title)
 
 void
 CXMachine::
-setIconTitle(Window xwin, const string &title)
+setIconTitle(Window xwin, const std::string &title)
 {
   const CXAtom &atom = getAtom(XA_WM_ICON_NAME);
 
@@ -1718,7 +1718,7 @@ setIconTitle(Window xwin, const string &title)
 
 void
 CXMachine::
-getIconTitle(Window xwin, string &title)
+getIconTitle(Window xwin, std::string &title)
 {
   const CXAtom &atom1 = getAtom("_NET_WM_ICON_NAME");
 
@@ -1761,7 +1761,7 @@ setIntegerArrayProperty(Window xwin, const CXAtom &name, int *values, int num_va
 
 bool
 CXMachine::
-setStringProperty(Window xwin, const CXAtom &name, const string &value)
+setStringProperty(Window xwin, const CXAtom &name, const std::string &value)
 {
   XChangeProperty(display_, xwin, name.getXAtom(), XA_STRING,
                   8, PropModeReplace, (uchar *) value.c_str(), (int) value.size());
@@ -1816,7 +1816,7 @@ bool
 CXMachine::
 setAtomArrayProperty(Window xwin, const CXAtom &name, const CXAtom **atoms, int num_atoms)
 {
-  vector<Atom> atoms1;
+  std::vector<Atom> atoms1;
 
   atoms1.resize(num_atoms);
 
@@ -1884,14 +1884,14 @@ getIntegerProperty(Window xwin, const CXAtom &name, int *value)
 
 bool
 CXMachine::
-getStringProperty(const CXAtom &name, string &value)
+getStringProperty(const CXAtom &name, std::string &value)
 {
   return getStringProperty(getRoot(), name, value);
 }
 
 bool
 CXMachine::
-getStringProperty(Window xwin, const CXAtom &name, string &value)
+getStringProperty(Window xwin, const CXAtom &name, std::string &value)
 {
   ulong  n;
   Atom   type;
@@ -1909,7 +1909,7 @@ getStringProperty(Window xwin, const CXAtom &name, string &value)
   if (n == 0 || ! data)
     return false;
 
-  value = string((char *) data);
+  value = std::string((char *) data);
 
   XFree(data);
 
@@ -2178,7 +2178,7 @@ getWMState(Window xwin)
 
 bool
 CXMachine::
-getWMName(Window xwin, string &name)
+getWMName(Window xwin, std::string &name)
 {
   name = "";
 
@@ -2197,7 +2197,7 @@ getWMName(Window xwin, string &name)
 
 bool
 CXMachine::
-getWMIconName(Window xwin, string &name)
+getWMIconName(Window xwin, std::string &name)
 {
   name = "";
 
@@ -2295,7 +2295,7 @@ getWMClassHint(Window xwin, XClassHint **class_hint)
 
 bool
 CXMachine::
-setWMClassHint(Window xwin, const string &res_name, const string &res_class)
+setWMClassHint(Window xwin, const std::string &res_name, const std::string &res_class)
 {
   const char *strs[2] = { res_name.c_str(), res_class.c_str() };
 
@@ -2308,7 +2308,7 @@ setWMClassHint(Window xwin, const string &res_name, const string &res_class)
 
 void
 CXMachine::
-getWMClientMachine(Window xwin, string &client_machine)
+getWMClientMachine(Window xwin, std::string &client_machine)
 {
   char *client_machine1 = 0;
 
@@ -2325,7 +2325,7 @@ getWMClientMachine(Window xwin, string &client_machine)
 
 bool
 CXMachine::
-setWMClientMachine(Window xwin, const string &str)
+setWMClientMachine(Window xwin, const std::string &str)
 {
   const CXAtom &client_machine = getAtom("WM_CLIENT_MACHINE");
 
@@ -2607,7 +2607,7 @@ sendKeyReleasedEvent(Window xwin, int x, int y, int keycode)
 
 bool
 CXMachine::
-sendStringClientMessage(Window server_xwin, Window client_xwin, const string &str)
+sendStringClientMessage(Window server_xwin, Window client_xwin, const std::string &str)
 {
   const CXAtom &atom1 = getAtom("CLIENT_WINDOW");
 
@@ -2636,7 +2636,7 @@ sendStringClientMessage(Window server_xwin, Window client_xwin, const string &st
 
 bool
 CXMachine::
-readStringClientMessage(Window server_xwin, Window *client_xwin, string &str)
+readStringClientMessage(Window server_xwin, Window *client_xwin, std::string &str)
 {
   const CXAtom &atom1 = getAtom("CLIENT_WINDOW");
 
@@ -2651,7 +2651,7 @@ readStringClientMessage(Window server_xwin, Window *client_xwin, string &str)
 
 bool
 CXMachine::
-sendStringServerMessage(Window client_xwin, Window server_xwin, const string &str)
+sendStringServerMessage(Window client_xwin, Window server_xwin, const std::string &str)
 {
   const CXAtom &atom1 = getAtom("SERVER_WINDOW");
 
@@ -2680,7 +2680,7 @@ sendStringServerMessage(Window client_xwin, Window server_xwin, const string &st
 
 bool
 CXMachine::
-readStringServerMessage(Window client_xwin, Window *server_xwin, string &str)
+readStringServerMessage(Window client_xwin, Window *server_xwin, std::string &str)
 {
   const CXAtom &atom1 = getAtom("SERVER_WINDOW");
 
@@ -2903,7 +2903,7 @@ sendWmState(Window window, int action, const std::string &atom1, const std::stri
 
 bool
 CXMachine::
-sendWindowMessage(Window from, Window to, const string &str)
+sendWindowMessage(Window from, Window to, const std::string &str)
 {
   const CXAtom &atom = getAtom("WINDOW_MESSAGE");
 
@@ -3279,7 +3279,7 @@ drawPoint(Window xwin, GC gc, int x, int y)
 
 void
 CXMachine::
-drawString(Window xwin, GC gc, int x, int y, const string &str)
+drawString(Window xwin, GC gc, int x, int y, const std::string &str)
 {
   XDrawString(display_, xwin, gc, x, y, str.c_str(), str.size());
 }
@@ -3399,7 +3399,7 @@ loadFont(const char *name)
 
 const CXAtom &
 CXMachine::
-getAtom(const string &name) const
+getAtom(const std::string &name) const
 {
   return atomMgr_->getCXAtom(name);
 }
@@ -3722,7 +3722,7 @@ getEventWindow(XEvent *event) const
   }
 }
 
-string
+std::string
 CXMachine::
 getEventName(XEvent *event) const
 {
@@ -3853,7 +3853,7 @@ XErrorHandler(Display *, XErrorEvent *event)
   }
 
   if (CXMachineInst->error_proc_) {
-    string msg =
+    std::string msg =
       CStrUtil::strprintf("X Error - %s (%d) : %s (%d)",
                           routine, event->request_code, message, event->error_code);
 
@@ -3882,7 +3882,7 @@ getXErrorRoutine(int code)
 {
   static char buffer[256];
 
-  string code_string = CStrUtil::toString(code);
+  std::string code_string = CStrUtil::toString(code);
 
   XGetErrorDatabaseText(display_, "XRequest", code_string.c_str(), "", buffer, 256);
 
@@ -3895,7 +3895,7 @@ getXErrorMessage(int code)
 {
   static char buffer[256];
 
-  string code_string = CStrUtil::toString(code);
+  std::string code_string = CStrUtil::toString(code);
 
   XGetErrorDatabaseText(display_, "XProtoError", code_string.c_str(), "", buffer, 256);
 
@@ -3964,25 +3964,25 @@ selectRootRegion(int *xmin, int *ymin, int *xmax, int *ymax) const
       y2 = y1;
 
       drawRectangle(root, gc, std::min(x1, x2), std::min(y1, y2),
-                    abs(x2 - x1) + 1, abs(y2 - y1) + 1);
+                    std::abs(x2 - x1) + 1, std::abs(y2 - y1) + 1);
 
       pressed = true;
     }
     else if (event_.type == MotionNotify) {
       if (pressed) {
         drawRectangle(root, gc, std::min(x1, x2), std::min(y1, y2),
-                      abs(x2 - x1) + 1, abs(y2 - y1) + 1);
+                      std::abs(x2 - x1) + 1, std::abs(y2 - y1) + 1);
 
         x2 = event_.xmotion.x_root;
         y2 = event_.xmotion.y_root;
 
         drawRectangle(root, gc, std::min(x1, x2), std::min(y1, y2),
-                      abs(x2 - x1) + 1, abs(y2 - y1) + 1);
+                      std::abs(x2 - x1) + 1, std::abs(y2 - y1) + 1);
       }
     }
     else {
       drawRectangle(root, gc, std::min(x1, x2), std::min(y1, y2),
-                    abs(x2 - x1) + 1, abs(y2 - y1) + 1);
+                    std::abs(x2 - x1) + 1, std::abs(y2 - y1) + 1);
 
       pressed = false;
 
@@ -4023,7 +4023,7 @@ unsetCursor(Window xwin)
 
 bool
 CXMachine::
-selectionSetText(Window xwin, const string &text)
+selectionSetText(Window xwin, const std::string &text)
 {
   XSetSelectionOwner(display_, XA_PRIMARY, xwin, CurrentTime);
 
@@ -4126,11 +4126,11 @@ selectionNotifyEvent(XSelectionEvent *event)
     return;
 
   selection_xwin_ = getEventWindow((XEvent *) event);
-  selection_text_ = string((char *) data);
+  selection_text_ = std::string((char *) data);
   selection_set_  = true;
 }
 
-string
+std::string
 CXMachine::
 selectionGetText(Window xwin)
 {
@@ -4214,7 +4214,7 @@ getMonitorWidthMM(double *width)
   if (! config.getValue("width", width))
     return false;
 
-  string units;
+  std::string units;
 
   if (! config.getValue("width_units", units))
     units = "mm";
@@ -4234,7 +4234,7 @@ getMonitorHeightMM(double *height)
   if (! config.getValue("height", height))
     return false;
 
-  string units;
+  std::string units;
 
   if (! config.getValue("height_units", units))
     units = "mm";

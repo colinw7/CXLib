@@ -17,7 +17,7 @@ decodeVisualMask(uint full_mask, int *shift, uint *mask)
 
 void
 CXUtil::
-decodeDisplayName(const string &display_name, string &hostname,
+decodeDisplayName(const std::string &display_name, std::string &hostname,
                   int *display_num, int *screen_num)
 {
   char hostname1[256];
@@ -88,12 +88,12 @@ decodeDisplayName(const string &display_name, string &hostname,
   *display_num = 0;
 }
 
-string
+std::string
 CXUtil::
-encodeXFontName(const string &name, CFontStyle style, int size)
+encodeXFontName(const std::string &name, CFontStyle style, int size)
 {
-  string style_str;
-  string slant_str;
+  std::string style_str;
+  std::string slant_str;
 
   if (style & CFONT_STYLE_BOLD)
     style_str = "bold";
@@ -109,10 +109,10 @@ encodeXFontName(const string &name, CFontStyle style, int size)
   else
     slant_str = "r";
 
-  string size_str = CStrUtil::toString(size);
+  std::string size_str = CStrUtil::toString(size);
 
-  string font_name = "-*-" + name + "-" + style_str + "-" + slant_str +
-                     "-normal-*-" + size_str + "-*-*-*-*-*-*-*";
+  std::string font_name = "-*-" + name + "-" + style_str + "-" + slant_str +
+                          "-normal-*-" + size_str + "-*-*-*-*-*-*-*";
 
   return font_name;
 }

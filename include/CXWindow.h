@@ -78,9 +78,7 @@ class CXWindow : public CWindow {
 
   void setEventAdapter(CEventAdapter *adapter);
 
-  CEventAdapter *getEventAdapter() const {
-    return event_adapter_;
-  }
+  CEventAdapter *getEventAdapter() const { return event_adapter_; }
 
   CXEventAdapter *getXEventAdapter() const;
 

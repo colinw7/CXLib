@@ -324,9 +324,9 @@ rgbaIToPixel(uint red, uint green, uint blue, uint alpha)
       uint green1 = colors_[i].green & 0x00FF;
       uint blue1  = colors_[i].blue  & 0x00FF;
 
-      diff1 = abs(red1   - red  )*
-              abs(green1 - green)*
-              abs(blue1  - blue );
+      diff1 = std::abs(int(red1  ) - int(red  ))*
+              std::abs(int(green1) - int(green))*
+              std::abs(int(blue1 ) - int(blue ));
 
       if (diff1 < diff) {
         nearest = i;
@@ -373,9 +373,9 @@ rgbaIToPixel(uint red, uint green, uint blue, uint alpha)
     int diff1   = 0;
 
     for (i = 0; i < num_colors_; ++i) {
-      uint gray = colors_[i].red & 0x00FF;
+      uint gray = (colors_[i].red & 0x00FF);
 
-      diff1 = abs(gray - red);
+      diff1 = std::abs(int(gray) - int(red));
 
       if (diff1 < diff) {
         nearest = i;

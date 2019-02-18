@@ -597,7 +597,7 @@ class CXMachine {
   XErrorProc error_proc_ { 0 };
 
   Window      selection_xwin_ { None };
-  bool        selection_set_ { false };
+  bool        selection_set_  { false };
   std::string selection_text_;
 };
 

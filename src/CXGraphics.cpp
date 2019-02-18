@@ -597,10 +597,10 @@ getImage(int x, int y, int width, int height, XImage **ximage)
 
 void
 CXGraphics::
-drawText(int x, int y, const string &str)
+drawText(int x, int y, const std::string &str)
 {
   if (! font_.isValid()) {
-    std::cerr << "Bad Font" << endl;
+    std::cerr << "Bad Font\n";
     return;
   }
 
@@ -619,10 +619,10 @@ drawText(int x, int y, const string &str)
 
 void
 CXGraphics::
-drawTextImage(int x, int y, const string &str)
+drawTextImage(int x, int y, const std::string &str)
 {
   if (! font_.isValid()) {
-    std::cerr << "Bad Font" << endl;
+    std::cerr << "Bad Font\n";
     return;
   }
 
@@ -838,7 +838,7 @@ getCharHeight()
 
 int
 CXGraphics::
-getStringWidth(const string &str)
+getStringWidth(const std::string &str)
 {
   if (font_.isValid())
     return font_->getIStringWidth(str);

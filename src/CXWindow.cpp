@@ -295,7 +295,7 @@ getFont(CFontPtr &font) const
 
 void
 CXWindow::
-setFont(const string &name, CFontStyle style, int size)
+setFont(const std::string &name, CFontStyle style, int size)
 {
   CFontPtr font = CFontMgrInst->lookupFont(name, style, size);
 
@@ -304,7 +304,7 @@ setFont(const string &name, CFontStyle style, int size)
 
 void
 CXWindow::
-setFont(const string &full_name)
+setFont(const std::string &full_name)
 {
   CFontPtr font = CFontMgrInst->lookupFont(full_name);
 
@@ -695,8 +695,8 @@ void
 CXWindow::
 drawPolygon(double *x, double *y, uint num_xy)
 {
-  vector<int> xi; xi.resize(num_xy);
-  vector<int> yi; yi.resize(num_xy);
+  std::vector<int> xi; xi.resize(num_xy);
+  std::vector<int> yi; yi.resize(num_xy);
 
   for (uint i = 0; i < num_xy; ++i) {
     xi[i] = (int) x[i];
@@ -711,8 +711,8 @@ void
 CXWindow::
 fillPolygon(double *x, double *y, uint num_xy)
 {
-  vector<int> xi; xi.resize(num_xy);
-  vector<int> yi; yi.resize(num_xy);
+  std::vector<int> xi; xi.resize(num_xy);
+  std::vector<int> yi; yi.resize(num_xy);
 
   for (uint i = 0; i < num_xy; ++i) {
     xi[i] = (int) x[i];
@@ -820,7 +820,7 @@ drawSubImage(const CImagePtr &image, double src_x, double src_y,
 
 void
 CXWindow::
-drawText(double x, double y, const string &str)
+drawText(double x, double y, const std::string &str)
 {
   if (graphics_)
     graphics_->drawText((int) x, (int) y, str);
@@ -1027,7 +1027,7 @@ setFillComplex(bool comp)
 
 uint
 CXWindow::
-getStringWidth(const string &str) const
+getStringWidth(const std::string &str) const
 {
   if (graphics_)
     return graphics_->getStringWidth(str);
@@ -1118,7 +1118,7 @@ raiseWait(uint timeout)
 
 void
 CXWindow::
-setWindowTitle(const string &title)
+setWindowTitle(const std::string &title)
 {
   CXWindow *top = getTopWindow();
 
@@ -1127,7 +1127,7 @@ setWindowTitle(const string &title)
 
 void
 CXWindow::
-setIconTitle(const string &title)
+setIconTitle(const std::string &title)
 {
   CXWindow *top = getTopWindow();
 
@@ -1136,7 +1136,7 @@ setIconTitle(const string &title)
 
 void
 CXWindow::
-getWindowTitle(string &title) const
+getWindowTitle(std::string &title) const
 {
   CXWindow *th = const_cast<CXWindow *>(this);
 
@@ -1147,7 +1147,7 @@ getWindowTitle(string &title) const
 
 void
 CXWindow::
-getIconTitle(string &title) const
+getIconTitle(std::string &title) const
 {
   CXWindow *th = const_cast<CXWindow *>(this);
 
@@ -1158,7 +1158,7 @@ getIconTitle(string &title) const
 
 bool
 CXWindow::
-setProperty(const string &name, const string &value)
+setProperty(const std::string &name, const std::string &value)
 {
   const CXAtom &atom = CXMachineInst->getAtom(name);
 
@@ -1220,7 +1220,7 @@ demaximize()
 
 bool
 CXWindow::
-setSelectText(const string &text)
+setSelectText(const std::string &text)
 {
   CXMachineInst->selectionSetText(window_, text);
 
@@ -1280,7 +1280,7 @@ translateToRootCoords(int wx, int wy, int *rx, int *ry) const
 
 void
 CXWindow::
-selectionSetText(const string &text)
+selectionSetText(const std::string &text)
 {
   CXMachineInst->selectionSetText(window_, text);
 }
@@ -1294,9 +1294,9 @@ beep()
 
 void
 CXWindow::
-setShellProperties(const string &name)
+setShellProperties(const std::string &name)
 {
-  string str = COSUser::getHostName();
+  std::string str = COSUser::getHostName();
 
   const CXAtom &protocols     = CXMachineInst->getAtom("WM_PROTOCOLS");
   const CXAtom &delete_window = CXMachineInst->getAtom("WM_DELETE_WINDOW");

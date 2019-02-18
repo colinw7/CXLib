@@ -230,7 +230,7 @@ getCwmDesktop()
 
 const CXAtom &
 CXAtomMgr::
-getCXAtom(const string &name)
+getCXAtom(const std::string &name)
 {
   CXAtomMap::const_iterator patom1 = atom_map_.find(name);
   CXAtomMap::const_iterator patom2 = atom_map_.end();
@@ -269,7 +269,7 @@ getCXAtom(Atom atom)
 //---
 
 CXAtom::
-CXAtom(const string &name, Atom xatom) :
+CXAtom(const std::string &name, Atom xatom) :
  name_(name), xatom_(xatom)
 {
 }

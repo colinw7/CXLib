@@ -218,7 +218,7 @@ createXImage()
                          (char *) xdata_, width, height, pad, bytes_per_line);
 
   if (! ximage_)
-    cerr << "Failed to create ximage" << endl;
+    std::cerr << "Failed to create ximage\n";
 
   ximage_owner_ = true;
 
@@ -274,7 +274,7 @@ initXImage()
     }
   }
   else {
-    vector<Pixel> pixels;
+    std::vector<Pixel> pixels;
 
     int num = getNumColors();
 
@@ -532,7 +532,7 @@ getImageColors(CRGB **colors, int *num_colors)
 
   int num_xcolors = visual->map_entries;
 
-  vector<XColor> xcolors;
+  std::vector<XColor> xcolors;
 
   xcolors.resize(num_xcolors);
 
@@ -541,7 +541,7 @@ getImageColors(CRGB **colors, int *num_colors)
 
   XQueryColors(display, cmap, &xcolors[0], num_xcolors);
 
-  vector<int> used;
+  std::vector<int> used;
 
   used.resize(num_xcolors);
 

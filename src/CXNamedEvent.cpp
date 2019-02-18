@@ -1,7 +1,7 @@
 #include <CXLibI.h>
 
 CXNamedEvent::
-CXNamedEvent(const string &name) :
+CXNamedEvent(const std::string &name) :
  name_(name)
 {
   parse();
@@ -23,16 +23,16 @@ parse()
 
   // Parse String
 
-  string modifiers = "";
-  string object    = "";
-  string data      = "";
+  std::string modifiers = "";
+  std::string object    = "";
+  std::string data      = "";
 
   uint state = 0;
 
-  string::size_type pos1 = name_. find("<");
-  string::size_type pos2 = name_.rfind(">");
+  std::string::size_type pos1 = name_. find("<");
+  std::string::size_type pos2 = name_.rfind(">");
 
-  if (pos1 == string::npos || pos2 == string::npos || pos1 >= pos2)
+  if (pos1 == std::string::npos || pos2 == std::string::npos || pos1 >= pos2)
     goto done;
 
   modifiers = name_.substr(0, pos1);
@@ -42,7 +42,7 @@ parse()
   data = name_.substr(pos2 + 1);
 
   if (modifiers != "") {
-    vector<string> words;
+    std::vector<std::string> words;
 
     CStrUtil::addFields(modifiers, words, "+");
 
@@ -101,7 +101,7 @@ parse()
     KeySym keysym = XStringToKeysym(data.c_str());
 
     if (keysym == NoSymbol) {
-      cerr << "Unknowm KeySym Name " << data << endl;
+      std::cerr << "Unknowm KeySym Name " << data << "\n";
       goto done;
     }
 
@@ -119,7 +119,7 @@ parse()
     KeySym keysym = XStringToKeysym(data.c_str());
 
     if (keysym == NoSymbol) {
-      cerr << "Unknowm KeySym Name " << data << endl;
+      std::cerr << "Unknowm KeySym Name " << data << "\n";
       goto done;
     }
 
@@ -172,7 +172,7 @@ parse()
 
  done:
   if (! event_)
-    std::cerr << "Invalid Event Name '" << name_ << "'" << endl;
+    std::cerr << "Invalid Event Name '" << name_ << "'\n";
 
   return flag;
 }

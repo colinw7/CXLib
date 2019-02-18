@@ -9,12 +9,12 @@ class CXTimer1 : public CTimer {
  ~CXTimer1();
 
  private:
-  static list<CXTimer1 *> timers_;
+  static std::list<CXTimer1 *> timers_;
 
   void timeOut();
 };
 
-list<CXTimer1 *> CXTimer1::timers_;
+std::list<CXTimer1 *> CXTimer1::timers_;
 
 CXTimer::
 CXTimer(uint msecs, CTimerFlags flags)

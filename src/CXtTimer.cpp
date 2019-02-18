@@ -14,14 +14,14 @@ class CXtTimer1 {
   static void setAppContext(XtAppContext app_context);
 
  private:
-  static XtAppContext      app_context_;
-  static list<CXtTimer1 *> timers_;
+  static XtAppContext           app_context_;
+  static std::list<CXtTimer1 *> timers_;
 
   static void calltimeOut(void *data, XtIntervalId *id);
 };
 
-XtAppContext      CXtTimer1::app_context_ = 0;
-list<CXtTimer1 *> CXtTimer1::timers_;
+XtAppContext           CXtTimer1::app_context_ = 0;
+std::list<CXtTimer1 *> CXtTimer1::timers_;
 
 CXtTimer::
 CXtTimer(uint msecs, CTimerFlags flags)

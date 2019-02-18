@@ -11,7 +11,7 @@ setPrototype()
 }
 
 CXFont::
-CXFont(const string &family, CFontStyle style, double size, double angle,
+CXFont(const std::string &family, CFontStyle style, double size, double angle,
        double char_angle, int x_res, int y_res) :
  CFont(family, style, size, angle, char_angle, x_res, y_res),
  screen_(*CXMachineInst->getCXScreen(0)),
@@ -21,7 +21,7 @@ CXFont(const string &family, CFontStyle style, double size, double angle,
 }
 
 CXFont::
-CXFont(CXScreen &screen, const string &family, CFontStyle style, double size, double angle,
+CXFont(CXScreen &screen, const std::string &family, CFontStyle style, double size, double angle,
        double char_angle, int x_res, int y_res) :
  CFont(family, style, size, angle, char_angle, x_res, y_res), screen_(screen),
  font_family_(CFontFamily::lookup(family))
@@ -30,7 +30,7 @@ CXFont(CXScreen &screen, const string &family, CFontStyle style, double size, do
 }
 
 CXFont::
-CXFont(const string &full_name) :
+CXFont(const std::string &full_name) :
  CFont(full_name), screen_(*CXMachineInst->getCXScreen(0)),
  font_family_(CFontFamily::lookup(getFamily()))
 {
@@ -38,7 +38,7 @@ CXFont(const string &full_name) :
 }
 
 CXFont::
-CXFont(CXScreen &screen, const string &full_name) :
+CXFont(CXScreen &screen, const std::string &full_name) :
  CFont(full_name), screen_(screen), font_family_(CFontFamily::lookup(getFamily()))
 {
   init();
@@ -102,7 +102,7 @@ operator=(const CXFont &font)
 
 CFontPtr
 CXFont::
-dup(const string &family, CFontStyle style, double size,
+dup(const std::string &family, CFontStyle style, double size,
     double angle, double char_angle, int x_res, int y_res) const
 {
   CXFont *font =
@@ -115,7 +115,7 @@ void
 CXFont::
 init()
 {
-  string x_font_name = getXFontName();
+  std::string x_font_name = getXFontName();
 
   Display *display = screen_.getDisplay();
   Window   root    = screen_.getRoot();
@@ -161,7 +161,7 @@ init(XFontStruct *fs)
 
 uint
 CXFont::
-getIStringWidth(const string &str) const
+getIStringWidth(const std::string &str) const
 {
   int width;
 
@@ -172,12 +172,12 @@ getIStringWidth(const string &str) const
 
 CImagePtr
 CXFont::
-getStringImage(const string &str)
+getStringImage(const std::string &str)
 {
   uint w = getIStringWidth(str);
   uint h = getICharHeight();
 
-  string fileName = "app://getStringImage";
+  std::string fileName = "app://getStringImage";
 
   CImageFileSrc src(fileName);
 
@@ -214,9 +214,9 @@ loadFontDatabase()
 
   uint num_fonts = font_list.getNumFonts();
 
-  string     family;
-  CFontStyle style;
-  uint       size, x_res, y_res;
+  std::string family;
+  CFontStyle  style;
+  uint        size, x_res, y_res;
 
   for (uint i = 0; i < num_fonts; i++) {
     const char *font_name = font_list.getFont(i);
@@ -228,7 +228,7 @@ loadFontDatabase()
 
     CFontDef &font = font_family.lookupFontDef(style, size);
 
-    if (x_res > x_res || y_res > y_res) {
+    if (x_res > font.x_res || y_res > font.y_res) {
       font.x_res = x_res;
       font.y_res = y_res;
     }

@@ -257,7 +257,7 @@ drawAlphaImage(const CImagePtr &image, int x, int y)
 
 void
 CXDrawable::
-drawText(int x, int y, const string &str)
+drawText(int x, int y, const std::string &str)
 {
   graphics_->drawText(x, y, str);
 }
@@ -320,7 +320,7 @@ getCharHeight()
 
 uint
 CXDrawable::
-getStringWidth(const string &str)
+getStringWidth(const std::string &str)
 {
   return graphics_->getStringWidth(str);
 }
