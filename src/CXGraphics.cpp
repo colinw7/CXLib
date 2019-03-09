@@ -1,5 +1,12 @@
-#include <CXLibI.h>
+#include <CXGraphics.h>
+#include <CXMachine.h>
+#include <CXScreen.h>
+#include <CXImage.h>
+#include <CXPixmap.h>
+#include <CXFont.h>
 #include <CXrtFont.h>
+#include <CFontMgr.h>
+#include <CThrow.h>
 
 bool   CXGraphics::error_trapped = false;
 XPoint CXGraphics::poly_point[];
@@ -65,7 +72,7 @@ startDoubleBuffer(bool clear)
   bool update = false;
 
   if (! pixmap_) {
-    pixmap_ = CXMachineInst->createPixmap(width, height);
+    pixmap_ = PixmapP(CXMachineInst->createPixmap(width, height));
 
     update = true;
   }

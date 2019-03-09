@@ -1,5 +1,9 @@
-#include <CXLibI.h>
+#include <CXFont.h>
+#include <CXMachine.h>
+#include <CXScreen.h>
+#include <CXImage.h>
 #include <CXrtFont.h>
+#include <CFontMgr.h>
 
 void
 CXFont::

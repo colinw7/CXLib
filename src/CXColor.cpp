@@ -1,4 +1,6 @@
-#include <CXLibI.h>
+#include <CXColor.h>
+#include <CXMachine.h>
+#include <CXScreen.h>
 
 CXColorMgr::
 CXColorMgr() :
@@ -237,7 +239,7 @@ getDarkPixel() const
   if (! dark_color_) {
     CXColor *th = const_cast<CXColor *>(this);
 
-    th->dark_color_ = new CXColor(screen_, rgba_.getDarkRGBA());
+    th->dark_color_ = std::make_unique<CXColor>(screen_, rgba_.getDarkRGBA());
   }
 
   return dark_color_->getPixel();
@@ -250,7 +252,7 @@ getLightPixel() const
   if (! light_color_) {
     CXColor *th = const_cast<CXColor *>(this);
 
-    th->light_color_ = new CXColor(screen_, rgba_.getLightRGBA());
+    th->light_color_ = std::make_unique<CXColor>(screen_, rgba_.getLightRGBA());
   }
 
   return light_color_->getPixel();
@@ -263,7 +265,7 @@ getInversePixel() const
   if (! inverse_color_) {
     CXColor *th = const_cast<CXColor *>(this);
 
-    th->inverse_color_ = new CXColor(screen_, rgba_.getInverseRGBA());
+    th->inverse_color_ = std::make_unique<CXColor>(screen_, rgba_.getInverseRGBA());
   }
 
   return inverse_color_->getPixel();

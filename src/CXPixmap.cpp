@@ -1,4 +1,5 @@
-#include <CXLibI.h>
+#include <CXPixmap.h>
+#include <CXMachine.h>
 
 CXPixmap::
 CXPixmap(Window xwin, uint width, uint height) :

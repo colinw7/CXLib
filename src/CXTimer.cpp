@@ -1,4 +1,4 @@
-#include <CXLibI.h>
+#include <CXTimer.h>
 
 class CXTimer1 : public CTimer {
  private:

@@ -2,8 +2,9 @@
 #define CX_COLOR_H
 
 #include <CRGBA.h>
-#include <CAutoPtr.h>
+#include <std_Xt.h>
 #include <map>
+#include <memory>
 
 class CXScreen;
 class CXColor;
@@ -94,14 +95,15 @@ class CXColor {
   void init();
 
  private:
+  using ColorP = std::unique_ptr<CXColor>;
+
   CXScreen& screen_;
   CRGBA     rgba_;
-  Pixel     pixel_;
+  Pixel     pixel_     { 0 };
   bool      pixel_set_ { false };
-
-  CAutoPtr<CXColor> dark_color_;
-  CAutoPtr<CXColor> light_color_;
-  CAutoPtr<CXColor> inverse_color_;
+  ColorP    dark_color_;
+  ColorP    light_color_;
+  ColorP    inverse_color_;
 };
 
 #endif

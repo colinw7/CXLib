@@ -1,4 +1,7 @@
-#include <CXLibI.h>
+#include <CXImage.h>
+#include <CXMachine.h>
+#include <CXScreen.h>
+#include <CImageMgr.h>
 
 void
 CXImage::

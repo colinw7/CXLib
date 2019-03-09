@@ -2,6 +2,7 @@
 #define CX_UTIL_H
 
 #include <CFontStyle.h>
+#include <string>
 
 class CXUtil {
  public:

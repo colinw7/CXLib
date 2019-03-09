@@ -1,4 +1,11 @@
-#include <CXLibI.h>
+#include <CXMachine.h>
+#include <CXWindow.h>
+#include <CXFont.h>
+#include <CXPixmap.h>
+#include <CXAtom.h>
+#include <CXUtil.h>
+#include <CXtTimer.h>
+#include <CWindow.h>
 
 #include <X11/XKBlib.h>
 #include <X11/extensions/shape.h>
@@ -9,6 +16,7 @@
 #include <CEnv.h>
 #include <CConfig.h>
 #include <CTimer.h>
+#include <CThrow.h>
 
 static bool selection_notify_received;
 
@@ -34,9 +42,9 @@ CXMachine()
 
   locked = true;
 
-  event_adapter_ = new CXEventAdapter;
+  event_adapter_ = std::make_unique<CXEventAdapter>();
 
-  atomMgr_ = new CXAtomMgr(*this);
+  atomMgr_ = std::make_unique<CXAtomMgr>(*this);
 
   XSetErrorHandler(CXMachine::XErrorHandler);
 
@@ -460,7 +468,7 @@ void
 CXMachine::
 setEventAdapter(CXEventAdapter *adapter)
 {
-  event_adapter_ = adapter;
+  event_adapter_ = EventAdapterP(adapter);
 }
 
 void
@@ -546,7 +554,7 @@ processEvent()
     event_adapter = window->getEventAdapter();
 
   if (! event_adapter)
-    event_adapter = event_adapter_;
+    event_adapter = event_adapter_.get();
 
 /*
   if (event_adapter) {
@@ -4058,7 +4066,7 @@ selectionClearEvent()
   }
 
   if (! event_adapter)
-    event_adapter = event_adapter_;
+    event_adapter = event_adapter_.get();
 
   if (event_adapter)
     event_adapter->selectionClearEvent();

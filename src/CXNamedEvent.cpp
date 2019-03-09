@@ -1,4 +1,8 @@
-#include <CXLibI.h>
+#include <CXNamedEvent.h>
+#include <CXMachine.h>
+#include <CStrUtil.h>
+#include <vector>
+#include <iostream>
 
 CXNamedEvent::
 CXNamedEvent(const std::string &name) :

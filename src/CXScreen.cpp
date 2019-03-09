@@ -1,4 +1,8 @@
-#include <CXLibI.h>
+#include <CXScreen.h>
+#include <CXMachine.h>
+#include <CXWindow.h>
+#include <CXImage.h>
+#include <CXUtil.h>
 
 CXScreen::
 CXScreen(int screen_num) :

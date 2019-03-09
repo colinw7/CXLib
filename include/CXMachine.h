@@ -7,9 +7,10 @@
 #include <CFont.h>
 #include <CRGBA.h>
 #include <CEvent.h>
-#include <CAutoPtr.h>
 #include <CIPoint2D.h>
 #include <MwmUtil.h>
+#include <vector>
+#include <memory>
 
 #define _NET_WM_MOVERESIZE_SIZE_TOPLEFT     0
 #define _NET_WM_MOVERESIZE_SIZE_TOP         1
@@ -78,7 +79,7 @@ class CXMachine {
   int           getNumScreens   () const { return num_screens_    ; }
   XtAppContext  getAppContext   () const { return app_context_    ; }
 
-  CXEventAdapter *getEventAdapter() const { return event_adapter_; }
+  CXEventAdapter *getEventAdapter() const { return event_adapter_.get(); }
 
   Time getLastEventTime() const { return event_last_time_; }
 
@@ -561,7 +562,10 @@ class CXMachine {
   typedef std::map<int, CXScreen *>   CXScreenMap;
   typedef std::map<int, MaximizeData> MaximizeDataMap;
 
-  Display*     display_ { nullptr };
+  using EventAdapterP = std::unique_ptr<CXEventAdapter>;
+  using AtomMgrP      = std::unique_ptr<CXAtomMgr>;
+
+  Display*     display_     { nullptr };
   std::string  display_name_;
   std::string  hostname_;
   int          display_num_ { 0 };
@@ -569,17 +573,17 @@ class CXMachine {
   int          num_screens_ { 0 };
   XtAppContext app_context_ { nullptr };
 
-  CAutoPtr<CXEventAdapter> event_adapter_;
-  XEvent                   event_;
-  Time                     event_last_time_ { 0 };
-  Window                   event_win_ { None };
-  CIPoint2D                event_pos_;
-  CMouseButton             event_button_num_ { CBUTTON_NONE };
-  bool                     event_button_pressed_ { false };
-  Time                     event_button_time_ { 0 };
-  int                      event_button_count_ { 0 };
-  KeySym                   event_keysym_ { 0 };
-  uint                     event_modifier_ { CMODIFIER_NONE };
+  EventAdapterP event_adapter_;
+  XEvent        event_;
+  Time          event_last_time_      { 0 };
+  Window        event_win_            { None };
+  CIPoint2D     event_pos_;
+  CMouseButton  event_button_num_     { CBUTTON_NONE };
+  bool          event_button_pressed_ { false };
+  Time          event_button_time_    { 0 };
+  int           event_button_count_   { 0 };
+  KeySym        event_keysym_         { 0 };
+  uint          event_modifier_       { CMODIFIER_NONE };
 
   bool pedantic_ { false };
 
@@ -592,7 +596,7 @@ class CXMachine {
 
   MaximizeDataMap max_data_map_;
 
-  CAutoPtr<CXAtomMgr> atomMgr_;
+  AtomMgrP atomMgr_;
 
   XErrorProc error_proc_ { 0 };
 

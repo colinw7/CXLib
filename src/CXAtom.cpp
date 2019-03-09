@@ -1,4 +1,6 @@
-#include <CXLibI.h>
+#include <CXAtom.h>
+#include <CXMachine.h>
+#include <CThrow.h>
 
 CXAtomMgr::
 CXAtomMgr() :

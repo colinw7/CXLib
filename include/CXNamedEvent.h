@@ -1,6 +1,7 @@
 #ifndef CX_NAMED_EVENT_H
 #define CX_NAMED_EVENT_H
 
+#include <std_Xt.h>
 #include <string>
 
 class CXNamedEvent {

@@ -1,4 +1,6 @@
-#include <CXLibI.h>
+#include <CXCursor.h>
+#include <CXMachine.h>
+#include <CXScreen.h>
 
 CXCursor::
 CXCursor(CXScreen &screen, CCursorType type) :

@@ -1,4 +1,5 @@
-#include <CXLibI.h>
+#include <CXWindow.h>
+#include <CXLibPixelRenderer.h>
 #include <COSUser.h>
 
 CWindow *
@@ -124,7 +125,7 @@ init(Window window)
 
   screen_.addWindow(this);
 
-  graphics_ = new CXGraphics(screen_, window_);
+  graphics_ = std::make_unique<CXGraphics>(screen_, window_);
 
   CXMachineInst->getWindowGeometry(window_, &x_, &y_, &width_, &height_, nullptr);
 }
@@ -139,7 +140,7 @@ init(Window window, uint width, uint height)
 
   screen_.addWindow(this);
 
-  graphics_ = new CXGraphics(screen_, window_);
+  graphics_ = std::make_unique<CXGraphics>(screen_, window_);
 
   x_      = 0;
   y_      = 0;
@@ -213,9 +214,9 @@ create()
 
     screen_.addWindow(this);
 
-    graphics_ = new CXGraphics(screen_, window_);
+    graphics_ = std::make_unique<CXGraphics>(screen_, window_);
 
-    cursor_ = new CXCursor(CURSOR_TYPE_ARROW);
+    cursor_ = std::make_unique<CXCursor>(CURSOR_TYPE_ARROW);
 
     setWindowTitle("Window");
   }
@@ -276,14 +277,14 @@ CXGraphics *
 CXWindow::
 getCXGraphics() const
 {
-  return graphics_;
+  return graphics_.get();
 }
 
 CXGraphics *
 CXWindow::
 getXorCXGraphics() const
 {
-  return xor_graphics_;
+  return xor_graphics_.get();
 }
 
 void
@@ -333,7 +334,7 @@ void
 CXWindow::
 setCursor(CCursorType type)
 {
-  cursor_ = new CXCursor(screen_, type);
+  cursor_ = std::make_unique<CXCursor>(screen_, type);
 
   CXMachineInst->setCursor(window_, cursor_->getXCursor());
 }
@@ -342,7 +343,7 @@ void
 CXWindow::
 setCursor(CXCursor &cursor)
 {
-  cursor_ = new CXCursor(cursor);
+  cursor_ = std::make_unique<CXCursor>(cursor);
 
   CXMachineInst->setCursor(window_, cursor_->getXCursor());
 }
@@ -378,7 +379,7 @@ void
 CXWindow::
 setEventAdapter(CEventAdapter *adapter)
 {
-  event_adapter_ = adapter;
+  event_adapter_ = EventAdapterP(adapter);
 }
 
 CXEventAdapter *
@@ -1078,7 +1079,7 @@ createXorGraphics() const
   if (! xor_graphics_) {
     CXWindow *th = const_cast<CXWindow *>(this);
 
-    th->xor_graphics_ = new CXGraphics(screen_, window_);
+    th->xor_graphics_ = std::make_unique<CXGraphics>(screen_, window_);
 
     th->xor_graphics_->setXor();
 

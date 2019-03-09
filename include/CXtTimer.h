@@ -2,6 +2,7 @@
 #define CXT_TIMER_H
 
 #include <CTimer.h>
+#include <std_Xt.h>
 
 class CXtTimer1;
 

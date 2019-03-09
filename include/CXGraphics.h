@@ -7,7 +7,7 @@
 #include <CXColor.h>
 #include <CImage.h>
 #include <CFontStyle.h>
-#include <CAutoPtr.h>
+#include <memory>
 
 enum CXLineType {
   CX_LINE_TYPE_SOLID,
@@ -139,17 +139,19 @@ class CXGraphics {
  private:
   enum { MAX_POLY_POINTS=100 };
 
-  CXScreen&           screen_;
-  Window              window_           { 0 };
-  Display*            display_          { nullptr };
-  bool                is_pixmap_        { false };
-  GC                  gc_;
-  CXColor             bg_;
-  CXColor             fg_;
-  CFontPtr            font_;
-  CAutoPtr<CXPixmap>  pixmap_;
-  bool                in_double_buffer_ { false };
-  bool                fill_complex_     { false };
+  using PixmapP = std::unique_ptr<CXPixmap>;
+
+  CXScreen& screen_;
+  Window    window_           { 0 };
+  Display*  display_          { nullptr };
+  bool      is_pixmap_        { false };
+  GC        gc_;
+  CXColor   bg_;
+  CXColor   fg_;
+  CFontPtr  font_;
+  PixmapP   pixmap_;
+  bool      in_double_buffer_ { false };
+  bool      fill_complex_     { false };
 
   static bool   error_trapped;
   static XPoint poly_point[MAX_POLY_POINTS];

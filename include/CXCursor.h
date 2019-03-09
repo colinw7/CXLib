@@ -5,6 +5,7 @@ class CXScreen;
 
 #include <CRGBA.h>
 #include <CCursor.h>
+#include <std_Xt.h>
 
 class CXCursor {
  public:

@@ -1,6 +1,7 @@
 #ifndef CX_ATOM_H
 #define CX_ATOM_H
 
+#include <std_Xt.h>
 #include <map>
 
 class CXMachine;

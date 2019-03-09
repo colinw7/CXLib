@@ -1,4 +1,6 @@
-#include <CXLibI.h>
+#include <CXUtil.h>
+#include <CStrUtil.h>
+#include <cstring>
 
 void
 CXUtil::

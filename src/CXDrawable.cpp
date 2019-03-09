@@ -1,4 +1,5 @@
-#include <CXLibI.h>
+#include <CXDrawable.h>
+#include <CXImage.h>
 
 CXDrawable::
 CXDrawable()
