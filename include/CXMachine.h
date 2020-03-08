@@ -39,7 +39,7 @@ class CXColor;
 
 typedef void (*CXMachineEventProc)(CXMachine *machine, XEvent *event);
 
-struct CXEventAdapter;
+class CXEventAdapter;
 
 #define CXLIB_ALL_FONTS_PATTERN "-*-*-*-*-*-*-*-*-*-*-*-*-*-*"
 
@@ -112,7 +112,7 @@ class CXMachine {
 
   void init();
 
-  Display *openDisplay  (const std::string &display_name);
+  Display *openDisplay  (const std::string &display_name="");
   Display *openXtDisplay(const std::string &display_name, const std::string &appname,
                          int *argc, char **argv);
   void     closeDisplay ();

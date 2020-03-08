@@ -47,7 +47,7 @@ class CXImage : public CImage {
   CXImage &operator=(const CXImage &image);
 
  public:
-  virtual CImagePtr dup() const;
+  CImagePtr dup() const override;
 
   //------
 
@@ -72,22 +72,21 @@ class CXImage : public CImage {
   bool setPixel(int pos, const CXColor &color);
   bool setPixel(int x, int y, const CXColor &color);
 
-  virtual bool setColorIndexPixel(int pos, Pixel pixel);
-  virtual bool setColorIndexPixel(int x, int y, Pixel pixel);
+  bool setColorIndexPixel(int pos, uint pixel) override;
+  bool setColorIndexPixel(int x, int y, uint pixel) override;
 
-  virtual void setRGBAData(uint *data);
+  void setRGBAData(uint *data) override;
 
-  virtual void setRGBAData(const CRGBA &rgba);
-  virtual void setRGBAData(const CRGBA &rgba, int left, int bottom,
-                           int right, int top);
+  void setRGBAData(const CRGBA &rgba) override;
+  void setRGBAData(const CRGBA &rgba, int left, int bottom, int right, int top) override;
 
-  virtual bool setRGBAPixel(int pos, const CRGBA &rgba);
-  virtual bool setRGBAPixel(int x, int y, const CRGBA &rgba);
+  bool setRGBAPixel(int pos, const CRGBA &rgba) override;
+  bool setRGBAPixel(int x, int y, const CRGBA &rgba) override;
 
 //uint rgbaToPixel(const CRGBA &rgba) const;
 //void pixelToRGBA(uint pixel, CRGBA &rgba) const;
 
-  void dataChanged();
+  void dataChanged() override;
 
   //------
 

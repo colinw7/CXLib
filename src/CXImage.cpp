@@ -281,12 +281,12 @@ initXImage()
 
     int num = getNumColors();
 
-    CRGBA rgba;
+    CRGBA prgba;
 
     for (int i = 0; i < num; ++i) {
-      getColorRGBA(i, rgba);
+      getColorRGBA(i, prgba);
 
-      pixels.push_back(CXColor(rgba).getPixel());
+      pixels.push_back(CXColor(prgba).getPixel());
     }
 
     //------
@@ -624,7 +624,7 @@ setPixel(int x, int y, const CXColor &color)
 
 bool
 CXImage::
-setColorIndexPixel(int pos, Pixel pixel)
+setColorIndexPixel(int pos, uint pixel)
 {
   if (ximage_) {
     int x1, y1, x2, y2;
@@ -641,7 +641,7 @@ setColorIndexPixel(int pos, Pixel pixel)
 
 bool
 CXImage::
-setColorIndexPixel(int x, int y, Pixel pixel)
+setColorIndexPixel(int x, int y, uint pixel)
 {
   if (ximage_)
     XPutPixel(ximage_, x, y, pixel);
