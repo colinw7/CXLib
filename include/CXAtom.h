@@ -3,6 +3,7 @@
 
 #include <std_Xt.h>
 #include <map>
+#include <string>
 
 class CXMachine;
 class CXAtom;

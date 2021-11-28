@@ -87,7 +87,7 @@ CXFont::
   delete xrt_font_;
 }
 
-const CXFont &
+CXFont &
 CXFont::
 operator=(const CXFont &font)
 {

@@ -37,8 +37,8 @@ class CXFont : public CFont {
   CXFont(const CFont &font);
   CXFont(const CXFont &font);
 
-  const CXFont &operator=(const CFont &font);
-  const CXFont &operator=(const CXFont &font);
+  CXFont &operator=(const CFont &font);
+  CXFont &operator=(const CXFont &font);
 
  public:
   double getCharWidth   () const { return getICharWidth(); }
