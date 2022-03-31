@@ -50,7 +50,7 @@ class CXFontList {
   CXFontList(const char *pattern=CXLIB_ALL_FONTS_PATTERN, uint max_fonts=CXLIB_MAX_FONTS);
  ~CXFontList();
 
-  uint getNumFonts() const { return num_fonts_; }
+  uint getNumFonts() const { return uint(num_fonts_); }
 
   const char *getFont(uint i) const { return fonts_[i]; }
 
@@ -89,23 +89,23 @@ class CXMachine {
 
   void setIsShift(bool flag) {
     if (flag)
-      event_modifier_ |=  CMODIFIER_SHIFT  ;
+      event_modifier_ |= uint( CMODIFIER_SHIFT);
     else
-      event_modifier_ &= ~CMODIFIER_SHIFT  ;
+      event_modifier_ &= uint(~CMODIFIER_SHIFT);
   }
 
   void setIsCtrl (bool flag) {
     if (flag)
-      event_modifier_ |=  CMODIFIER_CONTROL;
+      event_modifier_ |= uint( CMODIFIER_CONTROL);
     else
-      event_modifier_ &= ~CMODIFIER_CONTROL;
+      event_modifier_ &= uint(~CMODIFIER_CONTROL);
   }
 
   void setIsAlt  (bool flag) {
     if (flag)
-      event_modifier_ |=  CMODIFIER_ALT    ;
+      event_modifier_ |= uint( CMODIFIER_ALT);
     else
-      event_modifier_ &= ~CMODIFIER_ALT    ;
+      event_modifier_ &= uint(~CMODIFIER_ALT);
   }
 
   void setPedantic(bool flag) { pedantic_ = flag; }
@@ -558,9 +558,9 @@ class CXMachine {
     int x, y, width, height;
   };
 
-  typedef std::map<int, Display  *>   DisplayMap;
-  typedef std::map<int, CXScreen *>   CXScreenMap;
-  typedef std::map<int, MaximizeData> MaximizeDataMap;
+  typedef std::map<int, Display  *>      DisplayMap;
+  typedef std::map<int, CXScreen *>      CXScreenMap;
+  typedef std::map<Window, MaximizeData> MaximizeDataMap;
 
   using EventAdapterP = std::unique_ptr<CXEventAdapter>;
   using AtomMgrP      = std::unique_ptr<CXAtomMgr>;

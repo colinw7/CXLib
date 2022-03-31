@@ -89,7 +89,7 @@ openDisplay(const std::string &display_name)
       display_name1 = DisplayString(display_);
   }
   else
-    display_ = XOpenDisplay((char *) display_name1.c_str());
+    display_ = XOpenDisplay(const_cast<char *>(display_name1.c_str()));
 
   if (! display_)
     return 0;
@@ -124,13 +124,14 @@ openXtDisplay(const std::string &display_name, const std::string &app_name, int 
 
   std::string class_name = app_name;
 
-  int len = class_name.size();
+  auto len = class_name.size();
 
-  for (int i = 0; i < len; ++i)
+  for (size_t i = 0; i < len; ++i) {
     if (islower(class_name[i])) {
-      class_name[i] = toupper(class_name[i]);
+      class_name[i] = char(toupper(class_name[i]));
       break;
     }
+  }
 
   Display *display =
     XtOpenDisplay(app_context_, display_name.c_str(), app_name.c_str(), class_name.c_str(),
@@ -429,7 +430,7 @@ getWindowChildren(Window xwin, Window **children, int *num_children) const
     return false;
   }
 
-  *num_children = num_children1;
+  *num_children = int(num_children1);
 
   return true;
 }
@@ -536,7 +537,7 @@ tickLoop(uint nframes, CXEventAdapter *adapter)
     COSTime::diffHRTime(secs1, usecs1, secs2, usecs2, &dsecs, &dusecs);
 
     if (dsecs == 0 && dusecs < usecs)
-      COSTimer::msleep(usecs - dusecs);
+      COSTimer::msleep(uint(usecs - dusecs));
   }
 }
 
@@ -565,7 +566,7 @@ processEvent()
 
   switch (event_.type) {
     case ButtonPress: {
-      event_button_num_ = (CMouseButton) event_.xbutton.button;
+      event_button_num_ = CMouseButton(event_.xbutton.button);
 
       event_pos_ = CIPoint2D(event_.xbutton.x, event_.xbutton.y);
 
@@ -573,7 +574,7 @@ processEvent()
 
       ++event_button_count_;
 
-      uint dt = event_last_time_ - event_button_time_;
+      uint dt = uint(event_last_time_ - event_button_time_);
 
       if (dt > 500) {
         event_button_time_  = event_last_time_;
@@ -581,7 +582,7 @@ processEvent()
       }
 
       if (event_adapter) {
-        CMouseEvent bevent(event_pos_, event_button_num_, event_button_count_,
+        CMouseEvent bevent(event_pos_, event_button_num_, uint(event_button_count_),
                            CEventModifier(event_modifier_));
 
         event_adapter->buttonPressEvent(bevent);
@@ -590,14 +591,14 @@ processEvent()
       break;
     }
     case ButtonRelease: {
-      event_button_num_ = (CMouseButton) event_.xbutton.button;
+      event_button_num_ = CMouseButton(event_.xbutton.button);
 
       event_pos_ = CIPoint2D(event_.xbutton.x, event_.xbutton.y);
 
       event_button_pressed_ = false;
 
       if (event_adapter) {
-        CMouseEvent bevent(event_pos_, event_button_num_, event_button_count_,
+        CMouseEvent bevent(event_pos_, event_button_num_, uint(event_button_count_),
                            CEventModifier(event_modifier_));
 
         event_adapter->buttonReleaseEvent(bevent);
@@ -609,7 +610,7 @@ processEvent()
       event_pos_ = CIPoint2D(event_.xmotion.x, event_.xmotion.y);
 
       if (event_adapter) {
-        CMouseEvent bevent(event_pos_, event_button_num_, event_button_count_,
+        CMouseEvent bevent(event_pos_, event_button_num_, uint(event_button_count_),
                            CEventModifier(event_modifier_));
 
         if (event_button_pressed_)
@@ -656,7 +657,7 @@ processEvent()
         else if (event_keysym_ == 0xff0d) event_keysym_ = 0x0d;
         else if (event_keysym_ == 0xff1b) event_keysym_ = 0x1b;
 
-        CKeyEvent kevent(event_pos_, (CKeyType) event_keysym_,
+        CKeyEvent kevent(event_pos_, CKeyType(event_keysym_),
                          text, CEventModifier(event_modifier_));
 
         event_adapter->keyPressEvent(kevent);
@@ -686,7 +687,7 @@ processEvent()
         else if (event_keysym_ == 0xff0d) event_keysym_ = 0x0d;
         else if (event_keysym_ == 0xff1b) event_keysym_ = 0x1b;
 
-        CKeyEvent kevent(event_pos_, (CKeyType) event_keysym_,
+        CKeyEvent kevent(event_pos_, CKeyType(event_keysym_),
                          text, CEventModifier(event_modifier_));
 
         event_adapter->keyReleaseEvent(kevent);
@@ -725,8 +726,8 @@ processEvent()
     case ConfigureNotify: {
       if (event_adapter) {
         if (window) {
-          uint w = event_.xconfigure.width;
-          uint h = event_.xconfigure.height;
+          uint w = uint(event_.xconfigure.width);
+          uint h = uint(event_.xconfigure.height);
 
           if (window->getLastWidth() != w || window->getLastHeight() != h) {
             event_adapter->resizeEvent();
@@ -777,10 +778,10 @@ processEvent()
       break;
     }
     case ClientMessage: {
-      const CXAtom &atom = getAtom(event_.xclient.message_type);
+      const CXAtom &atom = getAtom(Atom(event_.xclient.message_type));
 
       if (isWMProtocolsAtom(atom)) {
-        const CXAtom &atom1 = getAtom(event_.xclient.data.l[0]);
+        const CXAtom &atom1 = getAtom(Atom(event_.xclient.data.l[0]));
 
         if (isWMDeleteWindowAtom(atom1)) {
           if (event_adapter)
@@ -790,13 +791,13 @@ processEvent()
       else {
         const CXAtom &winMsgAtom = getAtom("WINDOW_MESSAGE");
 
-        const CXAtom &clientAtom = getAtom(event_.xclient.data.l[0]);
+        const CXAtom &clientAtom = getAtom(Atom(event_.xclient.data.l[0]));
 
         if (clientAtom == winMsgAtom) {
           if (event_adapter) {
-            const CXAtom &msgAtom = getAtom(event_.xclient.data.l[1]);
+            const CXAtom &msgAtom = getAtom(Atom(event_.xclient.data.l[1]));
 
-            CXWindow *from = lookupWindow(event_.xclient.data.l[2]);
+            CXWindow *from = lookupWindow(Window(event_.xclient.data.l[2]));
 
             event_adapter->clientMessageEvent(from, msgAtom.getName().c_str());
           }
@@ -822,7 +823,7 @@ KeySym
 CXMachine::
 getEventKeysym() const
 {
-  return keycodeToKeysym(event_.xkey.keycode, event_.xkey.state);
+  return keycodeToKeysym(event_.xkey.keycode, int(event_.xkey.state));
 }
 
 std::string
@@ -837,7 +838,7 @@ CXMachine::
 getEventString(const XEvent *event) const
 {
   if (event->type == KeyPress || event->type == KeyRelease)
-    return keycodeToString(event->xkey.keycode, event->xkey.state);
+    return keycodeToString(event->xkey.keycode, int(event->xkey.state));
   else
     return "";
 }
@@ -846,7 +847,7 @@ char
 CXMachine::
 getEventChar() const
 {
-  return keycodeToChar(event_.xkey.keycode, event_.xkey.state);
+  return keycodeToChar(event_.xkey.keycode, int(event_.xkey.state));
 }
 
 char *
@@ -958,23 +959,23 @@ convertEventState(uint state)
   if (state & Mod1Mask   ) modifiers |= CMODIFIER_ALT;
   if (state & Mod2Mask   ) modifiers |= CMODIFIER_META;
 
-  return (CEventModifier) modifiers;
+  return CEventModifier(modifiers);
 }
 
 CKeyType
 CXMachine::
 convertEventKeyCodeToType(uint keycode, uint state)
 {
-  KeySym keysym = keycodeToKeysym(keycode, state);
+  KeySym keysym = keycodeToKeysym(keycode, int(state));
 
-  return (CKeyType) keysym;
+  return CKeyType(keysym);
 }
 
 std::string
 CXMachine::
 convertEventKeyCodeToString(uint keycode, uint state)
 {
-  std::string str = keycodeToString(keycode, state);
+  std::string str = keycodeToString(keycode, int(state));
 
   return str;
 }
@@ -1053,24 +1054,24 @@ compareEvents(XEvent *event1, XEvent *event2)
     return false;
 
   if      (event1->type == ButtonPress) {
-    XButtonPressedEvent *button_event1 = (XButtonPressedEvent *) event1;
-    XButtonPressedEvent *button_event2 = (XButtonPressedEvent *) event2;
+    XButtonPressedEvent *button_event1 = reinterpret_cast<XButtonPressedEvent *>(event1);
+    XButtonPressedEvent *button_event2 = reinterpret_cast<XButtonPressedEvent *>(event2);
 
     if (button_event1->button != button_event2->button ||
         button_event1->state  != button_event2->state)
       return false;
   }
   else if (event1->type == KeyPress) {
-    XKeyPressedEvent *key_event1 = (XKeyPressedEvent *) event1;
-    XKeyPressedEvent *key_event2 = (XKeyPressedEvent *) event2;
+    XKeyPressedEvent *key_event1 = reinterpret_cast<XKeyPressedEvent *>(event1);
+    XKeyPressedEvent *key_event2 = reinterpret_cast<XKeyPressedEvent *>(event2);
 
     if (key_event1->keycode != key_event2->keycode ||
         key_event1->state   != key_event2->state)
       return false;
   }
   else if (event1->type == KeyRelease) {
-    XKeyReleasedEvent *key_event1 = (XKeyReleasedEvent *) event1;
-    XKeyReleasedEvent *key_event2 = (XKeyReleasedEvent *) event2;
+    XKeyReleasedEvent *key_event1 = reinterpret_cast<XKeyReleasedEvent *>(event1);
+    XKeyReleasedEvent *key_event2 = reinterpret_cast<XKeyReleasedEvent *>(event2);
 
     if (key_event1->keycode != key_event2->keycode ||
         key_event1->state   != key_event2->state)
@@ -1156,7 +1157,7 @@ getWindowEventMask(Window xwin) const
   if (! XGetWindowAttributes(display_, xwin, &attr))
     return 0;
 
-  return attr.your_event_mask;
+  return uint(attr.your_event_mask);
 }
 
 bool
@@ -1462,14 +1463,14 @@ resizeWindow(Window xwin, int width, int height)
   width  = std::max(width , 1);
   height = std::max(height, 1);
 
-  XResizeWindow(display_, xwin, width, height);
+  XResizeWindow(display_, xwin, uint(width), uint(height));
 }
 
 void
 CXMachine::
 moveResizeWindow(Window xwin, int x, int y, int width, int height)
 {
-  XMoveResizeWindow(display_, xwin, x, y, width, height);
+  XMoveResizeWindow(display_, xwin, x, y, uint(width), uint(height));
 }
 
 void
@@ -1544,21 +1545,21 @@ void
 CXMachine::
 grabKey(Window xwin, int keycode, int state)
 {
-  XGrabKey(display_, keycode, state, xwin, True, GrabModeAsync, GrabModeAsync);
+  XGrabKey(display_, keycode, uint(state), xwin, True, GrabModeAsync, GrabModeAsync);
 }
 
 void
 CXMachine::
 ungrabKey(Window xwin, int keycode, int state)
 {
-  XUngrabKey(display_, keycode, state, xwin);
+  XUngrabKey(display_, keycode, uint(state), xwin);
 }
 
 void
 CXMachine::
 grabButton(Window xwin, int button, int modifiers, int event_mask, Cursor cursor)
 {
-  XGrabButton(display_, button, modifiers, xwin, True, event_mask,
+  XGrabButton(display_, uint(button), uint(modifiers), xwin, True, uint(event_mask),
               GrabModeSync, GrabModeAsync, None, cursor);
 }
 
@@ -1566,7 +1567,7 @@ void
 CXMachine::
 ungrabButton(Window xwin, int button, int modifiers)
 {
-  XUngrabButton(display_, button, modifiers, xwin);
+  XUngrabButton(display_, uint(button), uint(modifiers), xwin);
 }
 
 Window
@@ -1586,7 +1587,7 @@ createOverrideWindow(int x, int y, int width, int height, int border,
   attr1.override_redirect = True;
 
   Window xwin =
-    XCreateWindow(display_, root, x, y, (uint) width, (uint) height, border,
+    XCreateWindow(display_, root, x, y, uint(width), uint(height), uint(border),
                   CopyFromParent, InputOutput, CopyFromParent, attr_mask, &attr1);
 
   return xwin;
@@ -1601,7 +1602,7 @@ createWindow(Window parent_xwin, int x, int y, int width, int height,
     parent_xwin = getRoot();
 
   Window xwin =
-    XCreateWindow(display_, parent_xwin, x, y, (uint) width, (uint) height, border,
+    XCreateWindow(display_, parent_xwin, x, y, uint(width), uint(height), uint(border),
                   CopyFromParent, InputOutput, CopyFromParent, attr_mask, attr);
 
   return xwin;
@@ -1636,7 +1637,7 @@ createXPixmap(Window xwin, uint width, uint height, uint depth)
   assert(xwin != None);
 
   if (depth == 0)
-    depth = getDepth(0);
+    depth = uint(getDepth(0));
 
   Pixmap xpixmap = XCreatePixmap(display_, xwin, width, height, depth);
 
@@ -1742,10 +1743,10 @@ bool
 CXMachine::
 setIntegerProperty(Window xwin, const CXAtom &name, int value)
 {
-  CARD32 val = value;
+  CARD32 val = CARD32(value);
 
   XChangeProperty(display_, xwin, name.getXAtom(), XA_CARDINAL,
-                  32, PropModeReplace, (uchar *) &val, 1);
+                  32, PropModeReplace, reinterpret_cast<uchar *>(&val), 1);
 
   return true;
 }
@@ -1756,13 +1757,15 @@ setIntegerArrayProperty(Window xwin, const CXAtom &name, int *values, int num_va
 {
   std::vector<long> vals;
 
-  vals.resize(num_values);
+  auto num_values1 = size_t(num_values);
 
-  for (int i = 0; i < num_values; ++i)
+  vals.resize(uint(num_values1));
+
+  for (size_t i = 0; i < num_values1; ++i)
     vals[i] = values[i];
 
   XChangeProperty(display_, xwin, name.getXAtom(), XA_CARDINAL,
-                  32, PropModeReplace, (uchar *) &vals[0], num_values);
+                  32, PropModeReplace, reinterpret_cast<uchar *>(&vals[0]), num_values);
 
   return true;
 }
@@ -1772,7 +1775,8 @@ CXMachine::
 setStringProperty(Window xwin, const CXAtom &name, const std::string &value)
 {
   XChangeProperty(display_, xwin, name.getXAtom(), XA_STRING,
-                  8, PropModeReplace, (uchar *) value.c_str(), (int) value.size());
+                  8, PropModeReplace, reinterpret_cast<uchar *>(const_cast<char *>(value.c_str())),
+                  int(value.size()));
 
   return true;
 }
@@ -1790,10 +1794,10 @@ bool
 CXMachine::
 setWindowProperty(Window xwin, const CXAtom &name, Window value)
 {
-  CARD32 val = value;
+  CARD32 val = CARD32(value);
 
   XChangeProperty(display_, xwin, name.getXAtom(), XA_WINDOW,
-                  32, PropModeReplace, (uchar *) &val, 1);
+                  32, PropModeReplace, reinterpret_cast<uchar *>(&val), 1);
 
   return true;
 }
@@ -1803,7 +1807,7 @@ CXMachine::
 setWindowArrayProperty(Window xwin, const CXAtom &name, Window *xwins, int num_xwins)
 {
   XChangeProperty(display_, xwin, name.getXAtom(), XA_WINDOW,
-                  32, PropModeReplace, (uchar *) xwins, num_xwins);
+                  32, PropModeReplace, reinterpret_cast<uchar *>(xwins), num_xwins);
 
   return true;
 }
@@ -1815,7 +1819,7 @@ setAtomProperty(Window xwin, const CXAtom &name, const CXAtom *atom)
   Atom xatom = atom->getXAtom();
 
   XChangeProperty(display_, xwin, name.getXAtom(), XA_ATOM,
-                  32, PropModeReplace, (uchar *) &xatom, 1);
+                  32, PropModeReplace, reinterpret_cast<uchar *>(&xatom), 1);
 
   return true;
 }
@@ -1826,13 +1830,15 @@ setAtomArrayProperty(Window xwin, const CXAtom &name, const CXAtom **atoms, int 
 {
   std::vector<Atom> atoms1;
 
-  atoms1.resize(num_atoms);
+  auto num_atoms1 = size_t(num_atoms);
 
-  for (int i = 0; i < num_atoms; ++i)
+  atoms1.resize(num_atoms1);
+
+  for (size_t i = 0; i < num_atoms1; ++i)
     atoms1[i] = atoms[i]->getXAtom();
 
   XChangeProperty(display_, xwin, name.getXAtom(), XA_ATOM,
-                  32, PropModeReplace, (uchar *) &atoms1[0], num_atoms);
+                  32, PropModeReplace, reinterpret_cast<uchar *>(&atoms1[0]), num_atoms);
 
   return true;
 }
@@ -1881,9 +1887,9 @@ getIntegerProperty(Window xwin, const CXAtom &name, int *value)
   if (n == 0 || ! data)
     return false;
 
-  CARD32 val = *((CARD32 *) data);
+  CARD32 val = *(reinterpret_cast<CARD32 *>(data));
 
-  *value = val;
+  *value = int(val);
 
   XFree(data);
 
@@ -1917,7 +1923,7 @@ getStringProperty(Window xwin, const CXAtom &name, std::string &value)
   if (n == 0 || ! data)
     return false;
 
-  value = std::string((char *) data);
+  value = std::string(reinterpret_cast<char *>(data));
 
   XFree(data);
 
@@ -1951,7 +1957,7 @@ getPixmapProperty(Window xwin, const CXAtom &name, Pixmap *value)
   if (format != 32 || n != 1 || left != 0)
     return false;
 
-  *value = *((Pixmap *) data);
+  *value = *(reinterpret_cast<Pixmap *>(data));
 
   XFree(data);
 
@@ -1985,7 +1991,7 @@ getWindowProperty(Window xwin, const CXAtom &name, Window *value) const
   if (format != 32 || n != 1 || left != 0)
     return false;
 
-  *value = *((Window *) data);
+  *value = *(reinterpret_cast<Window *>(data));
 
   XFree(data);
 
@@ -2013,7 +2019,7 @@ getWindowArrayProperty(Window xwin, const CXAtom &name, std::vector<Window> &win
     return false;
 
   for (ulong i = 0; i < n; ++i)
-    windows.push_back(((Window *) data)[i]);
+    windows.push_back((reinterpret_cast<Window *>(data))[i]);
 
   XFree(data);
 
@@ -2040,7 +2046,7 @@ getAtomProperty(Window xwin, const CXAtom &name, CXAtom &atom)
   if (format != 32 || n != 1 || left != 0)
     return false;
 
-  atom = getAtom(*((Atom *) data));
+  atom = getAtom(*(reinterpret_cast<Atom *>(data)));
 
   XFree(data);
 
@@ -2068,7 +2074,7 @@ getAtomArrayProperty(Window xwin, const CXAtom &name, std::vector<CXAtom> &atoms
     return false;
 
   for (ulong i = 0; i < n; ++i)
-    atoms.push_back(getAtom(((Atom *) data)[i]));
+    atoms.push_back(getAtom((reinterpret_cast<Atom *>(data))[i]));
 
   XFree(data);
 
@@ -2116,12 +2122,12 @@ setWMStateNormal(Window xwin)
 {
   uint data[2];
 
-  data[0] = (uint) NormalState;
+  data[0] = uint(NormalState);
   data[1] = None;
 
   XChangeProperty(display_, xwin,
                   getWMStateAtom().getXAtom(), getWMStateAtom().getXAtom(),
-                  32, PropModeReplace, (uchar *) data, 2);
+                  32, PropModeReplace, reinterpret_cast<uchar *>(data), 2);
 }
 
 void
@@ -2130,12 +2136,12 @@ setWMStateIconic(Window xwin, Window icon_xwin)
 {
   uint data[2];
 
-  data[0] = (uint) IconicState;
-  data[1] = (uint) icon_xwin;
+  data[0] = uint(IconicState);
+  data[1] = uint(icon_xwin);
 
   XChangeProperty(display_, xwin,
                   getWMStateAtom().getXAtom(), getWMStateAtom().getXAtom(),
-                  32, PropModeReplace, (uchar *) data, 2);
+                  32, PropModeReplace, reinterpret_cast<uchar *>(data), 2);
 }
 
 bool
@@ -2177,7 +2183,7 @@ getWMState(Window xwin)
   if (n == 0 || ! data)
     return -1;
 
-  int state = ((int *) data)[0];
+  int state = (reinterpret_cast<int *>(data))[0];
 
   XFree(data);
 
@@ -2195,7 +2201,7 @@ getWMName(Window xwin, std::string &name)
   if (! XGetWMName(display_, xwin, &text_prop))
     return false;
 
-  const char *cname = (const char *) text_prop.value;
+  const char *cname = reinterpret_cast<const char *>(text_prop.value);
 
   if (cname && cname[0] != '\0')
     name = cname;
@@ -2214,7 +2220,7 @@ getWMIconName(Window xwin, std::string &name)
   if (! XGetWMIconName(display_, xwin, &text_prop))
     return false;
 
-  const char *cname = (const char *) text_prop.value;
+  const char *cname = reinterpret_cast<const char *>(text_prop.value);
 
   if (cname && cname[0] != '\0')
     name = cname;
@@ -2234,7 +2240,7 @@ getWMNormalHints(Window xwin, XSizeHints **size_hints, int *supplied)
     size_hints1.flags = 0;
 
   *size_hints = &size_hints1;
-  *supplied   = supplied1;
+  *supplied   = int(supplied1);
 }
 
 bool
@@ -2309,7 +2315,7 @@ setWMClassHint(Window xwin, const std::string &res_name, const std::string &res_
 
   const CXAtom &wm_class = getAtom("WM_CLASS");
 
-  setStringListProperty(xwin, wm_class, (char **) strs, 2);
+  setStringListProperty(xwin, wm_class, const_cast<char **>(strs), 2);
 
   return true;
 }
@@ -2318,15 +2324,15 @@ void
 CXMachine::
 getWMClientMachine(Window xwin, std::string &client_machine)
 {
-  char *client_machine1 = 0;
+  char *client_machine1 = nullptr;
 
   XTextProperty text_prop;
 
   if (XGetWMClientMachine(display_, xwin, &text_prop))
-    client_machine1 = (char *) text_prop.value;
+    client_machine1 = reinterpret_cast<char *>(text_prop.value);
 
   if (client_machine1 == 0)
-    client_machine1 = (char *) "localhost";
+    client_machine1 = const_cast<char *>("localhost");
 
   client_machine = client_machine1;
 }
@@ -2365,9 +2371,11 @@ getWMProtocols(Window xwin, const CXAtom ***protocols, int *num_protocols)
   if (! XGetWMProtocols(display_, xwin, &protocols1, num_protocols))
     *num_protocols = 0;
 
-  *protocols = new const CXAtom * [*num_protocols];
+  auto num_protocols1 = size_t(*num_protocols);
 
-  for (int i = 0; i < *num_protocols; ++i)
+  *protocols = new const CXAtom * [num_protocols1];
+
+  for (size_t i = 0; i < num_protocols1; ++i)
     (*protocols)[i] = &getAtom(protocols1[i]);
 }
 
@@ -2392,13 +2400,13 @@ getWMMwmHints(Window xwin, MotifWmHints &mwm_hints)
   if (! data || n != PROP_MOTIF_WM_HINTS_ELEMENTS)
     return false;
 
-  long *ldata = (long *) data;
+  long *ldata = reinterpret_cast<long *>(data);
 
-  mwm_hints.flags       = ldata[0];
-  mwm_hints.functions   = ldata[1];
-  mwm_hints.decorations = ldata[2];
-  mwm_hints.input_mode  = ldata[3];
-  mwm_hints.status      = ldata[4];
+  mwm_hints.flags       = int(ldata[0]);
+  mwm_hints.functions   = int(ldata[1]);
+  mwm_hints.decorations = int(ldata[2]);
+  mwm_hints.input_mode  = int(ldata[3]);
+  mwm_hints.status      = int(ldata[4]);
 
   return true;
 }
@@ -2576,10 +2584,10 @@ sendKeyPressedEvent(Window xwin, int x, int y, int keycode)
   event.x_root      = x;
   event.y_root      = y;
   event.state       = 0;
-  event.keycode     = keycode;
+  event.keycode     = uint(keycode);
   event.same_screen = True;
 
-  if (! XSendEvent(display_, xwin, False, KeyPressMask, (XEvent *) &event))
+  if (! XSendEvent(display_, xwin, False, KeyPressMask, reinterpret_cast<XEvent *>(&event)))
     return true;
 
   return false;
@@ -2604,10 +2612,10 @@ sendKeyReleasedEvent(Window xwin, int x, int y, int keycode)
   event.x_root      = x;
   event.y_root      = y;
   event.state       = 0;
-  event.keycode     = keycode;
+  event.keycode     = uint(keycode);
   event.same_screen = True;
 
-  if (! XSendEvent(display_, xwin, False, KeyReleaseMask, (XEvent *) &event))
+  if (! XSendEvent(display_, xwin, False, KeyReleaseMask, reinterpret_cast<XEvent *>(&event)))
     return true;
 
   return false;
@@ -2634,9 +2642,9 @@ sendStringClientMessage(Window server_xwin, Window client_xwin, const std::strin
   event.window       = server_xwin;
   event.message_type = XA_CARDINAL;
   event.format       = 32;
-  event.data.l[0]    = atom2.getXAtom();
+  event.data.l[0]    = long(atom2.getXAtom());
 
-  if (! XSendEvent(display_, server_xwin, False, NoEventMask, (XEvent *) &event))
+  if (! XSendEvent(display_, server_xwin, False, NoEventMask, reinterpret_cast<XEvent *>(&event)))
     return true;
 
   return false;
@@ -2678,9 +2686,9 @@ sendStringServerMessage(Window client_xwin, Window server_xwin, const std::strin
   event.window       = client_xwin;
   event.message_type = XA_CARDINAL;
   event.format       = 32;
-  event.data.l[0]    = atom2.getXAtom();
+  event.data.l[0]    = long(atom2.getXAtom());
 
-  if (! XSendEvent(display_, client_xwin, False, NoEventMask, (XEvent *) &event))
+  if (! XSendEvent(display_, client_xwin, False, NoEventMask, reinterpret_cast<XEvent *>(&event)))
     return true;
 
   return false;
@@ -2718,10 +2726,10 @@ sendShowDesktop(bool show)
   event.window       = root;
   event.message_type = getAtom("_NET_SHOWING_DESKTOP").getXAtom();
   event.format       = 32;
-  event.data.l[0]    = (show ? 1 : 0);
+  event.data.l[0]    = long(show ? 1 : 0);
 
   if (! XSendEvent(display_, root, False, (SubstructureNotifyMask|SubstructureRedirectMask),
-                   (XEvent *) &event))
+                   reinterpret_cast<XEvent *>(&event)))
     return true;
 
   return false;
@@ -2742,13 +2750,13 @@ sendClose(Window window)
   event.window       = window;
   event.message_type = getAtom("_NET_CLOSE_WINDOW").getXAtom();
   event.format       = 32;
-  event.data.l[0]    = CurrentTime;
+  event.data.l[0]    = long(CurrentTime);
   event.data.l[1]    = 2;
 
   Window root = getRoot();
 
   if (! XSendEvent(display_, root, False, (SubstructureNotifyMask|SubstructureRedirectMask),
-                   (XEvent *) &event))
+                   reinterpret_cast<XEvent *>(&event)))
     return true;
 
   return false;
@@ -2770,13 +2778,13 @@ sendActivate(Window window)
   event.message_type = getAtom("_NET_ACTIVE_WINDOW").getXAtom();
   event.format       = 32;
   event.data.l[0]    = 2;
-  event.data.l[1]    = CurrentTime;
+  event.data.l[1]    = long(CurrentTime);
   event.data.l[2]    = 0;
 
   Window root = getRoot();
 
   if (! XSendEvent(display_, root, False, (SubstructureNotifyMask|SubstructureRedirectMask),
-                   (XEvent *) &event))
+                   reinterpret_cast<XEvent *>(&event)))
     return true;
 
   return false;
@@ -2807,16 +2815,16 @@ sendMoveWindowBy(Window window, int dx, int dy)
   event.window       = window;
   event.message_type = getAtom("_NET_MOVERESIZE_WINDOW").getXAtom();
   event.format       = 32;
-  event.data.l[0]    = StaticGravity | (0xF << 8) | (0x2 << 12);
-  event.data.l[1]    = x + dx;
-  event.data.l[2]    = y + dy;
-  event.data.l[3]    = w;
-  event.data.l[4]    = h;
+  event.data.l[0]    = long(StaticGravity | (0xF << 8) | (0x2 << 12));
+  event.data.l[1]    = long(x + dx);
+  event.data.l[2]    = long(y + dy);
+  event.data.l[3]    = long(w);
+  event.data.l[4]    = long(h);
 
   Window root = getRoot();
 
   if (! XSendEvent(display_, root, False, (SubstructureNotifyMask|SubstructureRedirectMask),
-                   (XEvent *) &event))
+                   reinterpret_cast<XEvent *>(&event)))
     return true;
 
   return false;
@@ -2837,16 +2845,16 @@ sendDragWindowBy(Window window, int x, int y, int button, int action)
   event.window       = window;
   event.message_type = getAtom("_NET_WM_MOVERESIZE").getXAtom();
   event.format       = 32;
-  event.data.l[0]    = x;
-  event.data.l[1]    = y;
-  event.data.l[2]    = action;
-  event.data.l[3]    = button;
+  event.data.l[0]    = long(x);
+  event.data.l[1]    = long(y);
+  event.data.l[2]    = long(action);
+  event.data.l[3]    = long(button);
   event.data.l[4]    = 2;
 
   Window root = getRoot();
 
   if (! XSendEvent(display_, root, False, (SubstructureNotifyMask|SubstructureRedirectMask),
-                   (XEvent *) &event))
+                   reinterpret_cast<XEvent *>(&event)))
     return true;
 
   return false;
@@ -2868,13 +2876,13 @@ sendRestackWindow(Window window, Window sibling, bool above)
   event.message_type = getAtom("_NET_RESTACK_WINDOW").getXAtom();
   event.format       = 32;
   event.data.l[0]    = 2; // pager
-  event.data.l[1]    = sibling;
-  event.data.l[2]    = (above ? Above : Below);
+  event.data.l[1]    = long(sibling);
+  event.data.l[2]    = long(above ? Above : Below);
 
   Window root = getRoot();
 
   if (! XSendEvent(display_, root, False, (SubstructureNotifyMask|SubstructureRedirectMask),
-                   (XEvent *) &event))
+                   reinterpret_cast<XEvent *>(&event)))
     return true;
 
   return false;
@@ -2895,15 +2903,15 @@ sendWmState(Window window, int action, const std::string &atom1, const std::stri
   event.window       = window;
   event.message_type = getAtom("_NET_WM_STATE").getXAtom();
   event.format       = 32;
-  event.data.l[0]    = action;
-  event.data.l[1]    = getAtom(atom1).getXAtom();
-  event.data.l[2]    = (atom2 != "" ? getAtom(atom2).getXAtom() : 0);
+  event.data.l[0]    = long(action);
+  event.data.l[1]    = long(getAtom(atom1).getXAtom());
+  event.data.l[2]    = long(atom2 != "" ? getAtom(atom2).getXAtom() : 0);
   event.data.l[3]    = 2;
 
   Window root = getRoot();
 
   if (! XSendEvent(display_, root, False, (SubstructureNotifyMask|SubstructureRedirectMask),
-                   (XEvent *) &event))
+                   reinterpret_cast<XEvent *>(&event)))
     return true;
 
   return false;
@@ -2926,11 +2934,11 @@ sendWindowMessage(Window from, Window to, const std::string &str)
   event.window       = to;
   event.message_type = XA_CARDINAL;
   event.format       = 32;
-  event.data.l[0]    = atom.getXAtom();
-  event.data.l[1]    = msgAtom.getXAtom();
-  event.data.l[2]    = from;
+  event.data.l[0]    = long(atom.getXAtom());
+  event.data.l[1]    = long(msgAtom.getXAtom());
+  event.data.l[2]    = long(from);
 
-  if (! XSendEvent(display_, to, False, NoEventMask, (XEvent *) &event))
+  if (! XSendEvent(display_, to, False, NoEventMask, reinterpret_cast<XEvent *>(&event)))
     return true;
 
   return false;
@@ -2963,7 +2971,7 @@ sendExposeEvent(Window xwin)
   event.height     = 9999;
   event.count      = 0;
 
-  if (! XSendEvent(display_, xwin, False, ExposureMask, (XEvent *) &event))
+  if (! XSendEvent(display_, xwin, False, ExposureMask, reinterpret_cast<XEvent *>(&event)))
     return true;
 
   return false;
@@ -2988,7 +2996,7 @@ sendConfigureNotifyEvent(Window xwin, int x, int y, int width, int height,
   event.above             = above_xwin;
   event.override_redirect = False;
 
-  if (! XSendEvent(display_, xwin, False, StructureNotifyMask, (XEvent *) &event))
+  if (! XSendEvent(display_, xwin, False, StructureNotifyMask, reinterpret_cast<XEvent *>(&event)))
     return true;
 
   return false;
@@ -3036,7 +3044,7 @@ void
 CXMachine::
 setWindowBorderWidth(Window xwin, int width)
 {
-  XSetWindowBorderWidth(display_, xwin, width);
+  XSetWindowBorderWidth(display_, xwin, uint(width));
 }
 
 void
@@ -3224,15 +3232,15 @@ startRectClip(GC gc, int x, int y, int width, int height)
 {
   XPoint points[4];
 
-  points[0].x = x;
-  points[0].y = y;
-  points[2].x = x + width  - 1;
-  points[2].y = y + height - 1;
+  points[0].x = short(x);
+  points[0].y = short(y);
+  points[2].x = short(x + width  - 1);
+  points[2].y = short(y + height - 1);
 
-  points[1].x = points[2].x;
-  points[1].y = points[0].y;
-  points[3].x = points[0].x;
-  points[3].y = points[2].y;
+  points[1].x = short(points[2].x);
+  points[1].y = short(points[0].y);
+  points[3].x = short(points[0].x);
+  points[3].y = short(points[2].y);
 
   Region region = XPolygonRegion(points, 4, EvenOddRule);
 
@@ -3268,14 +3276,14 @@ void
 CXMachine::
 drawRectangle(Window xwin, GC gc, int x, int y, int width, int height) const
 {
-  XDrawRectangle(display_, xwin, gc, x, y, (uint) width, (uint) height);
+  XDrawRectangle(display_, xwin, gc, x, y, uint(width), uint(height));
 }
 
 void
 CXMachine::
 fillRectangle(Window xwin, GC gc, int x, int y, int width, int height)
 {
-  XFillRectangle(display_, xwin, gc, x, y, (uint) width, (uint) height);
+  XFillRectangle(display_, xwin, gc, x, y, uint(width), uint(height));
 }
 
 void
@@ -3289,7 +3297,7 @@ void
 CXMachine::
 drawString(Window xwin, GC gc, int x, int y, const std::string &str)
 {
-  XDrawString(display_, xwin, gc, x, y, str.c_str(), str.size());
+  XDrawString(display_, xwin, gc, x, y, str.c_str(), int(str.size()));
 }
 
 void
@@ -3298,7 +3306,7 @@ copyArea(Window src_xwin, Window dest_xwin, GC gc, int src_x, int src_y,
          int src_width, int src_height, int desy_x, int desy_y)
 {
   XCopyArea(display_, src_xwin, dest_xwin, gc, src_x, src_y,
-            (uint) src_width, (uint) src_height, desy_x, desy_y);
+            uint(src_width), uint(src_height), desy_x, desy_y);
 }
 
 void
@@ -3309,8 +3317,8 @@ copyPlanes(Window src_xwin, int src_depth, Window dest_xwin, int dest_depth,
 {
   for (int i = 0; i < src_depth && i < dest_depth; ++i)
     XCopyPlane(display_, src_xwin, dest_xwin, gc, src_x, src_y,
-               (uint) src_width, (uint) src_height,
-               desy_x, desy_y, (uint) (i + 1));
+               uint(src_width), uint(src_height),
+               desy_x, desy_y, uint(i + 1));
 }
 
 Pixmap
@@ -3324,7 +3332,7 @@ createStipplePixmap()
     Window root = getRoot();
 
     stipple_bitmap =
-      XCreateBitmapFromData(display_, root, (char *) stipple_bits, 2, 2);
+      XCreateBitmapFromData(display_, root, reinterpret_cast<char *>(stipple_bits), 2, 2);
   }
 
   return stipple_bitmap;
@@ -3424,7 +3432,7 @@ CXMachine::
 keycodeToKeysym(uint keycode) const
 {
   //KeySym keysym = XKeycodeToKeysym(display_, keycode, 0);
-  KeySym keysym = XkbKeycodeToKeysym(display_, keycode, 0, 0);
+  KeySym keysym = XkbKeycodeToKeysym(display_, KeyCode(keycode), 0, 0);
 
   return keysym;
 }
@@ -3438,7 +3446,7 @@ keycodeToKeysym(uint keycode, int state) const
   if (app_context_ != 0) {
     Modifiers modifiers_return;
 
-    XtTranslateKeycode(display_, keycode, state, &modifiers_return, &keysym);
+    XtTranslateKeycode(display_, KeyCode(keycode), uint(state), &modifiers_return, &keysym);
 
     if (keysym < 128) {
       if (state & ControlMask && ! (modifiers_return & ControlMask))
@@ -3454,7 +3462,7 @@ keycodeToKeysym(uint keycode, int state) const
 
     event.display = display_;
     event.window  = getRoot();
-    event.state   = state;
+    event.state   = uint(state);
     event.keycode = keycode;
 
     int len = XLookupString(&event, buffer, sizeof(buffer) - 1, &keysym, nullptr);
@@ -3546,7 +3554,7 @@ keysymToString1(KeySym keysym, bool multi) const
   str[1] = '\0';
 
   if      (keysym <= 255)
-    str[0] = keysym;
+    str[0] = char(keysym);
   else if (keysym == XK_BackSpace)
     str[0] = '\b';
   else if (keysym == XK_Escape)
@@ -3662,7 +3670,7 @@ keysymToString1(KeySym keysym, bool multi) const
   else if (keysym == XK_Page_Down) str1 = "\033[6~";
   else                             str1 = XKeysymToString(keysym);
 
-  return (char *) str1;
+  return const_cast<char *>(str1);
 }
 
 uint
@@ -4097,7 +4105,8 @@ selectionRequestEvent(XSelectionRequestEvent *event)
   if (event->target == XA_STRING) {
     XChangeProperty(event->display, event->requestor, event->property,
                     event->target, 8, PropModeReplace,
-                    (uchar *) selection_text_.c_str(), selection_text_.size());
+                    reinterpret_cast<uchar *>(const_cast<char *>(selection_text_.c_str())),
+                    int(selection_text_.size()));
 
     event1.property = event->property;
   }
@@ -4105,7 +4114,7 @@ selectionRequestEvent(XSelectionRequestEvent *event)
     event1.property = None;
   }
 
-  XSendEvent(event->display, event->requestor, False, 0, (XEvent *) &event1);
+  XSendEvent(event->display, event->requestor, False, 0, reinterpret_cast<XEvent *>(&event1));
 }
 
 void
@@ -4133,8 +4142,8 @@ selectionNotifyEvent(XSelectionEvent *event)
   if (type != XA_STRING)
     return;
 
-  selection_xwin_ = getEventWindow((XEvent *) event);
-  selection_text_ = std::string((char *) data);
+  selection_xwin_ = getEventWindow(reinterpret_cast<XEvent *>(event));
+  selection_text_ = std::string(reinterpret_cast<char *>(data));
   selection_set_  = true;
 }
 
@@ -4269,7 +4278,7 @@ idleEvent()
 CXFontList::
 CXFontList(const char *pattern, uint max_fonts)
 {
-  fonts_ = XListFonts(CXMachineInst->getDisplay(), pattern, max_fonts, &num_fonts_);
+  fonts_ = XListFonts(CXMachineInst->getDisplay(), pattern, int(max_fonts), &num_fonts_);
 }
 
 CXFontList::

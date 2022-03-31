@@ -35,7 +35,8 @@ CXWindow(CWindowType type) :
 
 CXWindow::
 CXWindow(CXScreen &screen, Window parent_window, int x, int y, uint width, uint height) :
- screen_(screen), parent_xwindow_(parent_window), x_(x), y_(y), width_(width), height_(height)
+ screen_(screen), parent_xwindow_(parent_window), x_(x), y_(y),
+ width_(int(width)), height_(int(height))
 {
   init(CWINDOW_TYPE_NORMAL);
 }
@@ -44,14 +45,15 @@ CXWindow::
 CXWindow(CXWindow *parent_window, int x, int y, uint width, uint height) :
  screen_(parent_window ? parent_window->getCXScreen() : *CXMachineInst->getCXScreen(0)),
  parent_window_ (parent_window), parent_xwindow_(parent_window ? parent_window->getXWindow() : 0),
- x_(x), y_(y), width_(width), height_(height)
+ x_(x), y_(y), width_(int(width)), height_(int(height))
 {
   init(CWINDOW_TYPE_NORMAL);
 }
 
 CXWindow::
 CXWindow(CXScreen &screen, int x, int y, uint width, uint height, CWindowType type) :
- screen_(screen), parent_xwindow_(screen_.getRoot()), x_(x), y_(y), width_(width), height_(height)
+ screen_(screen), parent_xwindow_(screen_.getRoot()), x_(x), y_(y),
+ width_(int(width)), height_(int(height))
 {
   init(type);
 }
@@ -59,7 +61,7 @@ CXWindow(CXScreen &screen, int x, int y, uint width, uint height, CWindowType ty
 CXWindow::
 CXWindow(int x, int y, uint width, uint height, CWindowType type) :
  screen_(*CXMachineInst->getCXScreen(0)), parent_xwindow_(screen_.getRoot()),
- x_(x), y_(y), width_(width), height_(height)
+ x_(x), y_(y), width_(int(width)), height_(int(height))
 {
   init(type);
 }
@@ -67,7 +69,7 @@ CXWindow(int x, int y, uint width, uint height, CWindowType type) :
 CXWindow::
 CXWindow(uint width, uint height, CWindowType type) :
  screen_(*CXMachineInst->getCXScreen(0)), parent_xwindow_(screen_.getRoot()),
- width_(width), height_(height)
+ width_(int(width)), height_(int(height))
 {
   init(type);
 }
@@ -144,8 +146,8 @@ init(Window window, uint width, uint height)
 
   x_      = 0;
   y_      = 0;
-  width_  = width;
-  height_ = height;
+  width_  = int(width);
+  height_ = int(height);
 
   last_width_  = 0;
   last_height_ = 0;
@@ -223,7 +225,7 @@ create()
   else {
     move(x_, y_);
 
-    resize(width_, height_);
+    resize(uint(width_), uint(height_));
   }
 }
 
@@ -363,7 +365,7 @@ getWidth() const
 {
   getSize(nullptr, nullptr);
 
-  return width_;
+  return uint(width_);
 }
 
 uint
@@ -372,7 +374,7 @@ getHeight() const
 {
   getSize(nullptr, nullptr);
 
-  return height_;
+  return uint(height_);
 }
 
 void
@@ -444,25 +446,25 @@ getSize(uint *width, uint *height) const
   else
     th->width_ = 1;
 
-  if (width ) *width  = width_;
-  if (height) *height = height_;
+  if (width ) *width  = uint(width_);
+  if (height) *height = uint(height_);
 }
 
 void
 CXWindow::
 getScreenSize(uint *width, uint *height) const
 {
-  if (width ) *width  = getCXScreen().getWidth ();
-  if (height) *height = getCXScreen().getHeight();
+  if (width ) *width  = uint(getCXScreen().getWidth ());
+  if (height) *height = uint(getCXScreen().getHeight());
 }
 
 void
 CXWindow::
 resize(uint width, uint height)
 {
-  if ((int) width != width_ || (int) height != height_) {
-    width_  = width;
-    height_ = height;
+  if (int(width) != width_ || int(height) != height_) {
+    width_  = int(width);
+    height_ = int(height);
 
     CXMachineInst->resizeWindow(window_, width_, height_);
   }
@@ -478,7 +480,7 @@ map()
 
   move(x_, y_);
 
-  resize(width_, height_);
+  resize(uint(width_), uint(height_));
 
   mapped_ = true;
 }
@@ -653,7 +655,7 @@ CXWindow::
 drawLine(double x1, double y1, double x2, double y2)
 {
   if (graphics_)
-    graphics_->drawLine((int) x1, (int) y1, (int) x2, (int) y2);
+    graphics_->drawLine(int(x1), int(y1), int(x2), int(y2));
 }
 
 void
@@ -663,7 +665,7 @@ drawXorLine(double x1, double y1, double x2, double y2)
   createXorGraphics();
 
   if (xor_graphics_)
-    xor_graphics_->drawLine((int) x1, (int) y1, (int) x2, (int) y2);
+    xor_graphics_->drawLine(int(x1), int(y1), int(x2), int(y2));
 }
 
 void
@@ -671,7 +673,7 @@ CXWindow::
 drawRectangle(double x, double y, double width1, double height1)
 {
   if (graphics_)
-    graphics_->drawRectangle((int) x, (int) y, (int) (width1  - 1.0), (int) (height1 - 1.0));
+    graphics_->drawRectangle(int(x), int(y), int(width1  - 1.0), int(height1 - 1.0));
 }
 
 void
@@ -681,7 +683,7 @@ drawXorRectangle(double x, double y, double width1, double height1)
   createXorGraphics();
 
   if (xor_graphics_)
-    xor_graphics_->drawRectangle((int) x, (int) y, (int) (width1  - 1.0), (int) (height1 - 1.0));
+    xor_graphics_->drawRectangle(int(x), int(y), int(width1  - 1.0), int(height1 - 1.0));
 }
 
 void
@@ -689,7 +691,7 @@ CXWindow::
 fillRectangle(double x, double y, double width1, double height1)
 {
   if (graphics_)
-    graphics_->fillRectangle((int) x, (int) y, (int) width1, (int) height1);
+    graphics_->fillRectangle(int(x), int(y), int(width1), int(height1));
 }
 
 void
@@ -700,12 +702,12 @@ drawPolygon(double *x, double *y, uint num_xy)
   std::vector<int> yi; yi.resize(num_xy);
 
   for (uint i = 0; i < num_xy; ++i) {
-    xi[i] = (int) x[i];
-    yi[i] = (int) y[i];
+    xi[i] = int(x[i]);
+    yi[i] = int(y[i]);
   }
 
   if (graphics_)
-    graphics_->drawPolygon(&xi[0], &yi[0], num_xy);
+    graphics_->drawPolygon(&xi[0], &yi[0], int(num_xy));
 }
 
 void
@@ -716,12 +718,12 @@ fillPolygon(double *x, double *y, uint num_xy)
   std::vector<int> yi; yi.resize(num_xy);
 
   for (uint i = 0; i < num_xy; ++i) {
-    xi[i] = (int) x[i];
-    yi[i] = (int) y[i];
+    xi[i] = int(x[i]);
+    yi[i] = int(y[i]);
   }
 
   if (graphics_)
-    graphics_->fillPolygon(&xi[0], &yi[0], num_xy);
+    graphics_->fillPolygon(&xi[0], &yi[0], int(num_xy));
 }
 
 void
@@ -729,7 +731,7 @@ CXWindow::
 drawCircle(double x, double y, double r)
 {
   if (graphics_)
-    graphics_->drawCircle((int) x, (int) y, (int) r);
+    graphics_->drawCircle(int(x), int(y), int(r));
 }
 
 void
@@ -737,7 +739,7 @@ CXWindow::
 fillCircle(double x, double y, double r)
 {
   if (graphics_)
-    graphics_->fillCircle((int) x, (int) y, (int) r);
+    graphics_->fillCircle(int(x), int(y), int(r));
 }
 
 void
@@ -745,7 +747,7 @@ CXWindow::
 drawEllipse(double x, double y, double xr, double yr)
 {
   if (graphics_)
-    graphics_->drawEllipse((int) x, (int) y, (int) xr, (int) yr);
+    graphics_->drawEllipse(int(x), int(y), int(xr), int(yr));
 }
 
 void
@@ -753,7 +755,7 @@ CXWindow::
 fillEllipse(double x, double y, double xr, double yr)
 {
   if (graphics_)
-    graphics_->fillEllipse((int) x, (int) y, (int) xr, (int) yr);
+    graphics_->fillEllipse(int(x), int(y), int(xr), int(yr));
 }
 
 void
@@ -761,7 +763,7 @@ CXWindow::
 drawArc(double x, double y, double xr, double yr, double a1, double a2)
 {
   if (graphics_)
-    graphics_->drawArc((int) x, (int) y, (int) xr, (int) yr, a1, a2);
+    graphics_->drawArc(int(x), int(y), int(xr), int(yr), a1, a2);
 }
 
 void
@@ -769,7 +771,7 @@ CXWindow::
 fillArc(double x, double y, double xr, double yr, double a1, double a2)
 {
   if (graphics_)
-    graphics_->fillArc((int) x, (int) y, (int) xr, (int) yr, a1, a2);
+    graphics_->fillArc(int(x), int(y), int(xr), int(yr), a1, a2);
 }
 
 void
@@ -777,7 +779,7 @@ CXWindow::
 drawPoint(double x, double y)
 {
   if (graphics_)
-    graphics_->drawPoint((int) x, (int) y);
+    graphics_->drawPoint(int(x), int(y));
 }
 
 void
@@ -785,7 +787,7 @@ CXWindow::
 drawImage(const CImagePtr &image, double x, double y)
 {
   if (graphics_)
-    graphics_->drawImage(image, (int) x, (int) y);
+    graphics_->drawImage(image, int(x), int(y));
 }
 
 void
@@ -793,7 +795,7 @@ CXWindow::
 drawAlphaImage(const CImagePtr &image, double x, double y)
 {
   if (graphics_)
-    graphics_->drawAlphaImage(image, (int) x, (int) y);
+    graphics_->drawAlphaImage(image, int(x), int(y));
 }
 
 void
@@ -815,8 +817,8 @@ drawSubImage(const CImagePtr &image, double src_x, double src_y,
     height1 = height2 - src_y;
 
   if (graphics_)
-    graphics_->drawSubImage(ximg, (int) src_x, (int) src_y, (int) dst_x, (int) dst_y,
-                            (int) width1, (int) height1);
+    graphics_->drawSubImage(ximg, int(src_x), int(src_y), int(dst_x), int(dst_y),
+                            int(width1), int(height1));
 }
 
 void
@@ -824,7 +826,7 @@ CXWindow::
 drawText(double x, double y, const std::string &str)
 {
   if (graphics_)
-    graphics_->drawText((int) x, (int) y, str);
+    graphics_->drawText(int(x), int(y), str);
 }
 
 void
@@ -832,7 +834,7 @@ CXWindow::
 clipRectangle(double x, double y, double width, double height)
 {
   if (graphics_)
-    graphics_->startClip((int) x, (int) y, (int) width, (int) height);
+    graphics_->startClip(int(x), int(y), int(width), int(height));
 }
 
 void
@@ -983,7 +985,7 @@ CXWindow::
 setLineWidth(double line_width)
 {
   if (graphics_)
-    graphics_->setLineWidth((int) line_width);
+    graphics_->setLineWidth(int(line_width));
 }
 
 void
@@ -991,7 +993,7 @@ CXWindow::
 setLineDash(int offset, char *dashes, uint num_dashes)
 {
   if (graphics_)
-    graphics_->setLineDash(offset, dashes, num_dashes);
+    graphics_->setLineDash(offset, dashes, int(num_dashes));
 }
 
 void
@@ -999,7 +1001,7 @@ CXWindow::
 setLineDash(int offset, int *dashes, uint num_dashes)
 {
   if (graphics_)
-    graphics_->setLineDash(offset, dashes, num_dashes);
+    graphics_->setLineDash(offset, dashes, int(num_dashes));
 }
 
 void
@@ -1031,7 +1033,7 @@ CXWindow::
 getStringWidth(const std::string &str) const
 {
   if (graphics_)
-    return graphics_->getStringWidth(str);
+    return uint(graphics_->getStringWidth(str));
   else
     return 1;
 }
@@ -1041,7 +1043,7 @@ CXWindow::
 copyArea(const CXWindow &src_window)
 {
   if (graphics_)
-    graphics_->copyArea(*src_window.getCXGraphics(), 0, 0, 0, 0, getWidth(), getHeight());
+    graphics_->copyArea(*src_window.getCXGraphics(), 0, 0, 0, 0, int(getWidth()), int(getHeight()));
 }
 
 CImagePtr
@@ -1060,7 +1062,7 @@ getImage(int x, int y, uint width, uint height) const
 
   CImagePtr image;
 
-  graphics_->getImage(x, y, width, height, image);
+  graphics_->getImage(x, y, int(width), int(height), image);
 
   return image;
 }
@@ -1307,10 +1309,10 @@ setShellProperties(const std::string &name)
 
   CXAtom **atoms = new CXAtom * [2];
 
-  atoms[0] = (CXAtom *) &delete_window;
-  atoms[1] = (CXAtom *) &take_focus;
+  atoms[0] = const_cast<CXAtom *>(&delete_window);
+  atoms[1] = const_cast<CXAtom *>(&take_focus);
 
-  CXMachineInst->setAtomArrayProperty(window_, protocols, (const CXAtom **) atoms, 2);
+  CXMachineInst->setAtomArrayProperty(window_, protocols, const_cast<const CXAtom **>(atoms), 2);
 
   CXMachineInst->setWMClassHint(window_, name, name);
 }

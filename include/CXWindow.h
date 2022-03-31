@@ -415,7 +415,7 @@ class CXWindowEventAdapter : public CXEventAdapter {
   }
 
   bool clientMessageEvent(void *from, const char *msg) {
-    if (! window_->clientMessageEvent((CXWindow *) from, msg))
+    if (! window_->clientMessageEvent(reinterpret_cast<CXWindow *>(from), msg))
       return false;
 
     return true;
