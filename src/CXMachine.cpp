@@ -2293,29 +2293,57 @@ setWMTransientFor(Window xwin, Window transient_xwin)
   return XSetTransientForHint(display_, xwin, transient_xwin);
 }
 
-void
+bool
+CXMachine::
+getWMClassHint(Window xwin, std::string &res_name, std::string &res_class)
+{
+  XClassHint class_hint;
+
+  if (! XGetClassHint(display_, xwin, &class_hint))
+    return false;
+
+  res_name  = std::string(class_hint.res_name);
+  res_class = std::string(class_hint.res_name);
+
+  return true;
+}
+
+bool
 CXMachine::
 getWMClassHint(Window xwin, XClassHint **class_hint)
 {
   static XClassHint class_hint1;
 
   if (! XGetClassHint(display_, xwin, &class_hint1)) {
-    class_hint1.res_name  = 0;
-    class_hint1.res_class = 0;
+    class_hint1.res_name  = nullptr;
+    class_hint1.res_class = nullptr;
+    return false;
   }
 
   *class_hint = &class_hint1;
+
+  return true;
 }
 
 bool
 CXMachine::
 setWMClassHint(Window xwin, const std::string &res_name, const std::string &res_class)
 {
+#if 0
   const char *strs[2] = { res_name.c_str(), res_class.c_str() };
 
   const CXAtom &wm_class = getAtom("WM_CLASS");
 
   setStringListProperty(xwin, wm_class, const_cast<char **>(strs), 2);
+#else
+  XClassHint class_hint;
+
+  class_hint.res_name  = const_cast<char *>(res_name.c_str());
+  class_hint.res_class = const_cast<char *>(res_class.c_str());
+
+  if (! XSetClassHint(display_, xwin, &class_hint))
+    return false;
+#endif
 
   return true;
 }

@@ -356,7 +356,8 @@ class CXMachine {
   void getWMTransientFor(Window xwin, Window *transient_xwin);
   bool setWMTransientFor(Window xwin, Window transient_xwin);
 
-  void getWMClassHint(Window xwin, XClassHint **class_hint);
+  bool getWMClassHint(Window xwin, std::string &res_name, std::string &res_class);
+  bool getWMClassHint(Window xwin, XClassHint **class_hint);
   bool setWMClassHint(Window xwin, const std::string &res_name, const std::string &res_class);
 
   void getWMClientMachine(Window xwin, std::string &client_machine);
