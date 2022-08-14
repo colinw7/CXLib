@@ -3,7 +3,7 @@
 CXDragWindow::
 CXDragWindow(CXScreen &screen, Window window, int width, int height)
 {
-  cxwindow_ = new CXWindow(screen, window, 0, 0, width, height);
+  cxwindow_ = new CXWindow(screen, window, 0, 0, uint(width), uint(height));
 
   cxwindow_->unmap();
 }
@@ -47,5 +47,5 @@ void
 CXDragWindow::
 setSize(int width, int height)
 {
-  cxwindow_->setSize(width, height);
+  cxwindow_->setSize(uint(width), uint(height));
 }

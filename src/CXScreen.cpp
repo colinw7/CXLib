@@ -37,9 +37,9 @@ init()
 
     num_colors_ = (1 << depth_);
 
-    colors_         .resize(num_colors_);
-    color_used_     .resize(num_colors_);
-    color_allocated_.resize(num_colors_);
+    colors_         .resize(uint(num_colors_));
+    color_used_     .resize(uint(num_colors_));
+    color_allocated_.resize(uint(num_colors_));
 
     setColorsUsed();
   }
@@ -50,9 +50,9 @@ init()
 
     num_used_colors_ = 0;
 
-    CXUtil::decodeVisualMask(visual_->red_mask  , &red_shift_  , &red_mask_  );
-    CXUtil::decodeVisualMask(visual_->green_mask, &green_shift_, &green_mask_);
-    CXUtil::decodeVisualMask(visual_->blue_mask , &blue_shift_ , &blue_mask_ );
+    CXUtil::decodeVisualMask(uint(visual_->red_mask  ), &red_shift_  , &red_mask_  );
+    CXUtil::decodeVisualMask(uint(visual_->green_mask), &green_shift_, &green_mask_);
+    CXUtil::decodeVisualMask(uint(visual_->blue_mask ), &blue_shift_ , &blue_mask_ );
 
     alpha_shift_ = 24;
     alpha_mask_  = 0xFF;
@@ -289,34 +289,34 @@ rgbaIToPixel(uint red, uint green, uint blue, uint alpha)
     uint blue1  = (blue  << 8) | blue;
 
     for (i = 0; i < num_colors_; ++i) {
-      if (color_used_[i] &&
-          colors_[i].red   == red1   &&
-          colors_[i].green == green1 &&
-          colors_[i].blue  == blue1)
-        return colors_[i].pixel;
+      if (color_used_[uint(i)] &&
+          colors_[uint(i)].red   == red1   &&
+          colors_[uint(i)].green == green1 &&
+          colors_[uint(i)].blue  == blue1)
+        return colors_[uint(i)].pixel;
     }
 
     if (num_used_colors_ < num_colors_) {
       for (i = 0; i < num_colors_; ++i) {
-        if (! color_used_[i])
+        if (! color_used_[uint(i)])
           break;
       }
 
-      color_used_[i] = true;
+      color_used_[uint(i)] = true;
 
-      colors_[i].pixel = i;
-      colors_[i].red   = red1;
-      colors_[i].green = green1;
-      colors_[i].blue  = blue1;
-      colors_[i].flags = DoRed | DoGreen | DoBlue;
+      colors_[uint(i)].pixel = Pixel(i);
+      colors_[uint(i)].red   = ushort(red1);
+      colors_[uint(i)].green = ushort(green1);
+      colors_[uint(i)].blue  = ushort(blue1);
+      colors_[uint(i)].flags = DoRed | DoGreen | DoBlue;
 
-      XStoreColor(display_, cmap_, &colors_[i]);
+      XStoreColor(display_, cmap_, &colors_[uint(i)]);
 
       CXMachineInst->flushEvents(true);
 
       num_used_colors_++;
 
-      return colors_[i].pixel;
+      return colors_[uint(i)].pixel;
     }
 
     int nearest = 0;
@@ -324,9 +324,9 @@ rgbaIToPixel(uint red, uint green, uint blue, uint alpha)
     int diff1   = 0;
 
     for (i = 0; i < num_colors_; ++i) {
-      uint cred1   = colors_[i].red   & 0x00FF;
-      uint cgreen1 = colors_[i].green & 0x00FF;
-      uint cblue1  = colors_[i].blue  & 0x00FF;
+      uint cred1   = colors_[uint(i)].red   & 0x00FF;
+      uint cgreen1 = colors_[uint(i)].green & 0x00FF;
+      uint cblue1  = colors_[uint(i)].blue  & 0x00FF;
 
       diff1 = std::abs(int(cred1  ) - int(red  ))*
               std::abs(int(cgreen1) - int(green))*
@@ -339,37 +339,37 @@ rgbaIToPixel(uint red, uint green, uint blue, uint alpha)
       }
     }
 
-    return colors_[nearest].pixel;
+    return colors_[uint(nearest)].pixel;
   }
   else {
     uint gray = (red << 8) | red;
 
     for (i = 0; i < num_colors_; ++i) {
-      if (color_used_[i] && colors_[i].red == gray)
-        return colors_[i].pixel;
+      if (color_used_[uint(i)] && colors_[uint(i)].red == gray)
+        return colors_[uint(i)].pixel;
     }
 
     if (num_used_colors_ < num_colors_) {
       for (i = 0; i < num_colors_; ++i) {
-        if (! color_used_[i])
+        if (! color_used_[uint(i)])
           break;
       }
 
-      color_used_[i] = true;
+      color_used_[uint(i)] = true;
 
-      colors_[i].pixel = i;
-      colors_[i].red   = gray;
-      colors_[i].green = gray;
-      colors_[i].blue  = gray;
-      colors_[i].flags = DoRed | DoGreen | DoBlue;
+      colors_[uint(i)].pixel = Pixel(i);
+      colors_[uint(i)].red   = ushort(gray);
+      colors_[uint(i)].green = ushort(gray);
+      colors_[uint(i)].blue  = ushort(gray);
+      colors_[uint(i)].flags = DoRed | DoGreen | DoBlue;
 
-      XStoreColor(display_, cmap_, &colors_[i]);
+      XStoreColor(display_, cmap_, &colors_[uint(i)]);
 
       CXMachineInst->flushEvents(true);
 
       num_used_colors_++;
 
-      return colors_[i].pixel;
+      return colors_[uint(i)].pixel;
     }
 
     int nearest = 0;
@@ -377,7 +377,7 @@ rgbaIToPixel(uint red, uint green, uint blue, uint alpha)
     int diff1   = 0;
 
     for (i = 0; i < num_colors_; ++i) {
-      uint igray = (colors_[i].red & 0x00FF);
+      uint igray = (colors_[uint(i)].red & 0x00FF);
 
       diff1 = std::abs(int(igray) - int(red));
 
@@ -388,7 +388,7 @@ rgbaIToPixel(uint red, uint green, uint blue, uint alpha)
       }
     }
 
-    return colors_[nearest].pixel;
+    return colors_[uint(nearest)].pixel;
   }
 }
 
@@ -426,17 +426,17 @@ pixelToRGBA(Pixel pixel)
     int i;
 
     for (i = 0; i < num_colors_; ++i) {
-      if (! color_used_[i])
+      if (! color_used_[uint(i)])
         continue;
 
-      if (colors_[i].pixel == pixel)
+      if (colors_[uint(i)].pixel == pixel)
         break;
     }
 
     if (i < num_colors_) {
-      red   = colors_[i].red  *rgb_scale;
-      green = colors_[i].green*rgb_scale;
-      blue  = colors_[i].blue *rgb_scale;
+      red   = colors_[uint(i)].red  *rgb_scale;
+      green = colors_[uint(i)].green*rgb_scale;
+      blue  = colors_[uint(i)].blue *rgb_scale;
     }
   }
   else {
@@ -445,10 +445,10 @@ pixelToRGBA(Pixel pixel)
     uint blue1  = (pixel >> blue_shift_ ) & blue_mask_;
     uint alpha1 = (pixel >> alpha_shift_) & alpha_mask_;
 
-    red   = ((double) red1  )/red_mask_  ;
-    green = ((double) green1)/green_mask_;
-    blue  = ((double) blue1 )/blue_mask_ ;
-    alpha = ((double) alpha1)/alpha_mask_;
+    red   = double(red1  )/double(red_mask_  );
+    green = double(green1)/double(green_mask_);
+    blue  = double(blue1 )/double(blue_mask_ );
+    alpha = double(alpha1)/double(alpha_mask_);
   }
 
   return CRGBA(red, green, blue, alpha);
@@ -477,19 +477,19 @@ allocateOwnGrayColormap()
   Colormap default_cmap = DefaultColormap(display_, screen_num_);
 
   for (int i = 0; i < 256; ++i)
-    xcolors[i].pixel = i;
+    xcolors[uint(i)].pixel = Pixel(i);
 
   XQueryColors(display_, default_cmap, xcolors, 256);
 
   for (int i = 0; i < 256; ++i) {
-    used_grays [i] = -1;
-    used_pixels[i] = false;
+    used_grays [uint(i)] = -1;
+    used_pixels[uint(i)] = false;
   }
 
   for (int i = 255; i >= 0; i--) {
-    int r = (xcolors[i].red   >> 8) & 0xFF;
-    int g = (xcolors[i].green >> 8) & 0xFF;
-    int b = (xcolors[i].blue  >> 8) & 0xFF;
+    int r = (xcolors[uint(i)].red   >> 8) & 0xFF;
+    int g = (xcolors[uint(i)].green >> 8) & 0xFF;
+    int b = (xcolors[uint(i)].blue  >> 8) & 0xFF;
 
     int gray = (r + g + b)/3;
 
@@ -497,33 +497,33 @@ allocateOwnGrayColormap()
   }
 
   for (int i = 0; i < 256; ++i)
-    if (used_grays[i] != -1)
-      used_pixels[used_grays[i]] = true;
+    if (used_grays[uint(i)] != -1)
+      used_pixels[used_grays[uint(i)]] = true;
 
   /*---------*/
 
   for (int i = 0; i < 256; ++i) {
     XColor color;
 
-    if (used_grays[i] == -1) {
+    if (used_grays[uint(i)] == -1) {
       int j = 0;
 
       for ( ; j < 256; ++j)
         if (! used_pixels[j])
           break;
 
-      color.pixel = j;
+      color.pixel = Pixel(j);
 
       used_pixels[j] = true;
     }
     else
-      color.pixel = used_grays[i];
+      color.pixel = Pixel(used_grays[uint(i)]);
 
     int gray = (i << 8) | i;
 
-    color.red   = gray;
-    color.green = gray;
-    color.blue  = gray;
+    color.red   = ushort(gray);
+    color.green = ushort(gray);
+    color.blue  = ushort(gray);
     color.flags = DoRed | DoGreen | DoBlue;
 
     XStoreColor(display_, new_cmap, &color);
@@ -543,10 +543,10 @@ CXScreen::
 setColorsUsed()
 {
   for (int i = 0; i < num_colors_; ++i) {
-    color_used_     [i] = true;
-    color_allocated_[i] = false;
+    color_used_     [uint(i)] = true;
+    color_allocated_[uint(i)] = false;
 
-    colors_[i].pixel = i;
+    colors_[uint(i)].pixel = Pixel(i);
   }
 
   CXMachineInst->flushEvents(true);
@@ -576,7 +576,7 @@ setColorsUsed()
   num_used_colors_ = 0;
 
   for (int i = 0; i < num_colors_; ++i)
-    if (color_used_[i])
+    if (color_used_[uint(i)])
       num_used_colors_++;
 }
 
@@ -585,19 +585,19 @@ CXScreen::
 freeAllocatedColors()
 {
   for (int i = 0; i < num_colors_; ++i) {
-    if (! color_allocated_[i])
+    if (! color_allocated_[uint(i)])
       continue;
 
-    colors_[i].red   = 0;
-    colors_[i].green = 0;
-    colors_[i].blue  = 0;
+    colors_[uint(i)].red   = 0;
+    colors_[uint(i)].green = 0;
+    colors_[uint(i)].blue  = 0;
 
-    XStoreColor(display_, cmap_, &colors_[i]);
+    XStoreColor(display_, cmap_, &colors_[uint(i)]);
 
-    XFreeColors(display_, cmap_, &colors_[i].pixel, 1, 0);
+    XFreeColors(display_, cmap_, &colors_[uint(i)].pixel, 1, 0);
 
-    color_used_     [i] = false;
-    color_allocated_[i] = false;
+    color_used_     [uint(i)] = false;
+    color_allocated_[uint(i)] = false;
   }
 
   CXMachineInst->flushEvents(true);
@@ -609,10 +609,10 @@ createMask(const CImagePtr &image)
 {
   Window xwindow = getRoot();
 
-  int width  = image->getWidth ();
-  int height = image->getHeight();
+  int width  = int(image->getWidth ());
+  int height = int(image->getHeight());
 
-  Pixmap mask = XCreatePixmap(display_, xwindow, width, height, 1);
+  Pixmap mask = XCreatePixmap(display_, xwindow, uint(width), uint(height), 1);
 
   if (mask == None)
     return None;
@@ -685,9 +685,9 @@ selectWMInput() const
   bool rc = CXMachineInst->addInput(root, SubstructureRedirectMask);
 
   if (rc) {
-    int event_mask = ButtonPressMask | ButtonReleaseMask  |
-                     EnterWindowMask | LeaveWindowMask    |
-                     KeyPressMask    | PropertyChangeMask;
+    uint event_mask = ButtonPressMask | ButtonReleaseMask  |
+                      EnterWindowMask | LeaveWindowMask    |
+                      KeyPressMask    | PropertyChangeMask;
 
     rc = CXMachineInst->addInput(root, event_mask);
   }

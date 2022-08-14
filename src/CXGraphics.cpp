@@ -72,12 +72,12 @@ startDoubleBuffer(bool clear)
   bool update = false;
 
   if (! pixmap_) {
-    pixmap_ = PixmapP(CXMachineInst->createPixmap(width, height));
+    pixmap_ = PixmapP(CXMachineInst->createPixmap(uint(width), uint(height)));
 
     update = true;
   }
   else
-    update = pixmap_->resizePixmap(width, height);
+    update = pixmap_->resizePixmap(uint(width), uint(height));
 
   if (update) {
     CXMachineInst->flushEvents(true);
@@ -111,7 +111,7 @@ copyDoubleBuffer()
     return;
 
   CXMachineInst->copyArea(pixmap_->getPixmap(), window_, gc_, 0, 0,
-                          pixmap_->getWidth(), pixmap_->getHeight(), 0, 0);
+                          int(pixmap_->getWidth()), int(pixmap_->getHeight()), 0, 0);
 
   CXMachineInst->flushEvents(true);
 }
@@ -134,7 +134,7 @@ clear(bool redraw)
   if (! is_pixmap_) {
     if (pixmap_) {
       CXMachineInst->fillRectangle(pixmap_->getPixmap(), gc_, 0, 0,
-                                   pixmap_->getWidth(), pixmap_->getHeight());
+                                   int(pixmap_->getWidth()), int(pixmap_->getHeight()));
 
       if (redraw)
         XClearArea(display_, window_, 0, 0, 1, 1, True);
@@ -147,7 +147,7 @@ clear(bool redraw)
 
         getSize(&width, &height);
 
-        XClearArea(display_, window_, 0, 0, width, height, True);
+        XClearArea(display_, window_, 0, 0, uint(width), uint(height), True);
       }
       else
         CXMachineInst->clearWindow(window_);
@@ -309,9 +309,9 @@ CXGraphics::
 drawRectangle(int x, int y, int width, int height)
 {
   if (pixmap_)
-    CXMachineInst->drawRectangle(pixmap_->getPixmap(), gc_, x, y, (uint) width, (uint) height);
+    CXMachineInst->drawRectangle(pixmap_->getPixmap(), gc_, x, y, width, height);
   else
-    CXMachineInst->drawRectangle(window_, gc_, x, y, (uint) width, (uint) height);
+    CXMachineInst->drawRectangle(window_, gc_, x, y, width, height);
 }
 
 void
@@ -337,8 +337,8 @@ drawPolygon(int *x, int *y, int num_xy)
   }
 
   for (int i = 0; i < num_xy; ++i) {
-    poly_point[i].x = x[i];
-    poly_point[i].y = y[i];
+    poly_point[uint(i)].x = short(x[uint(i)]);
+    poly_point[uint(i)].y = short(y[uint(i)]);
   }
 
   if (pixmap_)
@@ -360,8 +360,8 @@ fillPolygon(int *x, int *y, int num_xy)
   }
 
   for (int i = 0; i < num_xy; ++i) {
-    poly_point[i].x = x[i];
-    poly_point[i].y = y[i];
+    poly_point[uint(i)].x = short(x[uint(i)]);
+    poly_point[uint(i)].y = short(y[uint(i)]);
   }
 
   if (pixmap_)
@@ -377,9 +377,11 @@ CXGraphics::
 drawCircle(int x, int y, int r)
 {
   if (pixmap_)
-    XDrawArc(display_, pixmap_->getPixmap(), gc_, x - r, y - r, 2*r, 2*r, 0, 360*64);
+    XDrawArc(display_, pixmap_->getPixmap(), gc_, short(x - r), short(y - r),
+             uint(2*r), uint(2*r), 0, 360*64);
   else
-    XDrawArc(display_, window_, gc_, x - r, y - r, 2*r, 2*r, 0, 360*64);
+    XDrawArc(display_, window_, gc_, short(x - r), short(y - r),
+             uint(2*r), uint(2*r), 0, 360*64);
 }
 
 void
@@ -387,9 +389,11 @@ CXGraphics::
 fillCircle(int x, int y, int r)
 {
   if (pixmap_)
-    XFillArc(display_, pixmap_->getPixmap(), gc_, x - r, y - r, 2*r, 2*r, 0, 360*64);
+    XFillArc(display_, pixmap_->getPixmap(), gc_, short(x - r), short(y - r),
+             uint(2*r), uint(2*r), 0, 360*64);
   else
-    XFillArc(display_, window_, gc_, x - r, y - r, 2*r, 2*r, 0, 360*64);
+    XFillArc(display_, window_, gc_, short(x - r), short(y - r),
+             uint(2*r), uint(2*r), 0, 360*64);
 }
 
 void
@@ -397,9 +401,11 @@ CXGraphics::
 drawEllipse(int x, int y, int xr, int yr)
 {
   if (pixmap_)
-    XDrawArc(display_, pixmap_->getPixmap(), gc_, x - xr, y - yr, 2*xr, 2*yr, 0, 360*64);
+    XDrawArc(display_, pixmap_->getPixmap(), gc_, short(x - xr), short(y - yr),
+             uint(2*xr), uint(2*yr), 0, 360*64);
   else
-    XDrawArc(display_, window_, gc_, x - xr, y - yr, 2*xr, 2*yr, 0, 360*64);
+    XDrawArc(display_, window_, gc_, short(x - xr), short(y - yr),
+             uint(2*xr), uint(2*yr), 0, 360*64);
 }
 
 void
@@ -407,9 +413,11 @@ CXGraphics::
 fillEllipse(int x, int y, int xr, int yr)
 {
   if (pixmap_)
-    XFillArc(display_, pixmap_->getPixmap(), gc_, x - xr, y - yr, 2*xr, 2*yr, 0, 360*64);
+    XFillArc(display_, pixmap_->getPixmap(), gc_, short(x - xr), short(y - yr),
+             uint(2*xr), uint(2*yr), 0, 360*64);
   else
-    XFillArc(display_, window_, gc_, x - xr, y - yr, 2*xr, 2*yr, 0, 360*64);
+    XFillArc(display_, window_, gc_, short(x - xr), short(y - yr),
+             uint(2*xr), uint(2*yr), 0, 360*64);
 }
 
 void
@@ -417,11 +425,11 @@ CXGraphics::
 drawArc(int x, int y, int xr, int yr, double angle1, double angle2)
 {
   if (pixmap_)
-    XDrawArc(display_, pixmap_->getPixmap(), gc_, x - xr, y - yr, 2*xr, 2*yr,
-             (int) (angle1*64), (int) (-angle2*64));
+    XDrawArc(display_, pixmap_->getPixmap(), gc_, short(x - xr), short(y - yr),
+             uint(2*xr), uint(2*yr), int(angle1*64), int(-angle2*64));
   else
-    XDrawArc(display_, window_, gc_, x - xr, y - yr, 2*xr, 2*yr,
-             (int) (angle1*64), (int) (-angle2*64));
+    XDrawArc(display_, window_, gc_, short(x - xr), short(y - yr),
+             uint(2*xr), uint(2*yr), int(angle1*64), int(-angle2*64));
 }
 
 void
@@ -429,11 +437,11 @@ CXGraphics::
 fillArc(int x, int y, int xr, int yr, double angle1, double angle2)
 {
   if (pixmap_)
-    XFillArc(display_, pixmap_->getPixmap(), gc_, x - xr, y - yr, 2*xr, 2*yr,
-             (int) (angle1*64), (int) (-angle2*64));
+    XFillArc(display_, pixmap_->getPixmap(), gc_, short(x - xr), short(y - yr),
+             uint(2*xr), uint(2*yr), int(angle1*64), int(-angle2*64));
   else
-    XFillArc(display_, window_, gc_, x - xr, y - yr, 2*xr, 2*yr,
-             (int) (angle1*64), (int) (-angle2*64));
+    XFillArc(display_, window_, gc_, short(x - xr), short(y - yr),
+             uint(2*xr), uint(2*yr), int(angle1*64), int(-angle2*64));
 }
 
 void
@@ -463,10 +471,10 @@ drawSubImage(const CImagePtr &image, int src_x, int src_y,
 {
   if (pixmap_)
     CXMachineInst->drawImage(pixmap_->getPixmap(), gc_, image,
-                             src_x, src_y, dst_x, dst_y, width, height);
+                             src_x, src_y, dst_x, dst_y, uint(width), uint(height));
   else
     CXMachineInst->drawImage(window_, gc_, image,
-                             src_x, src_y, dst_x, dst_y, width, height);
+                             src_x, src_y, dst_x, dst_y, uint(width), uint(height));
 }
 
 void
@@ -475,10 +483,10 @@ drawSubImage(XImage *ximage, int src_x, int src_y, int dst_x, int dst_y, int wid
 {
   if (pixmap_)
     CXMachineInst->putImage(pixmap_->getPixmap(), gc_, ximage, src_x, src_y,
-                            dst_x, dst_y, width, height);
+                            dst_x, dst_y, uint(width), uint(height));
   else
     CXMachineInst->putImage(window_, gc_, ximage, src_x, src_y,
-                            dst_x, dst_y, width, height);
+                            dst_x, dst_y, uint(width), uint(height));
 }
 
 void
@@ -493,14 +501,14 @@ drawAlphaImage(const CImagePtr &image, int x, int y)
 
     for (uint iy = 0; iy < height; ++iy) {
       for (uint ix = 0; ix < width; ++ix) {
-        if (! image->isTransparent(ix, iy)) {
+        if (! image->isTransparent(int(ix), int(iy))) {
           CRGBA rgba;
 
-          image->getRGBAPixel(ix, iy, rgba);
+          image->getRGBAPixel(int(ix), int(iy), rgba);
 
           setForeground(rgba);
 
-          drawPoint(x + ix, y + iy);
+          drawPoint(x + int(ix), y + int(iy));
         }
       }
     }
@@ -511,14 +519,14 @@ drawAlphaImage(const CImagePtr &image, int x, int y)
 
     for (uint iy = 0; iy < height; ++iy) {
       for (uint ix = 0; ix < width; ++ix) {
-        if (! image->isTransparent(ix, iy)) {
+        if (! image->isTransparent(int(ix), int(iy))) {
           CRGBA rgba;
 
-          image->getRGBAPixel(ix, iy, rgba);
+          image->getRGBAPixel(int(ix), int(iy), rgba);
 
           setForeground(rgba);
 
-          drawPoint(x + ix, y + iy);
+          drawPoint(x + int(ix), y + int(iy));
         }
       }
     }
@@ -537,8 +545,8 @@ drawSubAlphaImage(const CImagePtr &image, int src_x, int src_y,
 
   src_x  = std::max(src_x , 0);
   src_y  = std::max(src_y , 0);
-  width  = std::min(width , (int) image->getWidth ());
-  height = std::min(height, (int) image->getHeight());
+  width  = std::min(width , int(image->getWidth ()));
+  height = std::min(height, int(image->getHeight()));
 
   int xx, yy;
 
@@ -595,9 +603,10 @@ getImage(int x, int y, int width, int height, XImage **ximage)
   *ximage = nullptr;
 
   if (pixmap_)
-    *ximage = XGetImage(display_, pixmap_->getPixmap(), x, y, width, height, AllPlanes, ZPixmap);
+    *ximage = XGetImage(display_, pixmap_->getPixmap(), x, y, uint(width), uint(height),
+                        AllPlanes, ZPixmap);
   else
-    *ximage = XGetImage(display_, window_, x, y, width, height, AllPlanes, ZPixmap);
+    *ximage = XGetImage(display_, window_, x, y, uint(width), uint(height), AllPlanes, ZPixmap);
 
   return true;
 }
@@ -652,15 +661,15 @@ startClip(int x, int y, int width, int height)
 {
   XPoint points[4];
 
-  points[0].x = x;
-  points[0].y = y;
-  points[2].x = x + width  - 1;
-  points[2].y = y + height - 1;
+  points[0].x = short(x);
+  points[0].y = short(y);
+  points[2].x = short(x + width  - 1);
+  points[2].y = short(y + height - 1);
 
-  points[1].x = points[2].x;
-  points[1].y = points[0].y;
-  points[3].x = points[0].x;
-  points[3].y = points[2].y;
+  points[1].x = short(points[2].x);
+  points[1].y = short(points[0].y);
+  points[3].x = short(points[0].x);
+  points[3].y = short(points[2].y);
 
   Region region = XPolygonRegion(points, 4, EvenOddRule);
 
@@ -743,7 +752,7 @@ setLineDash(int offset, int *dashes, int num_dashes)
     static char cdashes[256];
 
     for (int i = 0; i< num_dashes; ++i)
-      cdashes[i] = dashes[i];
+      cdashes[uint(i)] = char(dashes[uint(i)]);
 
     setLineType(CX_LINE_TYPE_DASHED);
 
@@ -757,7 +766,7 @@ void
 CXGraphics::
 setLineDash(const CILineDash &line_dash)
 {
-  setLineDash(line_dash.getOffset(), line_dash.getLengths(), line_dash.getNumLengths());
+  setLineDash(line_dash.getOffset(), line_dash.getLengths(), int(line_dash.getNumLengths()));
 }
 
 void
@@ -814,8 +823,8 @@ getSize(int *width, int *height) const
 
     XGetGeometry(display_, window_, &root, &x, &y, &width1, &height1, &border_width, &depth);
 
-    *width  = width1;
-    *height = height1;
+    *width  = int(width1);
+    *height = int(height1);
   }
 
   CXMachineInst->flushEvents(false);
@@ -828,7 +837,7 @@ CXGraphics::
 getCharWidth()
 {
   if (font_.isValid())
-    return font_->getICharWidth();
+    return int(font_->getICharWidth());
   else
     return 8;
 }
@@ -838,7 +847,7 @@ CXGraphics::
 getCharHeight()
 {
   if (font_.isValid())
-    return font_->getICharHeight();
+    return int(font_->getICharHeight());
   else
     return 10;
 }
@@ -848,9 +857,9 @@ CXGraphics::
 getStringWidth(const std::string &str)
 {
   if (font_.isValid())
-    return font_->getIStringWidth(str);
+    return int(font_->getIStringWidth(str));
   else
-    return getCharWidth()*str.size();
+    return getCharWidth()*int(str.size());
 }
 
 void

@@ -183,7 +183,7 @@ getXImage(Drawable drawable, int x, int y, int width, int height)
 {
   Display *display = screen_.getDisplay();
 
-  ximage_ = XGetImage(display, drawable, x, y, width, height, AllPlanes, ZPixmap);
+  ximage_ = XGetImage(display, drawable, x, y, uint(width), uint(height), AllPlanes, ZPixmap);
 
   ximage_owner_ = true;
 }
@@ -204,7 +204,7 @@ createXImage()
 
   int size = getDataSize();
 
-  xdata_ = new uchar [size];
+  xdata_ = new uchar [size_t(size)];
 
   int pad = BitmapPad(display);
 
@@ -217,8 +217,9 @@ createXImage()
   int width  = std::max(1, x2 - x1 + 1);
   int height = std::max(1, y2 - y1 + 1);
 
-  ximage_ = XCreateImage(display, visual, screen_.getDepth(), format, xoffset,
-                         (char *) xdata_, width, height, pad, bytes_per_line);
+  ximage_ = XCreateImage(display, visual, uint(screen_.getDepth()), format, xoffset,
+                         reinterpret_cast<char *>(xdata_), uint(width), uint(height),
+                         pad, bytes_per_line);
 
   if (! ximage_)
     std::cerr << "Failed to create ximage\n";
@@ -247,7 +248,7 @@ initXImage()
 
   Pixel pixel;
 
-  int width = getWidth();
+  int width = int(getWidth());
 
   if (! hasColormap()) {
     int ind = y1*width;
@@ -284,7 +285,7 @@ initXImage()
     CRGBA prgba;
 
     for (int i = 0; i < num; ++i) {
-      getColorRGBA(i, prgba);
+      getColorRGBA(uint(i), prgba);
 
       pixels.push_back(CXColor(prgba).getPixel());
     }
@@ -298,7 +299,7 @@ initXImage()
 
       for (int x = x1; x <= x2; ++x) {
         if (validPixel(x, y))
-          pixel = getColorIndexPixel(ind1);
+          pixel = Pixel(getColorIndexPixel(ind1));
         else
           pixel = 0;
 
@@ -343,8 +344,8 @@ getXPixmap() const
 
     getWindow(&x1, &y1, &x2, &y2);
 
-    uint width  = x2 - x1 + 1;
-    uint height = y2 - y1 + 1;
+    uint width  = uint(x2 - x1 + 1);
+    uint height = uint(y2 - y1 + 1);
 
     //----
 
@@ -368,7 +369,7 @@ getXPixmap() const
 
           CXMachineInst->setForeground(gc, pixel);
 
-          CXMachineInst->drawPoint(pixmap_, gc, x, y);
+          CXMachineInst->drawPoint(pixmap_, gc, int(x), int(y));
         }
       }
     }
@@ -377,7 +378,7 @@ getXPixmap() const
 
       for (uint y = 0; y < height; ++y) {
         for (uint x = 0; x < width; ++x) {
-          CXMachineInst->drawPoint(pixmap_, gc, x, y);
+          CXMachineInst->drawPoint(pixmap_, gc, int(x), int(y));
         }
       }
     }
@@ -397,10 +398,10 @@ getXMask() const
 
     getWindow(&x1, &y1, &x2, &y2);
 
-    int width = getWidth();
+    int width = int(getWidth());
 
-    uint pwidth  = x2 - x1 + 1;
-    uint pheight = y2 - y1 + 1;
+    uint pwidth  = uint(x2 - x1 + 1);
+    uint pheight = uint(y2 - y1 + 1);
 
     //----
 
@@ -417,7 +418,7 @@ getXMask() const
 
     CXMachineInst->setForeground(gc, 0);
 
-    CXMachineInst->fillRectangle(mask_, gc, 0, 0, pwidth, pheight);
+    CXMachineInst->fillRectangle(mask_, gc, 0, 0, int(pwidth), int(pheight));
 
     CXMachineInst->setForeground(gc, 1);
 
@@ -482,7 +483,7 @@ createImageData()
       for (int ix = 0; ix < ximage_->width; ++ix) {
         pixel = XGetPixel(ximage_, ix, iy);
 
-        CImage::setColorIndexPixel(x1 + ix, y1 + iy, pixel);
+        CImage::setColorIndexPixel(x1 + ix, y1 + iy, uint(pixel));
       }
     }
   }
@@ -495,7 +496,7 @@ createImageData()
 
         //pixel |= 0xFF000000;
 
-        setData(x1 + ix, y1 + iy, pixel);
+        setData(x1 + ix, y1 + iy, uint(pixel));
       }
     }
   }
@@ -537,21 +538,21 @@ getImageColors(CRGB **colors, int *num_colors)
 
   std::vector<XColor> xcolors;
 
-  xcolors.resize(num_xcolors);
+  xcolors.resize(uint(num_xcolors));
 
   for (int i = 0; i < num_xcolors; ++i)
-    xcolors[i].pixel = (uint) i;
+    xcolors[uint(i)].pixel = uint(i);
 
   XQueryColors(display, cmap, &xcolors[0], num_xcolors);
 
   std::vector<int> used;
 
-  used.resize(num_xcolors);
+  used.resize(uint(num_xcolors));
 
   int num_used = 0;
 
   for (int i = 0; i < num_xcolors; ++i)
-    used[i] = 0;
+    used[uint(i)] = 0;
 
   Pixel pixel;
 
@@ -559,7 +560,7 @@ getImageColors(CRGB **colors, int *num_colors)
     for (int x = 0; x < ximage_->width; ++x) {
       pixel = XGetPixel(ximage_, x, y);
 
-      if ((int) pixel >= num_xcolors)
+      if (int(pixel) >= num_xcolors)
         continue;
 
       if (used[pixel] == 0)
@@ -570,18 +571,18 @@ getImageColors(CRGB **colors, int *num_colors)
   }
 
   if (num_used > 0) {
-    *colors     = new CRGB [num_used];
+    *colors     = new CRGB [uint(num_used)];
     *num_colors = 0;
 
     for (int i = 0; i < num_used; ++i) {
-      if (used[i] == 0)
+      if (used[uint(i)] == 0)
         continue;
 
-      int red   = xcolors[i].red   >> 8;
-      int green = xcolors[i].green >> 8;
-      int blue  = xcolors[i].blue  >> 8;
+      int red   = xcolors[uint(i)].red   >> 8;
+      int green = xcolors[uint(i)].green >> 8;
+      int blue  = xcolors[uint(i)].blue  >> 8;
 
-      (*colors)[used[i] - 1] = CRGB(red/255.0, green/255.0, blue/255.0);
+      (*colors)[used[uint(i)] - 1] = CRGB(red/255.0, green/255.0, blue/255.0);
 
       ++(*num_colors);
     }
@@ -604,9 +605,9 @@ setPixel(int pos, const CXColor &color)
 
     getWindow(&x1, &y1, &x2, &y2);
 
-    uint width = x2 - x1 + 1;
+    uint width = uint(x2 - x1 + 1);
 
-    XPutPixel(ximage_, pos % width, pos / width, color.getPixel());
+    XPutPixel(ximage_, uint(pos) % width, uint(pos) / width, color.getPixel());
   }
 
   return CImage::setRGBAPixel(pos, color.getRGBA());
@@ -631,9 +632,9 @@ setColorIndexPixel(int pos, uint pixel)
 
     getWindow(&x1, &y1, &x2, &y2);
 
-    uint width = x2 - x1 + 1;
+    uint width = uint(x2 - x1 + 1);
 
-    XPutPixel(ximage_, pos % width, pos / width, pixel);
+    XPutPixel(ximage_, uint(pos) % width, uint(pos) / width, pixel);
   }
 
   return CImage::setColorIndexPixel(pos, pixel);
@@ -693,9 +694,9 @@ setRGBAPixel(int pos, const CRGBA &rgba)
 
     getWindow(&x1, &y1, &x2, &y2);
 
-    uint width = x2 - x1 + 1;
+    uint width = uint(x2 - x1 + 1);
 
-    XPutPixel(ximage_, pos % width, pos / width, pixel);
+    XPutPixel(ximage_, uint(pos) % width, uint(pos) / width, pixel);
   }
 
   return CImage::setRGBAPixel(pos, rgba);
@@ -724,9 +725,9 @@ getDataSize()
 
   getWindow(&x1, &y1, &x2, &y2);
 
-  uint height = y2 - y1 + 1;
+  uint height = uint(y2 - y1 + 1);
 
-  return row_size*height;
+  return row_size*int(height);
 }
 
 int
@@ -737,18 +738,18 @@ getRowSize()
 
   getWindow(&x1, &y1, &x2, &y2);
 
-  uint width = x2 - x1 + 1;
+  uint width = uint(x2 - x1 + 1);
 
   if      (screen_.getDepth() == 32)
-    return 4*width;
+    return int(4*width);
   else if (screen_.getDepth() == 24)
-    return 4*width;
+    return int(4*width);
   else if (screen_.getDepth() == 16)
-    return 2*width;
+    return int(2*width);
   else if (screen_.getDepth() == 8)
-    return width;
+    return int(width);
   else
-    return ((width + 7)/8);
+    return int((width + 7)/8);
 }
 
 //----------------
@@ -761,10 +762,10 @@ draw(Display *display, Drawable drawable, GC gc, int x, int y)
 
   getWindow(&x1, &y1, &x2, &y2);
 
-  uint width  = x2 - x1 + 1;
-  uint height = y2 - y1 + 1;
+  uint width  = uint(x2 - x1 + 1);
+  uint height = uint(y2 - y1 + 1);
 
-  draw(display, drawable, gc, 0, 0, x, y, width, height);
+  draw(display, drawable, gc, 0, 0, x, y, int(width), int(height));
 }
 
 void
@@ -775,10 +776,10 @@ draw(CXScreen *cxscreen, Drawable drawable, GC gc, int x, int y)
 
   getWindow(&x1, &y1, &x2, &y2);
 
-  uint width  = x2 - x1 + 1;
-  uint height = y2 - y1 + 1;
+  uint width  = uint(x2 - x1 + 1);
+  uint height = uint(y2 - y1 + 1);
 
-  draw(cxscreen->getDisplay(), drawable, gc, 0, 0, x, y, width, height);
+  draw(cxscreen->getDisplay(), drawable, gc, 0, 0, x, y, int(width), int(height));
 }
 
 void
@@ -790,19 +791,20 @@ draw(Display *, Drawable drawable, GC gc, int src_x, int src_y,
 
   getWindow(&x1, &y1, &x2, &y2);
 
-  uint iwidth  = x2 - x1 + 1;
-  uint iheight = y2 - y1 + 1;
+  uint iwidth  = uint(x2 - x1 + 1);
+  uint iheight = uint(y2 - y1 + 1);
 
-  if (src_x + width  > (int) iwidth)
-    width = iwidth - src_x;
+  if (src_x + width  > int(iwidth))
+    width = int(iwidth) - src_x;
 
-  if (src_y + height > (int) iheight)
-    height = iheight - src_y;
+  if (src_y + height > int(iheight))
+    height = int(iheight) - src_y;
 
   XImage *ximage = getXImage();
 
   if (ximage)
-    CXMachineInst->putImage(drawable, gc, ximage, src_x, src_y, dst_x, dst_y, width, height);
+    CXMachineInst->putImage(drawable, gc, ximage, src_x, src_y,
+                            dst_x, dst_y, uint(width), uint(height));
 }
 
 void

@@ -130,9 +130,9 @@ init()
 
   xrt_font_->getExtents(&font_width, &font_ascent, &font_descent);
 
-  font_width_   = font_width;
-  font_ascent_  = font_ascent;
-  font_descent_ = font_descent;
+  font_width_   = uint(font_width);
+  font_ascent_  = uint(font_ascent);
+  font_descent_ = uint(font_descent);
 
   proportional_ = xrt_font_->isProportional();
 
@@ -152,9 +152,9 @@ init(XFontStruct *fs)
 
   xrt_font_->getExtents(&font_width, &font_ascent, &font_descent);
 
-  font_width_   = font_width;
-  font_ascent_  = font_ascent;
-  font_descent_ = font_descent;
+  font_width_   = uint(font_width);
+  font_ascent_  = uint(font_ascent);
+  font_descent_ = uint(font_descent);
 
   setSize(font_ascent_ + font_descent_);
 
@@ -171,7 +171,7 @@ getIStringWidth(const std::string &str) const
 
   xrt_font_->textExtents(str, &width, nullptr, nullptr);
 
-  return width;
+  return uint(width);
 }
 
 CImagePtr
@@ -187,9 +187,9 @@ getStringImage(const std::string &str)
 
   image_ = CImageMgrInst->createImage(src);
 
-  image_->setDataSize(w, h);
+  image_->setDataSize(int(w), int(h));
 
-  image_->setRGBAData(CRGBA(0,0,0,0));
+  image_->setRGBAData(CRGBA(0, 0, 0, 0));
 
   CXImage *ximage = image_.cast<CXImage>();
 

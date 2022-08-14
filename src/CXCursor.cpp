@@ -47,13 +47,13 @@ recolor(const CRGBA &bg, const CRGBA &fg)
   XColor fg_xcolor;
   XColor bg_xcolor;
 
-  fg_xcolor.red   = (int) (fg.getRed  ()*65535);
-  fg_xcolor.green = (int) (fg.getGreen()*65535);
-  fg_xcolor.blue  = (int) (fg.getBlue ()*65535);
+  fg_xcolor.red   = ushort(fg.getRed  ()*65535);
+  fg_xcolor.green = ushort(fg.getGreen()*65535);
+  fg_xcolor.blue  = ushort(fg.getBlue ()*65535);
 
-  bg_xcolor.red   = (int) (bg.getRed  ()*65535);
-  bg_xcolor.green = (int) (bg.getGreen()*65535);
-  bg_xcolor.blue  = (int) (bg.getBlue ()*65535);
+  bg_xcolor.red   = ushort(bg.getRed  ()*65535);
+  bg_xcolor.green = ushort(bg.getGreen()*65535);
+  bg_xcolor.blue  = ushort(bg.getBlue ()*65535);
 
   XRecolorCursor(display, xcursor_, &fg_xcolor, &bg_xcolor);
 }

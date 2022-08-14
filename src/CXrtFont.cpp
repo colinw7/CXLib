@@ -9,7 +9,7 @@ using std::string;
 
 CXrtFont::
 CXrtFont(Display *display, const string &name, double angle) :
- display_(display), window_(None), angle_((int) angle), name_(name)
+ display_(display), window_(None), angle_(int(angle)), name_(name)
 {
   window_ = DefaultRootWindow(display_);
 
@@ -18,7 +18,7 @@ CXrtFont(Display *display, const string &name, double angle) :
 
 CXrtFont::
 CXrtFont(Display *display, XFontStruct *fs, double angle) :
- display_(display), window_(None), angle_((int) angle), fs_(fs)
+ display_(display), window_(None), angle_(int(angle)), fs_(fs)
 {
   window_ = DefaultRootWindow(display_);
 
@@ -27,14 +27,14 @@ CXrtFont(Display *display, XFontStruct *fs, double angle) :
 
 CXrtFont::
 CXrtFont(Display *display, Window window, const string &name, double angle) :
- display_(display), window_(window), angle_((int) angle), name_(name)
+ display_(display), window_(window), angle_(int(angle)), name_(name)
 {
   initFontStruct(name);
 }
 
 CXrtFont::
 CXrtFont(Display *display, Window window, XFontStruct *fs, double angle) :
- display_(display), window_(window), angle_((int) angle), fs_(fs)
+ display_(display), window_(window), angle_(int(angle)), fs_(fs)
 {
   init();
 }
@@ -72,7 +72,7 @@ void
 CXrtFont::
 initFontStruct(const string &name)
 {
-  fs_ = XLoadQueryFont(display_, (char *) name.c_str());
+  fs_ = XLoadQueryFont(display_, const_cast<char *>(name.c_str()));
 
   if (! fs_)
     fs_ = XLoadQueryFont(display_, "fixed");
@@ -102,15 +102,15 @@ init()
   ascent_  = 0;
   descent_ = 0;
 
-  start_char_ = fs_->min_char_or_byte2;
-  end_char_   = fs_->max_char_or_byte2;
+  start_char_ = int(fs_->min_char_or_byte2);
+  end_char_   = int(fs_->max_char_or_byte2);
   num_chars_  = end_char_ - start_char_ + 1;
 
   if (fs_->per_char) {
     for (int i = 0; i < num_chars_; i++) {
-      width_   = std::max(width_  , (int) fs_->per_char[i].width  );
-      ascent_  = std::max(ascent_ , (int) fs_->per_char[i].ascent );
-      descent_ = std::max(descent_, (int) fs_->per_char[i].descent);
+      width_   = std::max(width_  , int(fs_->per_char[i].width  ));
+      ascent_  = std::max(ascent_ , int(fs_->per_char[i].ascent ));
+      descent_ = std::max(descent_, int(fs_->per_char[i].descent));
     }
   }
   else {
@@ -124,12 +124,15 @@ init()
   int (*error_handler)(Display *, XErrorEvent *) =
     XSetErrorHandler(CXrtFont::XErrorHandler);
 
-  pixmap1_ = XCreatePixmap(display_, window_, num_chars_*width_, ascent_ + descent_, 1);
+  pixmap1_ = XCreatePixmap(display_, window_,
+                           uint(num_chars_*width_), uint(ascent_ + descent_), 1);
 
   if      (angle_ == 90 || angle_ == 270)
-    pixmap2_ = XCreatePixmap(display_, window_, ascent_ + descent_, num_chars_*width_, 1);
+    pixmap2_ = XCreatePixmap(display_, window_,
+                             uint(ascent_ + descent_), uint(num_chars_*width_), 1);
   else if (angle_ == 180)
-    pixmap2_ = XCreatePixmap(display_, window_, num_chars_*width_, ascent_ + descent_, 1);
+    pixmap2_ = XCreatePixmap(display_, window_,
+                             uint(num_chars_*width_), uint(ascent_ + descent_), 1);
   else
     pixmap2_ = pixmap1_;
 
@@ -148,17 +151,20 @@ init()
   XSetForeground(display_, gc_, 0);
 
   if      (angle_ == 90 || angle_ == 270)
-    XFillRectangle(display_, pixmap2_, gc_, 0, 0, ascent_ + descent_, num_chars_*width_);
+    XFillRectangle(display_, pixmap2_, gc_, 0, 0,
+                   uint(ascent_ + descent_), uint(num_chars_*width_));
   else if (angle_ == 180)
-    XFillRectangle(display_, pixmap2_, gc_, 0, 0, num_chars_*width_, ascent_ + descent_);
+    XFillRectangle(display_, pixmap2_, gc_, 0, 0,
+                   uint(num_chars_*width_), uint(ascent_ + descent_));
 
-  XFillRectangle(display_, pixmap1_, gc_, 0, 0, num_chars_*width_, ascent_ + descent_);
+  XFillRectangle(display_, pixmap1_, gc_, 0, 0,
+                 uint(num_chars_*width_), uint(ascent_ + descent_));
 
   XSetForeground(display_, gc_, 1);
 
   XSetFont(display_, gc_, fs_->fid);
 
-  rotated_ = new bool [num_chars_];
+  rotated_ = new bool [uint(num_chars_)];
 
   for (int i = 0; i < num_chars_; i++)
     rotated_[i] = false;
@@ -194,7 +200,8 @@ textExtents(const string &str, int *width, int *ascent, int *descent)
   int         descent1;
   int         direction;
 
-  XTextExtents(fs_, (char *) str.c_str(), str.size(), &direction, &ascent1, &descent1, &overall);
+  XTextExtents(fs_, const_cast<char *>(str.c_str()), int(str.size()),
+               &direction, &ascent1, &descent1, &overall);
 
   if (width != NULL)
     *width = overall.width;
@@ -212,9 +219,9 @@ draw(Window window, GC gc, int x, int y, const string &str)
 {
   bool changed = false;
 
-  int len = str.size();
+  auto len = str.size();
 
-  for (int i = 0; i < len; i++) {
+  for (size_t i = 0; i < len; i++) {
     int c = str[i];
 
     if (c < 0 || c >= num_chars_)
@@ -232,11 +239,11 @@ draw(Window window, GC gc, int x, int y, const string &str)
       XDestroyImage(ximage_);
 
     if (angle_ == 0 || angle_ == 180)
-      ximage_ = XGetImage(display_, pixmap2_, 0, 0, num_chars_*width_,
-                          ascent_ + descent_, AllPlanes, XYPixmap);
+      ximage_ = XGetImage(display_, pixmap2_, 0, 0, uint(num_chars_*width_),
+                          uint(ascent_ + descent_), AllPlanes, XYPixmap);
     else
-      ximage_ = XGetImage(display_, pixmap2_, 0, 0, ascent_ + descent_,
-                          num_chars_*width_, AllPlanes, XYPixmap);
+      ximage_ = XGetImage(display_, pixmap2_, 0, 0, uint(ascent_ + descent_),
+                          uint(num_chars_*width_), AllPlanes, XYPixmap);
   }
 
   if (ximage_ == NULL)
@@ -244,7 +251,7 @@ draw(Window window, GC gc, int x, int y, const string &str)
 
   len = str.size();
 
-  for (int i = 0; i < len; i++) {
+  for (size_t i = 0; i < len; i++) {
     int c = str[i] - start_char_;
 
     if (c < 0 || c >= num_chars_)
@@ -338,9 +345,9 @@ draw(CPixelRenderer *renderer, int x, int y, const string &str)
 {
   bool changed = false;
 
-  int len = str.size();
+  auto len = str.size();
 
-  for (int i = 0; i < len; i++) {
+  for (size_t i = 0; i < len; i++) {
     int c = str[i];
 
     if (c < 0 || c >= num_chars_)
@@ -358,11 +365,11 @@ draw(CPixelRenderer *renderer, int x, int y, const string &str)
       XDestroyImage(ximage_);
 
     if (angle_ == 0 || angle_ == 180)
-      ximage_ = XGetImage(display_, pixmap2_, 0, 0, num_chars_*width_, ascent_ + descent_,
-                          AllPlanes, XYPixmap);
+      ximage_ = XGetImage(display_, pixmap2_, 0, 0,
+                          uint(num_chars_*width_), uint(ascent_ + descent_), AllPlanes, XYPixmap);
     else
-      ximage_ = XGetImage(display_, pixmap2_, 0, 0, ascent_ + descent_, num_chars_*width_,
-                          AllPlanes, XYPixmap);
+      ximage_ = XGetImage(display_, pixmap2_, 0, 0,
+                          uint(ascent_ + descent_), uint(num_chars_*width_), AllPlanes, XYPixmap);
   }
 
   if (ximage_ == NULL)
@@ -370,7 +377,7 @@ draw(CPixelRenderer *renderer, int x, int y, const string &str)
 
   len = str.size();
 
-  for (int i = 0; i < len; i++) {
+  for (size_t i = 0; i < len; i++) {
     int c = str[i] - start_char_;
 
     if (c < 0 || c >= num_chars_)
@@ -471,9 +478,9 @@ drawImage(Window window, GC gc, int x, int y, const string &str)
   int x1 = x;
   int y1 = y;
 
-  int len = str.size();
+  auto len = str.size();
 
-  for (int i = 0; i < len; i++) {
+  for (size_t i = 0; i < len; i++) {
     int c = str[i] - start_char_;
 
     if (c < 0 || c >= num_chars_)
@@ -487,24 +494,26 @@ drawImage(Window window, GC gc, int x, int y, const string &str)
       wc = fs_->min_bounds.width;
 
     if      (angle_ == 90) {
-      XFillRectangle(display_, window, gc, x1, y1 - wc, ascent_ + descent_, wc);
+      XFillRectangle(display_, window, gc, x1, y1 - wc,
+                     uint(ascent_ + descent_), uint(wc));
 
       y1 -= wc;
     }
     else if (angle_ == 270) {
       XFillRectangle(display_, window, gc, x1 - ascent_ - descent_, y1,
-                     ascent_ + descent_, wc);
+                     uint(ascent_ + descent_), uint(wc));
 
       y1 += wc;
     }
     else if (angle_ == 180) {
       XFillRectangle(display_, window, gc, x1 - wc, y1 - ascent_ - descent_,
-                     wc, ascent_ + descent_);
+                     uint(wc), uint(ascent_ + descent_));
 
       x1 -= wc;
     }
     else {
-      XFillRectangle(display_, window, gc, x1, y1, wc, ascent_ + descent_);
+      XFillRectangle(display_, window, gc, x1, y1,
+                     uint(wc), uint(ascent_ + descent_));
 
       x1 += wc;
     }
@@ -529,9 +538,9 @@ drawImage(CPixelRenderer *renderer, int x, int y, const string &str)
   int x1 = x;
   int y1 = y;
 
-  int len = str.size();
+  auto len = str.size();
 
-  for (int i = 0; i < len; i++) {
+  for (size_t i = 0; i < len; i++) {
     int c = str[i] - start_char_;
 
     if (c < 0 || c >= num_chars_)
@@ -597,7 +606,7 @@ rotateChar(int c)
 
   int xo = width_ - wc1;
 
-  char c2 = c;
+  char c2 = char(c);
 
   XDrawString(display_, pixmap1_, gc_, x1, ascent_, &c2, 1);
 

@@ -26,7 +26,7 @@ decodeDisplayName(const std::string &display_name, std::string &hostname,
 
   /* Check for "<name>:<display>.<screen>" */
 
-  int num = sscanf((char *) display_name.c_str(), "%[a-zA-Z0-9_]:%d.%d",
+  int num = sscanf(const_cast<char *>(display_name.c_str()), "%[a-zA-Z0-9_]:%d.%d",
                    hostname1, display_num, screen_num);
 
   if (num == 3) {
@@ -38,7 +38,7 @@ decodeDisplayName(const std::string &display_name, std::string &hostname,
 
   /* Check for "<name>:<display>" */
 
-  num = sscanf((char *) display_name.c_str(), "%[a-zA-Z0-9_]:%d",
+  num = sscanf(const_cast<char *>(display_name.c_str()), "%[a-zA-Z0-9_]:%d",
                hostname1, display_num);
 
   if (num == 2) {
@@ -53,7 +53,7 @@ decodeDisplayName(const std::string &display_name, std::string &hostname,
 
   /* Check for ":<display>.<screen>" */
 
-  num = sscanf((char *) display_name.c_str(), ":%d.%d",
+  num = sscanf(const_cast<char *>(display_name.c_str()), ":%d.%d",
                display_num, screen_num);
 
   if (num == 2) {
@@ -68,7 +68,7 @@ decodeDisplayName(const std::string &display_name, std::string &hostname,
 
   /* Check for ":<display> */
 
-  num = sscanf((char *) display_name.c_str(), ":%d", display_num);
+  num = sscanf(const_cast<char *>(display_name.c_str()), ":%d", display_num);
 
   if (num == 1) {
     strcpy(hostname1, "");

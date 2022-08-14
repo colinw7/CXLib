@@ -48,8 +48,8 @@ CXtTimer1(CXtTimer *timer, uint msecs, CTimerFlags flags) :
 {
   timer_id_ =
     XtAppAddTimeOut(app_context_, msecs_,
-                    (XtTimerCallbackProc) &CXtTimer1::calltimeOut,
-                    (char *) this);
+                    static_cast<XtTimerCallbackProc>(&CXtTimer1::calltimeOut),
+                    static_cast<void *>(this));
 
   timers_.push_back(this);
 }
@@ -67,15 +67,15 @@ void
 CXtTimer1::
 calltimeOut(void *data, XtIntervalId *)
 {
-  CXtTimer1 *timer = (CXtTimer1 *) data;
+  CXtTimer1 *timer = reinterpret_cast<CXtTimer1 *>(data);
 
   timer->timer_->timeOut();
 
   if (timer->flags_ & CTIMER_FLAGS_REPEAT)
     timer->timer_id_ =
       XtAppAddTimeOut(app_context_, timer->msecs_,
-                      (XtTimerCallbackProc) &CXtTimer1::calltimeOut,
-                      (char *) timer);
+                      static_cast<XtTimerCallbackProc>(&CXtTimer1::calltimeOut),
+                      static_cast<void *>(timer));
   else
     timer->timer_id_ = 0;
 }

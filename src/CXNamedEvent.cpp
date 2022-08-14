@@ -80,7 +80,7 @@ parse()
     event1->button = 1;
     event1->state  = state;
 
-    event_ = (XEvent *) event1;
+    event_ = reinterpret_cast<XEvent *>(event1);
   }
   else if (CStrUtil::casecmp(object, "Button2") == 0) {
     XButtonPressedEvent *event1 = new XButtonPressedEvent;
@@ -89,7 +89,7 @@ parse()
     event1->button = 2;
     event1->state  = state;
 
-    event_ = (XEvent *) event1;
+    event_ = reinterpret_cast<XEvent *>(event1);
   }
   else if (CStrUtil::casecmp(object, "Button3") == 0) {
     XButtonPressedEvent *event1 = new XButtonPressedEvent;
@@ -98,7 +98,7 @@ parse()
     event1->button = 3;
     event1->state  = state;
 
-    event_ = (XEvent *) event1;
+    event_ = reinterpret_cast<XEvent *>(event1);
   }
   else if (CStrUtil::casecmp(object, "Key"     ) == 0 ||
            CStrUtil::casecmp(object, "KeyPress") == 0) {
@@ -117,7 +117,7 @@ parse()
     event1->keycode = keycode;
     event1->state   = state;
 
-    event_ = (XEvent *) event1;
+    event_ = reinterpret_cast<XEvent *>(event1);
   }
   else if (CStrUtil::casecmp(object, "KeyRelease") == 0) {
     KeySym keysym = XStringToKeysym(data.c_str());
@@ -135,7 +135,7 @@ parse()
     event1->keycode = keycode;
     event1->state   = state;
 
-    event_ = (XEvent *) event1;
+    event_ = reinterpret_cast<XEvent *>(event1);
   }
   else
     goto done;

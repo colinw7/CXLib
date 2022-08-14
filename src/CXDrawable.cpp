@@ -159,14 +159,14 @@ void
 CXDrawable::
 drawPolygon(int *x, int *y, uint num_xy)
 {
-  graphics_->drawPolygon(x, y, num_xy);
+  graphics_->drawPolygon(x, y, int(num_xy));
 }
 
 void
 CXDrawable::
 fillPolygon(int *x, int *y, uint num_xy)
 {
-  graphics_->fillPolygon(x, y, num_xy);
+  graphics_->fillPolygon(x, y, int(num_xy));
 }
 
 void
@@ -234,8 +234,8 @@ drawSubImage(const CImagePtr &image, int src_x, int src_y,
 
   XImage *ximg = ximage->getXImage();
 
-  int width2  = image->getWidth();
-  int height2 = image->getHeight();
+  int width2  = int(image->getWidth());
+  int height2 = int(image->getHeight());
 
   if (src_x + width1 > width2)
     width1 = width2 - src_x;
@@ -281,14 +281,14 @@ void
 CXDrawable::
 setLineDash(int offset, char *dashes, uint num_dashes)
 {
-  graphics_->setLineDash(offset, dashes, num_dashes);
+  graphics_->setLineDash(offset, dashes, int(num_dashes));
 }
 
 void
 CXDrawable::
 setLineDash(int offset, int *dashes, uint num_dashes)
 {
-  graphics_->setLineDash(offset, dashes, num_dashes);
+  graphics_->setLineDash(offset, dashes, int(num_dashes));
 }
 
 void
@@ -323,7 +323,7 @@ uint
 CXDrawable::
 getStringWidth(const std::string &str)
 {
-  return graphics_->getStringWidth(str);
+  return uint(graphics_->getStringWidth(str));
 }
 
 CImagePtr
@@ -342,7 +342,7 @@ getImage(int x, int y, uint width, uint height)
 
   CImagePtr image;
 
-  graphics_->getImage(x, y, width, height, image);
+  graphics_->getImage(x, y, int(width), int(height), image);
 
   return image;
 }
