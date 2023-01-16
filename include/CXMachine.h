@@ -8,7 +8,7 @@
 #include <CRGBA.h>
 #include <CEvent.h>
 #include <CIPoint2D.h>
-#include <MwmUtil.h>
+#include <Xm/MwmUtil.h>
 #include <vector>
 #include <memory>
 

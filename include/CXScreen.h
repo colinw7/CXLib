@@ -11,9 +11,11 @@ class CXWindow;
 class CXScreen {
  public:
   CXScreen(int screen_num);
-  CXScreen(const CXScreen &screen);
+//CXScreen(const CXScreen &screen);
 
  ~CXScreen();
+
+//CXScreen &operator=(const CXScreen &screen);
 
   Display  *getDisplay() const;
   int       getScreenNum() const;

@@ -440,10 +440,10 @@ pixelToRGBA(Pixel pixel)
     }
   }
   else {
-    uint red1   = (pixel >> red_shift_  ) & red_mask_;
-    uint green1 = (pixel >> green_shift_) & green_mask_;
-    uint blue1  = (pixel >> blue_shift_ ) & blue_mask_;
-    uint alpha1 = (pixel >> alpha_shift_) & alpha_mask_;
+    uint red1   = uint((pixel >> red_shift_  ) & red_mask_  );
+    uint green1 = uint((pixel >> green_shift_) & green_mask_);
+    uint blue1  = uint((pixel >> blue_shift_ ) & blue_mask_ );
+    uint alpha1 = uint((pixel >> alpha_shift_) & alpha_mask_);
 
     red   = double(red1  )/double(red_mask_  );
     green = double(green1)/double(green_mask_);

@@ -9,6 +9,9 @@ class CXrtFont;
 class CXFont;
 
 class CXFont : public CFont {
+ public:
+  virtual ~CXFont();
+
  protected:
   friend class CXMachine;
 
@@ -26,8 +29,6 @@ class CXFont : public CFont {
   CXFont(XFontStruct *fs, uint angle=0);
 
   CXFont(CXScreen &screen, XFontStruct *fs, uint angle=0);
-
-  virtual ~CXFont();
 
   CFontPtr dup(const std::string &family, CFontStyle style, double size,
                double angle=0, double char_angle=0,

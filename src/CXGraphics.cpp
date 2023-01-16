@@ -615,12 +615,12 @@ void
 CXGraphics::
 drawText(int x, int y, const std::string &str)
 {
-  if (! font_.isValid()) {
+  if (! font_) {
     std::cerr << "Bad Font\n";
     return;
   }
 
-  CXFont *xfont = font_.cast<CXFont>();
+  auto *xfont = dynamic_cast<CXFont *>(font_.get());
 
   if (! xfont)
     return;
@@ -637,12 +637,12 @@ void
 CXGraphics::
 drawTextImage(int x, int y, const std::string &str)
 {
-  if (! font_.isValid()) {
+  if (! font_) {
     std::cerr << "Bad Font\n";
     return;
   }
 
-  CXFont *xfont = font_.cast<CXFont>();
+  auto *xfont = dynamic_cast<CXFont *>(font_.get());
 
   if (! xfont)
     return;
@@ -836,7 +836,7 @@ int
 CXGraphics::
 getCharWidth()
 {
-  if (font_.isValid())
+  if (font_)
     return int(font_->getICharWidth());
   else
     return 8;
@@ -846,7 +846,7 @@ int
 CXGraphics::
 getCharHeight()
 {
-  if (font_.isValid())
+  if (font_)
     return int(font_->getICharHeight());
   else
     return 10;
@@ -856,7 +856,7 @@ int
 CXGraphics::
 getStringWidth(const std::string &str)
 {
-  if (font_.isValid())
+  if (font_)
     return int(font_->getIStringWidth(str));
   else
     return getCharWidth()*int(str.size());
