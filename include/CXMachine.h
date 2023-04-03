@@ -212,7 +212,7 @@ class CXMachine {
   bool getWindowSize(Window xwin, int *w, int *h) const;
 
   bool getWindowGeometry(Window xwin, int *x, int *y,
-                         int *width=0, int *height=0, int *border=0) const;
+                         int *width=nullptr, int *height=nullptr, int *border=nullptr) const;
 
   CXWindow *lookupWindow(Window xwin) const;
 

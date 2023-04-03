@@ -11,7 +11,7 @@ class CXTimer1 : public CTimer {
  private:
   static std::list<CXTimer1 *> timers_;
 
-  void timeOut();
+  void timeOut() override;
 };
 
 std::list<CXTimer1 *> CXTimer1::timers_;

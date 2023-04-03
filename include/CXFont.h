@@ -32,7 +32,7 @@ class CXFont : public CFont {
 
   CFontPtr dup(const std::string &family, CFontStyle style, double size,
                double angle=0, double char_angle=0,
-               int x_res=100, int y_res=100) const;
+               int x_res=100, int y_res=100) const override;
 
  private:
   CXFont(const CFont &font);
@@ -42,27 +42,25 @@ class CXFont : public CFont {
   CXFont &operator=(const CXFont &font);
 
  public:
-  double getCharWidth   () const { return getICharWidth(); }
-  uint   getICharWidth  () const { return font_width_; }
-  double getCharAscent  () const { return getICharAscent(); }
-  uint   getICharAscent () const { return font_ascent_; }
-  double getCharDescent () const { return getICharDescent(); }
-  uint   getICharDescent() const { return font_descent_; }
-  double getCharHeight  () const { return getICharHeight(); }
-  uint   getICharHeight () const { return font_ascent_ + font_descent_; }
+  double getCharWidth   () const override { return getICharWidth(); }
+  uint   getICharWidth  () const override { return font_width_; }
+  double getCharAscent  () const override { return getICharAscent(); }
+  uint   getICharAscent () const override { return font_ascent_; }
+  double getCharDescent () const override { return getICharDescent(); }
+  uint   getICharDescent() const override { return font_descent_; }
+  double getCharHeight  () const override { return getICharHeight(); }
+  uint   getICharHeight () const override { return font_ascent_ + font_descent_; }
 
-  double getStringWidth (const std::string &str) const {
-    return getIStringWidth(str);
-  }
-  uint   getIStringWidth(const std::string &str) const;
+  double getStringWidth (const std::string &str) const override { return getIStringWidth(str); }
+  uint   getIStringWidth(const std::string &str) const override;
 
-  bool isProportional() const { return proportional_; }
+  bool isProportional() const override { return proportional_; }
 
-  double getCharAspect() const { return font_aspect_; }
+  double getCharAspect() const override { return font_aspect_; }
 
   CXrtFont *getXrtFont() const { return xrt_font_; }
 
-  CImagePtr getStringImage(const std::string &str);
+  CImagePtr getStringImage(const std::string &str) override;
 
   static void setPrototype();
 

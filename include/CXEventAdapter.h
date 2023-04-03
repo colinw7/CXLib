@@ -12,31 +12,31 @@ class CXEventAdapter : public CEventAdapter {
 
   virtual ~CXEventAdapter() { }
 
-  virtual bool buttonPressEvent  (const CMouseEvent &) { return false; }
-  virtual bool buttonMotionEvent (const CMouseEvent &) { return false; }
-  virtual bool buttonReleaseEvent(const CMouseEvent &) { return false; }
+  bool buttonPressEvent  (const CMouseEvent &) override { return false; }
+  bool buttonMotionEvent (const CMouseEvent &) override { return false; }
+  bool buttonReleaseEvent(const CMouseEvent &) override { return false; }
 
-  virtual bool keyPressEvent  (const CKeyEvent &) { return false; }
-  virtual bool keyReleaseEvent(const CKeyEvent &) { return false; }
+  bool keyPressEvent  (const CKeyEvent &) override { return false; }
+  bool keyReleaseEvent(const CKeyEvent &) override { return false; }
 
-  virtual bool pointerMotionEvent(const CMouseEvent &) { return false; }
+  bool pointerMotionEvent(const CMouseEvent &) override { return false; }
 
-  virtual bool exposeEvent() { return false; }
-  virtual bool resizeEvent() { return false; }
+  bool exposeEvent() override { return false; }
+  bool resizeEvent() override { return false; }
 
-  virtual bool enterEvent() { return false; }
-  virtual bool leaveEvent() { return false; }
+  bool enterEvent() override { return false; }
+  bool leaveEvent() override { return false; }
 
-  virtual bool visibilityEvent(bool) { return false; }
+  bool visibilityEvent(bool) override { return false; }
 
-  virtual bool idleEvent();
+  bool idleEvent() override;
   virtual bool tickEvent() { return false; }
 
   virtual bool selectionClearEvent() { return false; }
 
-  virtual bool closeEvent() { return false; }
+  bool closeEvent() override { return false; }
 
-  virtual bool clientMessageEvent(void *, const char *) { return false; }
+  bool clientMessageEvent(void *, const char *) override { return false; }
 
   //------
 

@@ -83,7 +83,7 @@ openDisplay(const std::string &display_name)
   std::string display_name1 = display_name;
 
   if (display_name1 == "") {
-    display_ = XOpenDisplay(0);
+    display_ = XOpenDisplay(nullptr);
 
     if (display_)
       display_name1 = DisplayString(display_);
@@ -92,7 +92,7 @@ openDisplay(const std::string &display_name)
     display_ = XOpenDisplay(const_cast<char *>(display_name1.c_str()));
 
   if (! display_)
-    return 0;
+    return nullptr;
 
   CXUtil::decodeDisplayName(display_name1, hostname_, &display_num_, &screen_num_);
 
@@ -138,7 +138,7 @@ openXtDisplay(const std::string &display_name, const std::string &app_name, int 
                   nullptr, 0, argc, argv);
 
   if (! display)
-    return 0;
+    return nullptr;
 
   XtDisplayInitialize(app_context_, display, app_name.c_str(),
                       class_name.c_str(), nullptr, 0, argc, argv);
@@ -169,14 +169,14 @@ closeDisplay()
 
   XCloseDisplay(display_);
 
-  displays_[screen_num_] = 0;
+  displays_[screen_num_] = nullptr;
 
-  display_      = 0;
+  display_      = nullptr;
   display_name_ = "";
   hostname_     = "";
   display_num_  = 0;
   screen_num_   = 0;
-  app_context_  = 0;
+  app_context_  = nullptr;
 }
 
 void
@@ -196,14 +196,14 @@ setDisplay(Display *display)
   }
   else {
     if (display_)
-      displays_[screen_num_] = 0;
+      displays_[screen_num_] = nullptr;
 
-    display_      = 0;
+    display_      = nullptr;
     display_name_ = "";
     hostname_     = "";
     display_num_  = 0;
     screen_num_   = 0;
-    app_context_  = 0;
+    app_context_  = nullptr;
   }
 }
 
@@ -224,7 +224,7 @@ getScreenDisplay(int screen_num) const
 
   if (screen_num < 0 || screen_num >= num_screens_) {
     CTHROW("Invalid Screen Num");
-    return 0;
+    return nullptr;
   }
 
   if (screen_num_ == screen_num)
@@ -240,7 +240,7 @@ getScreenDisplay(int screen_num) const
   Display *display = XOpenDisplay(display_name1);
 
   if (! display)
-    return 0;
+    return nullptr;
 
   th->displays_[screen_num] = display;
 
@@ -254,7 +254,7 @@ getCXScreen(int screen_num) const
   Display *display = getScreenDisplay(screen_num);
 
   if (! display)
-    return 0;
+    return nullptr;
 
   CXMachine *th = const_cast<CXMachine *>(this);
 
@@ -545,7 +545,7 @@ bool
 CXMachine::
 processEvent()
 {
-  CEventAdapter *event_adapter = 0;
+  CEventAdapter *event_adapter = nullptr;
 
   event_win_ = getEventWindow(&event_);
 
@@ -932,7 +932,7 @@ convertEvent(XEvent *event)
       return &kevent;
     }
     default:
-      return 0;
+      return nullptr;
   }
 }
 
@@ -1002,7 +1002,7 @@ void
 CXMachine::
 nextEvent(XEvent *event) const
 {
-  if (app_context_ != 0)
+  if (app_context_ != nullptr)
     XtAppNextEvent(app_context_, event);
   else
     XNextEvent(display_, event);
@@ -1275,7 +1275,7 @@ lookupWindow(Window xwin) const
       return window;
   }
 
-  return 0;
+  return nullptr;
 }
 
 bool
@@ -1300,7 +1300,7 @@ int
 CXMachine::
 getMulticlickTime() const
 {
-  if (app_context_ != 0)
+  if (app_context_ != nullptr)
     return XtGetMultiClickTime(display_);
   else
     return 500;
@@ -1588,7 +1588,8 @@ createOverrideWindow(int x, int y, int width, int height, int border,
 
   Window xwin =
     XCreateWindow(display_, root, x, y, uint(width), uint(height), uint(border),
-                  CopyFromParent, InputOutput, CopyFromParent, attr_mask, &attr1);
+                  CopyFromParent, InputOutput,
+                  static_cast<Visual *>(CopyFromParent), attr_mask, &attr1);
 
   return xwin;
 }
@@ -1603,7 +1604,8 @@ createWindow(Window parent_xwin, int x, int y, int width, int height,
 
   Window xwin =
     XCreateWindow(display_, parent_xwin, x, y, uint(width), uint(height), uint(border),
-                  CopyFromParent, InputOutput, CopyFromParent, attr_mask, attr);
+                  CopyFromParent, InputOutput,
+                  static_cast<Visual *>(CopyFromParent), attr_mask, attr);
 
   return xwin;
 }
@@ -2359,7 +2361,7 @@ getWMClientMachine(Window xwin, std::string &client_machine)
   if (XGetWMClientMachine(display_, xwin, &text_prop))
     client_machine1 = reinterpret_cast<char *>(text_prop.value);
 
-  if (client_machine1 == 0)
+  if (client_machine1 == nullptr)
     client_machine1 = const_cast<char *>("localhost");
 
   client_machine = client_machine1;
@@ -3471,7 +3473,7 @@ keycodeToKeysym(uint keycode, int state) const
 {
   KeySym keysym;
 
-  if (app_context_ != 0) {
+  if (app_context_ != nullptr) {
     Modifiers modifiers_return;
 
     XtTranslateKeycode(display_, KeyCode(keycode), uint(state), &modifiers_return, &keysym);
@@ -3955,7 +3957,7 @@ selectWindow() const
   Window root = getRoot();
 
   if (! grabPointer(root, ButtonPressMask, cursor.getXCursor()))
-    return 0;
+    return nullptr;
 
   allowEvents(SyncPointer);
 
@@ -3974,7 +3976,7 @@ selectWindow() const
   ungrabPointer();
 
   if (window == None)
-    return 0;
+    return nullptr;
 
   return new CXWindow(window);
 }
@@ -4092,7 +4094,7 @@ void
 CXMachine::
 selectionClearEvent()
 {
-  CXEventAdapter *event_adapter = 0;
+  CXEventAdapter *event_adapter = nullptr;
 
   if (selection_xwin_ != None) {
     CXWindow *window = lookupWindow(selection_xwin_);

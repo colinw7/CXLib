@@ -16,9 +16,9 @@ class CXLibPixelRenderer;
 
 class CXWindowFactory : public CWindowFactory {
  public:
-  CWindow *createWindow(int x, int y, uint width, uint height);
+  CWindow *createWindow(int x, int y, uint width, uint height) override;
 
-  CWindow *createWindow(CWindow *parent, int x, int y, uint width, uint height);
+  CWindow *createWindow(CWindow *parent, int x, int y, uint width, uint height) override;
 };
 
 class CXWindow : public CWindow {
@@ -40,7 +40,7 @@ class CXWindow : public CWindow {
 
   virtual ~CXWindow();
 
-  void destroy();
+  void destroy() override;
 
   virtual CXLibPixelRenderer *getPixelRenderer() const;
 
@@ -76,30 +76,28 @@ class CXWindow : public CWindow {
   ACCESSOR(LastWidth , uint, last_width )
   ACCESSOR(LastHeight, uint, last_height)
 
-  void setEventAdapter(CEventAdapter *adapter);
-
+  void setEventAdapter(CEventAdapter *adapter) override;
   CEventAdapter *getEventAdapter() const { return event_adapter_.get(); }
-
   CXEventAdapter *getXEventAdapter() const;
 
-  virtual void move(int x, int y);
-  virtual void resize(uint width, uint height);
+  virtual void move(int x, int y) override;
+  virtual void resize(uint width, uint height) override;
 
   virtual void setPosition(int x, int y);
 
-  void getPosition(int *x, int *y) const;
+  void getPosition(int *x, int *y) const override;
   void getRootPosition(int *x, int *y) const;
 
   virtual void setSize(uint width, uint height);
 
-  void getSize(uint *width, uint *height) const;
+  void getSize(uint *width, uint *height) const override;
 
-  void getScreenSize(uint *width, uint *height) const;
+  void getScreenSize(uint *width, uint *height) const override;
 
-  virtual void map();
-  virtual void unmap();
+  void map() override;
+  void unmap() override;
 
-  bool isMapped();
+  bool isMapped() override;
 
   Display *getDisplay() const;
 
@@ -127,7 +125,7 @@ class CXWindow : public CWindow {
   void endDoubleBuffer();
   void copyDoubleBuffer();
 
-  virtual void redraw();
+  void redraw() override;
 
   // renderer stuff
   void drawLine(double x1, double y1, double x2, double y2);
@@ -201,25 +199,25 @@ class CXWindow : public CWindow {
 
   bool raiseWait(uint timeout);
 
-  void setWindowTitle(const std::string &title);
-  void getWindowTitle(std::string &title) const;
+  void setWindowTitle(const std::string &title) override;
+  void getWindowTitle(std::string &title) const override;
 
-  void setIconTitle(const std::string &title);
-  void getIconTitle(std::string &title) const;
+  void setIconTitle(const std::string &title) override;
+  void getIconTitle(std::string &title) const override;
 
-  virtual bool setProperty(const std::string &name, const std::string &value);
+  bool setProperty(const std::string &name, const std::string &value) override;
 
-  virtual void iconize();
-  virtual void deiconize();
-  virtual void lower();
-  virtual void raise();
+  void iconize() override;
+  void deiconize() override;
+  void lower() override;
+  void raise() override;
   virtual void minimize();
-  virtual void maximize();
-  virtual void demaximize();
+  void maximize() override;
+  void demaximize() override;
 
-  virtual bool setSelectText(const std::string &str);
+  bool setSelectText(const std::string &str) override;
 
-  void expose();
+  void expose() override;
 
   void flushEvents();
 
@@ -231,7 +229,7 @@ class CXWindow : public CWindow {
 
   void selectionSetText(const std::string &text);
 
-  void beep();
+  void beep() override;
 
   void setShellProperties(const std::string &name);
 
@@ -241,24 +239,24 @@ class CXWindow : public CWindow {
 
   virtual void sendMessage(CXWindow *w, const char *msg);
 
-  virtual bool exposeEvent() { return false; }
-  virtual bool resizeEvent() { return false; }
+  bool exposeEvent() override { return false; }
+  bool resizeEvent() override { return false; }
 
-  virtual bool buttonPressEvent  (const CMouseEvent &) { return false; }
-  virtual bool buttonMotionEvent (const CMouseEvent &) { return false; }
-  virtual bool buttonReleaseEvent(const CMouseEvent &) { return false; }
+  bool buttonPressEvent  (const CMouseEvent &) override { return false; }
+  bool buttonMotionEvent (const CMouseEvent &) override { return false; }
+  bool buttonReleaseEvent(const CMouseEvent &) override { return false; }
 
-  virtual bool keyPressEvent  (const CKeyEvent &) { return false; }
-  virtual bool keyReleaseEvent(const CKeyEvent &) { return false; }
+  bool keyPressEvent  (const CKeyEvent &) override { return false; }
+  bool keyReleaseEvent(const CKeyEvent &) override { return false; }
 
-  virtual bool pointerMotionEvent(const CMouseEvent &) { return false; }
+  bool pointerMotionEvent(const CMouseEvent &) override { return false; }
 
-  virtual bool enterEvent() { return false; }
-  virtual bool leaveEvent() { return false; }
+  bool enterEvent() override { return false; }
+  bool leaveEvent() override { return false; }
 
   virtual bool selectionClearEvent() { return false; }
 
-  virtual bool closeEvent() { return false; }
+  bool closeEvent() override { return false; }
 
   virtual bool idleEvent() { return false; }
 
@@ -319,102 +317,102 @@ class CXWindowEventAdapter : public CXEventAdapter {
 
   CXWindow *getWindow() const { return window_; }
 
-  bool buttonPressEvent(const CMouseEvent &bevent) {
+  bool buttonPressEvent(const CMouseEvent &bevent) override {
     if (! window_->buttonPressEvent(bevent))
       CXMachineInst->getEventAdapter()->buttonPressEvent(bevent);
 
     return true;
   }
 
-  bool buttonMotionEvent(const CMouseEvent &bevent) {
+  bool buttonMotionEvent(const CMouseEvent &bevent) override {
     if (! window_->buttonMotionEvent(bevent))
       CXMachineInst->getEventAdapter()->buttonMotionEvent(bevent);
 
     return true;
   }
 
-  bool buttonReleaseEvent(const CMouseEvent &bevent) {
+  bool buttonReleaseEvent(const CMouseEvent &bevent) override {
     if (! window_->buttonReleaseEvent(bevent))
       CXMachineInst->getEventAdapter()->buttonReleaseEvent(bevent);
 
     return true;
   }
 
-  bool keyPressEvent(const CKeyEvent &kevent) {
+  bool keyPressEvent(const CKeyEvent &kevent) override {
     if (! window_->keyPressEvent(kevent))
       CXMachineInst->getEventAdapter()->keyPressEvent(kevent);
 
     return true;
   }
 
-  bool keyReleaseEvent(const CKeyEvent &kevent) {
+  bool keyReleaseEvent(const CKeyEvent &kevent) override {
     if (! window_->keyReleaseEvent(kevent))
       CXMachineInst->getEventAdapter()->keyReleaseEvent(kevent);
 
     return true;
   }
 
-  bool pointerMotionEvent(const CMouseEvent &bevent) {
+  bool pointerMotionEvent(const CMouseEvent &bevent) override {
     if (! window_->pointerMotionEvent(bevent))
       CXMachineInst->getEventAdapter()->pointerMotionEvent(bevent);
 
     return true;
   }
 
-  bool exposeEvent() {
+  bool exposeEvent() override {
     if (! window_->exposeEvent())
       CXMachineInst->getEventAdapter()->exposeEvent();
 
     return true;
   }
 
-  bool resizeEvent() {
+  bool resizeEvent() override {
     if (! window_->resizeEvent())
       CXMachineInst->getEventAdapter()->resizeEvent();
 
     return true;
   }
 
-  bool enterEvent() {
+  bool enterEvent() override {
     if (! window_->enterEvent())
       CXMachineInst->getEventAdapter()->enterEvent();
 
     return true;
   }
 
-  bool leaveEvent() {
+  bool leaveEvent() override {
     if (! window_->leaveEvent())
       CXMachineInst->getEventAdapter()->leaveEvent();
 
     return true;
   }
 
-  bool visibilityEvent(bool) {
+  bool visibilityEvent(bool) override {
     return false;
   }
 
-  bool selectionClearEvent() {
+  bool selectionClearEvent() override {
     if (! window_->selectionClearEvent())
       CXMachineInst->getEventAdapter()->selectionClearEvent();
 
     return true;
   }
 
-  bool closeEvent() {
+  bool closeEvent() override {
     if (! window_->closeEvent())
       CXMachineInst->getEventAdapter()->closeEvent();
 
     return true;
   }
 
-  bool idleEvent() {
+  bool idleEvent() override {
     if (! window_->idleEvent())
       CXMachineInst->getEventAdapter()->idleEvent();
 
     return true;
   }
 
-  bool clientMessageEvent(void *from, const char *msg) {
+  bool clientMessageEvent(void *from, const char *msg) override {
     if (! window_->clientMessageEvent(reinterpret_cast<CXWindow *>(from), msg))
       return false;
 
