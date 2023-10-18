@@ -20,7 +20,7 @@ class CXtTimer1 {
   static void calltimeOut(void *data, XtIntervalId *id);
 };
 
-XtAppContext           CXtTimer1::app_context_ = 0;
+XtAppContext           CXtTimer1::app_context_ = nullptr;
 std::list<CXtTimer1 *> CXtTimer1::timers_;
 
 CXtTimer::

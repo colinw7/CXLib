@@ -522,7 +522,7 @@ getXGC() const
   if (graphics_)
     return graphics_->getXGC();
   else
-    return 0;
+    return nullptr;
 }
 
 Visual *
