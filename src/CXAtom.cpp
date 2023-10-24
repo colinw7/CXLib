@@ -234,8 +234,8 @@ const CXAtom &
 CXAtomMgr::
 getCXAtom(const std::string &name)
 {
-  CXAtomMap::const_iterator patom1 = atom_map_.find(name);
-  CXAtomMap::const_iterator patom2 = atom_map_.end();
+  auto patom1 = atom_map_.find(name);
+  auto patom2 = atom_map_.end();
 
   if (patom1 != patom2)
     return *((*patom1).second);
