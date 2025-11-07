@@ -621,7 +621,7 @@ createMask(const CImagePtr &image)
 
   GC gc = CXMachineInst->createGC(mask, 0, 0);
 
-  if (image_mask.isValid()) {
+  if (image_mask) {
     CXMachineInst->setForeground(gc, 0);
 
     CXMachineInst->fillRectangle(mask, gc, 0, 0, width, height);

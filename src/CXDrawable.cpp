@@ -230,7 +230,7 @@ CXDrawable::
 drawSubImage(const CImagePtr &image, int src_x, int src_y,
              int dst_x, int dst_y, int width1, int height1)
 {
-  CXImage *ximage = image.cast<CXImage>();
+  auto *ximage = dynamic_cast<CXImage *>(image.get());
 
   XImage *ximg = ximage->getXImage();
 

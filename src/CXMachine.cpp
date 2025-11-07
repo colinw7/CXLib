@@ -6,9 +6,7 @@
 #include <CXUtil.h>
 #include <CXtTimer.h>
 #include <CWindow.h>
-
-#include <X11/XKBlib.h>
-#include <X11/extensions/shape.h>
+#include <CStrUtil.h>
 
 #include <COSSignal.h>
 #include <COSTimer.h>
@@ -17,6 +15,9 @@
 #include <CConfig.h>
 #include <CTimer.h>
 #include <CThrow.h>
+
+#include <X11/XKBlib.h>
+#include <X11/extensions/shape.h>
 
 static bool selection_notify_received;
 
@@ -3372,10 +3373,8 @@ void
 CXMachine::
 drawImage(Window xwin, GC gc, const CImagePtr &image, int x, int y)
 {
-  CXImage *ximage = image.cast<CXImage>();
-
-  if (! ximage)
-    return;
+  auto *ximage = dynamic_cast<CXImage *>(image.get());
+  if (! ximage) return;
 
   XImage *ximg = ximage->getXImage();
 
@@ -3390,10 +3389,8 @@ CXMachine::
 drawImage(Window xwin, GC gc, const CImagePtr &image, int src_x, int src_y,
           int dst_x, int dst_y, uint width, uint height)
 {
-  CXImage *ximage = image.cast<CXImage>();
-
-  if (! ximage)
-    return;
+  auto *ximage = dynamic_cast<CXImage *>(image.get());
+  if (! ximage) return;
 
   XImage *ximg = ximage->getXImage();
 
@@ -3407,10 +3404,8 @@ void
 CXMachine::
 drawAlphaImage(Window xwin, GC gc, const CImagePtr &image, int x, int y)
 {
-  CXImage *ximage = image.cast<CXImage>();
-
-  if (! ximage)
-    return;
+  auto *ximage = dynamic_cast<CXImage *>(image.get());
+  if (! ximage) return;
 
   XImage *ximg = ximage->getXImage();
 

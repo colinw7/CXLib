@@ -803,7 +803,7 @@ CXWindow::
 drawSubImage(const CImagePtr &image, double src_x, double src_y,
              double dst_x, double dst_y, double width1, double height1)
 {
-  CXImage *ximage = image.cast<CXImage>();
+  auto *ximage = dynamic_cast<CXImage *>(image.get());
 
   XImage *ximg = ximage->getXImage();
 

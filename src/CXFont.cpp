@@ -191,7 +191,7 @@ getStringImage(const std::string &str)
 
   image_->setRGBAData(CRGBA(0, 0, 0, 0));
 
-  CXImage *ximage = image_.cast<CXImage>();
+  auto *ximage = dynamic_cast<CXImage *>(image_.get());
 
   Pixmap pixmap = ximage->getXPixmap();
 

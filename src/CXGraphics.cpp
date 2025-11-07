@@ -538,7 +538,7 @@ CXGraphics::
 drawSubAlphaImage(const CImagePtr &image, int src_x, int src_y,
                   int dst_x, int dst_y, int width, int height)
 {
-  if (! image->isTransparent(COptReal(0.5)))
+  if (! image->isTransparent(CImage::OptReal(0.5)))
     return drawSubImage(image, src_x, src_y, dst_x, dst_y, width, height);
 
   CRGBA rgba;
